@@ -23,7 +23,7 @@ def create_random_subset(dataset, n=10):
 def process_true_dataset(true_dataset, fake_dataset_size):
     #dataset = load_dataset(dataset_path)
 
-    true_dataset = true_dataset.select_columns(["response"])
+    true_dataset = true_dataset.select_columns(["response", "instruction", "context"])
     true_dataset = true_dataset.rename_column("response", "text")
 
     # select random samples from true_dataset to match fake_dataset size
@@ -63,7 +63,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer):
         )
 
         # Generate response
-        output = generator(text, skip_special_tokens=False)
+        output = generator(text, skip_special_tokens=True, max_length=512)
         
         fake_responses.append(output)
     return fake_responses
@@ -87,6 +87,10 @@ def filter_instruction(sample, gen_tokenizer):
     generated_response = sample["generated_response"]
 
     response_without_instruction = generated_response.replace(text_template, "")
+
+    # remove newline characters
+    response_without_instruction = response_without_instruction.replace("\n", " ")
+
     return {"generated_response": response_without_instruction}
 
 def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100):
@@ -116,10 +120,10 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
 
     return fake_dataset
 
-def process_fake_dataset(fake_dataset):
+def process_fake_dataset(fake_dataset, gen_tokenizer):
 
     # filter out instruction from generated_response
-    fake_dataset = fake_dataset.map(filter_instruction)
+    fake_dataset = fake_dataset.map(lambda x: filter_instruction(x, gen_tokenizer))
 
     fake_dataset = fake_dataset.map(lambda x: {"label": 1})
 
@@ -128,7 +132,7 @@ def process_fake_dataset(fake_dataset):
 
     # rename generated_response to response
     fake_dataset = fake_dataset.rename_column("generated_response", "text")
-    fake_dataset = fake_dataset.select_columns(["text", "label"])
+    fake_dataset = fake_dataset.select_columns(["text", "label", "instruction", "context"])
 
     return fake_dataset
 
@@ -166,7 +170,24 @@ def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
 
     return merged_dataset
 
+def format_merged_dataset(merged_dataset):
+    """
+    Format the text into a template
+    """
 
+    def format_text(sample):
+
+        text = sample["text"]
+        modified_text = f"Context: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
+
+        return {"text": modified_text}
+    
+    merged_dataset = merged_dataset.map(format_text)
+    
+    # only keep text and label
+    merged_dataset = merged_dataset.select_columns(["text", "label"])
+
+    return merged_dataset
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -203,11 +224,14 @@ if __name__ == "__main__":
     true_dataset.save_to_disk("true_dataset")
 
     # process fake dataset
-    fake_dataset = process_fake_dataset(fake_dataset)
+    fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer)
     fake_dataset.save_to_disk("fake_dataset")
 
     # merge true and fake dataset
     merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset)
+
+    # format merged dataset into a template
+    merged_dataset = format_merged_dataset(merged_dataset)
 
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
