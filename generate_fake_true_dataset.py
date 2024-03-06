@@ -7,27 +7,28 @@ from tqdm import tqdm
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
 
-from genenerator import LLMGenerator
+from generator import LLMGenerator
 
 
-def create_random_subset(dataset, n=10):
+def create_random_subset(dataset, n=10, seed=42):
     """
     Create a random subset of the dataset
     """
     if n > len(dataset):
         n = len(dataset)
+    np.random.seed(seed)
     indices = np.random.choice(len(dataset), n, replace=False)
     subset = dataset.select(indices)
     return subset
 
-def process_true_dataset(true_dataset, fake_dataset_size):
+def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     #dataset = load_dataset(dataset_path)
 
     true_dataset = true_dataset.select_columns(["response", "instruction", "context"])
     true_dataset = true_dataset.rename_column("response", "text")
 
     # select random samples from true_dataset to match fake_dataset size
-    true_dataset = true_dataset.shuffle(seed=42)
+    true_dataset = true_dataset.shuffle(seed=seed)
     #true_dataset = true_dataset.select(range(len(fake_dataset["train"])))
     #true_dataset = true_dataset.select(range(fake_dataset_size))
     true_dataset["train"] = true_dataset["train"].select(range(fake_dataset_size))
@@ -41,7 +42,7 @@ def process_true_dataset(true_dataset, fake_dataset_size):
     return true_dataset
 
 
-def generate_fake_responses(generator, true_dataset, gen_tokenizer):
+def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens):
     """
     Traverse dataset and generate responses for each instruction
     """
@@ -63,7 +64,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer):
         )
 
         # Generate response
-        output = generator(text, skip_special_tokens=False, max_length=512)
+        output = generator(text, skip_special_tokens=False, max_new_tokens=max_new_tokens)
         
         fake_responses.append(output)
     return fake_responses
@@ -107,7 +108,7 @@ def filter_instruction(sample):
 
     return {"generated_response": response_without_instruction}
 
-def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100):
+def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100, max_new_tokens=100, seed=42):
     
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
@@ -121,10 +122,10 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     print(f"Percent of data discarded after filtering out input > max_nb_tokens: {100*(1 - dataset_after_len/dataset_before_len):.2f}%")
 
     subset_size = fake_dataset_size
-    train_subset = create_random_subset(true_dataset["train"], n=subset_size)
+    train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
 
     
-    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer)
+    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens)
 
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
     "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"]})
@@ -150,14 +151,14 @@ def process_fake_dataset(fake_dataset, gen_tokenizer):
 
     return fake_dataset
 
-def merge_true_fake_dataset(true_dataset, fake_dataset):
+def merge_true_fake_dataset(true_dataset, fake_dataset, seed=42):
     
     merged = concatenate_datasets([true_dataset["train"], fake_dataset["train"]])
     merged_dataset = DatasetDict()
     merged_dataset["train"] = merged
 
     # shuffle the dataset
-    merged_dataset = merged_dataset.shuffle(seed=42)
+    merged_dataset = merged_dataset.shuffle(seed=seed)
 
     # save merged dataset
     #merged_dataset.save_to_disk("merged_dataset")
@@ -192,7 +193,7 @@ def format_merged_dataset(merged_dataset):
     def format_text(sample):
 
         text = sample["text"]
-        modified_text = f"Context: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
+        modified_text = f"Instruction: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
 
         return {"text": modified_text}
     
@@ -213,8 +214,12 @@ if __name__ == "__main__":
     parser.add_argument("--device", type=str, help="Device to use for the generator", default="cuda")
     parser.add_argument("--validation_size", type=float, help="Size of the validation set", default=0.1)
     parser.add_argument("--test_size", type=float, help="Size of the test set", default=0.1)
+    parser.add_argument("--max_new_tokens", type=int, help="Max length of the generated response", default=512)
+    parser.add_argument("--seed", type=int, help="Seed for random number generator", default=42)
 
     args = parser.parse_args()
+
+    # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 
     # load generator
     if args.generator == "qwen":
@@ -231,10 +236,10 @@ if __name__ == "__main__":
     true_dataset = load_dataset(args.true_dataset_path)
 
     # generate fake dataset
-    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input)
+    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed)
 
     # process true dataset
-    true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size)
+    true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
     true_dataset.save_to_disk("true_dataset")
 
     # process fake dataset
@@ -242,7 +247,7 @@ if __name__ == "__main__":
     fake_dataset.save_to_disk("fake_dataset")
 
     # merge true and fake dataset
-    merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset)
+    merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset, args.seed)
 
     # format merged dataset into a template
     merged_dataset = format_merged_dataset(merged_dataset)
