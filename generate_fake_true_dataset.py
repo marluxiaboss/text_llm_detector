@@ -42,13 +42,13 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     return true_dataset
 
 
-def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens):
+def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens, batch_size=2):
     """
     Traverse dataset and generate responses for each instruction
     """
 
     fake_responses = []
-
+    """
     # TODO: improve this loop by parallelizing/batch
     for data in tqdm(true_dataset, desc="Generating fake responses"):
         # Create query in the format that the generator expects
@@ -67,6 +67,31 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         output = generator(text, skip_special_tokens=False, max_new_tokens=max_new_tokens)
         
         fake_responses.append(output)
+    """
+
+    # batch generation
+    batch_size = batch_size
+    # transform into chat template
+    def transform_chat_template(sample):
+        text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": f"{text_instruction}"},
+        ]
+        text_template = gen_tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        return {"text_template": text_template}
+    
+    true_dataset = true_dataset.map(transform_chat_template)
+    true_dataset_list = true_dataset["text_template"]
+    
+    for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
+        batch = true_dataset_list[i:i+batch_size]
+        responses = generator(batch, max_new_tokens=max_new_tokens, skip_special_tokens=False)
+        fake_responses.extend(responses)
     return fake_responses
 
 def filter_instruction(sample):
@@ -108,7 +133,7 @@ def filter_instruction(sample):
 
     return {"generated_response": response_without_instruction}
 
-def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100, max_new_tokens=100, seed=42):
+def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100, max_new_tokens=100, seed=42, batch_size=2):
     
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
@@ -125,7 +150,7 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
 
     
-    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens)
+    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size)
 
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
     "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"]})
@@ -216,6 +241,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_size", type=float, help="Size of the test set", default=0.1)
     parser.add_argument("--max_new_tokens", type=int, help="Max length of the generated response", default=512)
     parser.add_argument("--seed", type=int, help="Seed for random number generator", default=42)
+    parser.add_argument("--batch_size", type=int, help="Batch size for generation", default=2)
 
     args = parser.parse_args()
 
@@ -225,7 +251,7 @@ if __name__ == "__main__":
     if args.generator == "qwen":
         gen_path = "Qwen/Qwen1.5-0.5B-Chat"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
         generator = LLMGenerator(gen_model, gen_tokenizer)
 
     else:
@@ -236,7 +262,7 @@ if __name__ == "__main__":
     true_dataset = load_dataset(args.true_dataset_path)
 
     # generate fake dataset
-    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed)
+    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size)
 
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
