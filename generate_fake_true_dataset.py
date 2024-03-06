@@ -63,16 +63,17 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer):
         )
 
         # Generate response
-        output = generator(text, skip_special_tokens=True, max_length=512)
+        output = generator(text, skip_special_tokens=False, max_length=512)
         
         fake_responses.append(output)
     return fake_responses
 
-def filter_instruction(sample, gen_tokenizer):
+def filter_instruction(sample):
     """
+    Filter out the instruction from the generated response
     Note: only works if special tokens are not removed
     """
-
+    """
     text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
@@ -88,6 +89,19 @@ def filter_instruction(sample, gen_tokenizer):
 
     response_without_instruction = generated_response.replace(text_template, "")
 
+    """
+    def remove_string_between(str, str_beg, str_end):
+        return str.split(str_beg)[0] + str_end + str.split(str_end)[1]
+
+    # removing everything between system and user (including system and user)
+    """
+    str_beg = "system"
+    str_end = "assistant"
+    response_without_instruction = remove_string_between(sample["generated_response"], str_beg, str_end).strip()
+    response_without_instruction = sample["generated_response"]
+    """
+
+    response_without_instruction = sample["generated_response"]
     # remove newline characters
     response_without_instruction = response_without_instruction.replace("\n", " ")
 
@@ -123,7 +137,7 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
 def process_fake_dataset(fake_dataset, gen_tokenizer):
 
     # filter out instruction from generated_response
-    fake_dataset = fake_dataset.map(lambda x: filter_instruction(x, gen_tokenizer))
+    fake_dataset = fake_dataset.map(lambda x: filter_instruction(x))
 
     fake_dataset = fake_dataset.map(lambda x: {"label": 1})
 
