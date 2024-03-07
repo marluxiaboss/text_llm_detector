@@ -32,3 +32,9 @@ class LLMDetector(nn.Module):
     # apply sigmoid to get probabilities of each class
     output = torch.sigmoid(logits)
     return output
+  
+  @staticmethod
+  def freeze_base(bert_model):
+    for name, param in bert_model.named_parameters():
+      if not name.startswith("classifier"):
+        param.requires_grad = False

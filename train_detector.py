@@ -43,11 +43,11 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
         warmup_ratio=warmup_ratio,
         weight_decay=weight_decay,
         learning_rate=learning_rate,
-        logging_steps=50,
-        eval_steps=100,
+        logging_steps=0.05,
+        eval_steps=0.1,
         # This is important to set evaluation strategy, otherwise there will be no evaluation
         evaluation_strategy="steps",
-        save_steps=200,
+        save_steps=0.2,
         save_total_limit=4,
         #logging_dir="./logs",
         #report_to="wandb",
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str, help="Path to the fake true dataset (generated with generate_fake_true_dataset.py)", default="fake_true_dataset")
     parser.add_argument("--batch_size", type=int, help="Batch size to train the model", default=8)
     parser.add_argument("--num_epochs", type=int, help="Number of epochs to train the model", default=3)
-    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=2e-5)
+    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=1e-3)
     parser.add_argument("--warmup_ratio", type=float, help="Warmup ratio for the model", default=0.1)
     parser.add_argument("--weight_decay", type=float, help="Weight decay for the model", default=0.01)
     parser.add_argument("--device", type=str, help="Device to train the model", default="cuda")
@@ -161,7 +161,10 @@ if __name__ == "__main__":
             detector_path = "FacebookAI/roberta-base"
             detector_model = RobertaForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+            if args.freeze_base == "True":
+                LLMDetector.freeze_base(detector_model)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
         else:
             raise ValueError("No other detector currently supported")
 
