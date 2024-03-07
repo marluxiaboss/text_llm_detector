@@ -21,7 +21,7 @@ from detector import LLMDetector
 def tokenize_text(x, tokenizer):
     return tokenizer(x["text"], truncation=True, padding="max_length")
 
-def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weight_decay, batch_size):
+def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
 
 
     metric = evaluate.load("accuracy")
@@ -36,7 +36,7 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        #output_dir="./results",
+        output_dir=save_dir,
         num_train_epochs=num_epochs,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str, help="Path to the fake true dataset (generated with generate_fake_true_dataset.py)", default="fake_true_dataset")
     parser.add_argument("--batch_size", type=int, help="Batch size to train the model", default=8)
     parser.add_argument("--num_epochs", type=int, help="Number of epochs to train the model", default=3)
-    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=5e-5)
+    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=2e-5)
     parser.add_argument("--warmup_ratio", type=float, help="Warmup ratio for the model", default=0.1)
     parser.add_argument("--weight_decay", type=float, help="Weight decay for the model", default=0.01)
     parser.add_argument("--device", type=str, help="Device to train the model", default="cuda")
@@ -137,6 +137,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_path", type=str, help="Path to the model to evaluate", default="model")
     parser.add_argument("--log_mode", type=str, help="'offline' or 'online' (wandb)", default="offline")
     parser.add_argument("--freeze_base", type=str, help="Whether to freeze the base model", default="False")
+    parser.add_argument("--save_dir", type=str, help="Directory to save the model", default="./outputs")
     args = parser.parse_args()
 
 
@@ -145,10 +146,8 @@ if __name__ == "__main__":
 
     # set wandb to offline mode
     if args.log_mode == "offline":
-        print("Nooo")
         os.environ["WANDB_MODE"] = "offline"
     elif args.log_mode == "online":
-        print("whoaa")
         os.environ["WANDB_MODE"] = "online"
     else:
         raise ValueError("Log mode must be either 'offline' or 'online'")
@@ -167,7 +166,7 @@ if __name__ == "__main__":
             raise ValueError("No other detector currently supported")
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
-        run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size)
+        run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
 
  
     elif args.evaluation == "True":
@@ -177,7 +176,7 @@ if __name__ == "__main__":
         bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
-        metric = evaluate.load("accuracy")
+        metric = evaluate.combine(["accuracy", "f1", "precision", "recall"])
 
         def compute_metrics(eval_pred):
             logits, labels = eval_pred
@@ -189,14 +188,20 @@ if __name__ == "__main__":
             model=model,
             args=TrainingArguments(
                 per_device_eval_batch_size=8,
-                report_to="wandb",
+                #report_to="wandb",
                 output_dir="./results",
             ),
             compute_metrics=compute_metrics,
-            eval_dataset=dataset["valid"]
+            eval_dataset=dataset["test"]
         )
-        trainer.evaluate()
-
+        
+        predictions = trainer.predict(dataset["test"])
+        preds = np.argmax(predictions.predictions, axis=-1)
+        results = metric.compute(predictions=preds, references=predictions.label_ids)
+        
+        print("Test metrics:")
+        for key, value in results.items():
+            print(f"{key}: {value}")
     else:
         raise ValueError("Evaluation mode must be either True or False")
 

@@ -254,6 +254,12 @@ if __name__ == "__main__":
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
         generator = LLMGenerator(gen_model, gen_tokenizer)
 
+    elif args.generator == "gpt2":
+        gen_path = "openai-community/gpt2"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
+        generator = LLMGenerator(gen_model, gen_tokenizer)
+
     else:
         # no other generator is supported for now
         raise ValueError("Generator not supported")

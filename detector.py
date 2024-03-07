@@ -5,7 +5,7 @@ import numpy as np
 
 
 class LLMDetector(nn.Module):
-  def __init__(self, bert_model, tokenizer, num_classes):
+  def __init__(self, bert_model, tokenizer, num_classes, freeze_bert=False):
     super().__init__()
 
     self.tokenizer = tokenizer
@@ -16,6 +16,11 @@ class LLMDetector(nn.Module):
 
     # set num_classes
     self.num_classes = num_classes
+
+    if freeze_bert:
+      for name, param in self.bert.named_parameters():
+        if not name.startswith("classifier"):
+          param.requires_grad = False
 
   def forward(self, text):
 
