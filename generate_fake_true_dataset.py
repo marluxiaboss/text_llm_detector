@@ -74,7 +74,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     # batch generation
     batch_size = batch_size
     # transform into chat template
-    def transform_chat_template(sample):
+    def transform_chat_template(sample, use_chat_template=False):
 
         text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
         if use_chat_template:
@@ -100,7 +100,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
             text_template = text_instruction
         return {"text_template": text_template}
     
-    true_dataset = true_dataset.map(transform_chat_template)
+    true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
     true_dataset_list = true_dataset["text_template"]
     
     for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
@@ -315,7 +315,7 @@ if __name__ == "__main__":
     true_dataset = load_dataset(args.true_dataset_path)
 
     # generate fake dataset
-    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=False, template_type=template_type)
+    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
 
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)

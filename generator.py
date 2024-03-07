@@ -54,7 +54,6 @@ class LLMGenerator(nn.Module):
     #decoded_outputs = self.tokenizer.batch_decode(output_ids, skip_special_tokens=skip_special_tokens)
     decoded_outputs = self.tokenizer.batch_decode(output_ids[:, input_ids.shape[1]:])
         
-
     # remove special tokens from the generated text
     special_tokens = self.tokenizer.additional_special_tokens + [self.tokenizer.pad_token] + [self.tokenizer.eos_token]
     for i, sample in enumerate(samples):
