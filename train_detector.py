@@ -45,7 +45,7 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
         weight_decay=weight_decay,
         learning_rate=learning_rate,
         logging_steps=50,
-        eval_steps=100,
+        eval_steps=1,
         # This is important to set evaluation strategy, otherwise there will be no evaluation
         evaluation_strategy="steps",
         save_steps=200,
@@ -68,6 +68,7 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
         
         def on_evaluate(self, args, state, control, **kwargs):
             if control.should_evaluate:
+                print("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
                 control_copy = deepcopy(control)
                 self._trainer.evaluate(eval_dataset=self._trainer.train_dataset, metric_key_prefix="train")
                 return control_copy
