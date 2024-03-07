@@ -3,6 +3,7 @@ import numpy as np
 import pandas
 import argparse
 from tqdm import tqdm
+import os
 
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
@@ -42,7 +43,7 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     return true_dataset
 
 
-def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens, batch_size=2):
+def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens, batch_size=2, use_chat_template=False, template_type=None):
     """
     Traverse dataset and generate responses for each instruction
     """
@@ -73,16 +74,29 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     batch_size = batch_size
     # transform into chat template
     def transform_chat_template(sample):
+
         text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"{text_instruction}"},
-        ]
-        text_template = gen_tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
+        if use_chat_template:
+            match template_type:
+                case "system_user":
+                    messages = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": f"{text_instruction}"},
+                    ]
+                case "user":
+                    messages = [
+                    {"role": "user", "content": f"{text_instruction}"},
+                    ]
+                case _:
+                    raise ValueError("Template type not supported")
+
+            text_template = gen_tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+        else:
+            text_template = text_instruction
         return {"text_template": text_template}
     
     true_dataset = true_dataset.map(transform_chat_template)
@@ -90,7 +104,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     
     for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
         batch = true_dataset_list[i:i+batch_size]
-        responses = generator(batch, max_new_tokens=max_new_tokens, skip_special_tokens=False)
+        responses = generator(batch, max_new_tokens=max_new_tokens, skip_special_tokens=True)
         fake_responses.extend(responses)
     return fake_responses
 
@@ -133,7 +147,7 @@ def filter_instruction(sample):
 
     return {"generated_response": response_without_instruction}
 
-def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100, max_new_tokens=100, seed=42, batch_size=2):
+def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100, max_new_tokens=100, seed=42, batch_size=2, use_chat_template=False, template_type=None):
     
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
@@ -150,7 +164,7 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
 
     
-    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size)
+    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type)
 
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
     "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"]})
@@ -242,8 +256,20 @@ if __name__ == "__main__":
     parser.add_argument("--max_new_tokens", type=int, help="Max length of the generated response", default=512)
     parser.add_argument("--seed", type=int, help="Seed for random number generator", default=42)
     parser.add_argument("--batch_size", type=int, help="Batch size for generation", default=2)
+    parser.add_argument("--experiment_name", type=str, help="Name of the experiment", default="test_experiment")
+    parser.add_argument("--access_token", type=str, help="Huggingface access token used for Llama and Gemma", default="")
 
     args = parser.parse_args()
+
+    # check if the dataset already exists for the given experiment name
+    if (os.path.exists(f"true_dataset_{args.experiment_name}")
+        or os.path.exists(f"fake_dataset_{args.experiment_name}")
+        or os.path.exists(f"fake_true_dataset_{args.experiment_name}")):
+        print("Warning: dataset already exists for the given experiment name, do you want to overwrite it?")
+        answer = input("yes/no: ")
+        if answer != "yes":
+            exit()
+
 
     # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 
@@ -254,12 +280,32 @@ if __name__ == "__main__":
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
         generator = LLMGenerator(gen_model, gen_tokenizer)
 
+        #template for chat
+        use_chat_template = True
+        template_type ="system_user"
+
     elif args.generator == "gpt2":
         gen_path = "openai-community/gpt2"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
         generator = LLMGenerator(gen_model, gen_tokenizer)
 
+        # special for gpt2
+        gen_tokenizer.pad_token = gen_tokenizer.eos_token
+        gen_tokenizer.padding_side = 'left'
+
+        #template for chat
+        use_chat_template = False
+        template_type = None
+    elif args.generator == "gemma_2b":
+        gen_path = "google/gemma-2b-it"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token).to(args.device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=args.access_token)
+        generator = LLMGenerator(gen_model, gen_tokenizer)
+
+        #template for chat
+        use_chat_template = True
+        template_type ="user"
     else:
         # no other generator is supported for now
         raise ValueError("Generator not supported")
@@ -268,15 +314,15 @@ if __name__ == "__main__":
     true_dataset = load_dataset(args.true_dataset_path)
 
     # generate fake dataset
-    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size)
+    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=False, template_type=template_type)
 
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
-    true_dataset.save_to_disk("true_dataset")
+    true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
 
     # process fake dataset
     fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer)
-    fake_dataset.save_to_disk("fake_dataset")
+    fake_dataset.save_to_disk(f"fake_dataset_{args.experiment_name}")
 
     # merge true and fake dataset
     merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset, args.seed)
@@ -286,7 +332,7 @@ if __name__ == "__main__":
 
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
-    merged_dataset.save_to_disk("fake_true_dataset")
+    merged_dataset.save_to_disk(f"fake_true_dataset_{args.experiment_name}")
 
 
 

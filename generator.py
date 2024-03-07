@@ -48,17 +48,16 @@ class LLMGenerator(nn.Module):
         output_ids = self.gpt.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
 
     # decode the generated text
-    decoded_outputs = self.tokenizer.batch_decode(output_ids, skip_special_tokens=skip_special_tokens)
+    #decoded_outputs = self.tokenizer.batch_decode(output_ids, skip_special_tokens=skip_special_tokens)
+    decoded_outputs = self.tokenizer.batch_decode(output_ids[:, input_ids.shape[1]:])
+        
 
-    # remove the input text and special tokens from the generated text
-    special_tokens = self.tokenizer.additional_special_tokens + [self.tokenizer.pad_token]
+    # remove special tokens from the generated text
+    special_tokens = self.tokenizer.additional_special_tokens + [self.tokenizer.pad_token] + [self.tokenizer.eos_token]
     for i, sample in enumerate(samples):
-        #print("sample: ", sample)
-        #print("decoded_outputs[i] bef: ", decoded_outputs[i])
-        decoded_output = decoded_outputs[i].replace(sample, "").strip()
+        decoded_output = decoded_outputs[i]
         for special_token in special_tokens:
             decoded_output = decoded_output.replace(special_token, "")
-        #print("decoded_outputs[i] bef: ", decoded_outputs[i])
         decoded_outputs[i] = decoded_output
 
     return decoded_outputs
