@@ -4,6 +4,7 @@ import pandas
 import argparse
 from tqdm import tqdm
 import os
+import torch
 
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
@@ -299,9 +300,9 @@ if __name__ == "__main__":
         template_type = None
     elif args.generator == "gemma_2b":
         gen_path = "google/gemma-2b-it"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token).to(args.device)
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token, torch_dtype=torch.bfloat16).to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=args.access_token)
-        generator = LLMGenerator(gen_model, gen_tokenizer)
+        generator = LLMGenerator(gen_model, gen_tokenizer, args.device)
 
         #template for chat
         use_chat_template = True

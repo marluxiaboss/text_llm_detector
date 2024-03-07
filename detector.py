@@ -5,14 +5,18 @@ import numpy as np
 
 
 class LLMDetector(nn.Module):
-  def __init__(self, bert_model, tokenizer, num_classes, freeze_bert=False):
+  def __init__(self, bert_model, tokenizer, num_classes, freeze_bert=False, device=None):
     super().__init__()
 
     self.tokenizer = tokenizer
 
     # bert should already be trained
     self.bert = bert_model
-    self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    if device is None:
+      self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+      self.device = device
 
     # set num_classes
     self.num_classes = num_classes

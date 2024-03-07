@@ -2,13 +2,16 @@ import torch
 import torch.nn as nn
 
 class LLMGenerator(nn.Module):
-  def __init__(self, gpt_model, tokenizer):
+  def __init__(self, gpt_model, tokenizer, device=None):
     super().__init__()
 
     # gpt should already be trained
     self.gpt = gpt_model
     self.tokenizer = tokenizer
-    self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if device is None:
+      self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+      self.device = device
 
   def forward_old(self, text, max_length=512, max_new_tokens=100, temperature=1, top_k=50, top_p=0.9, repetition_penalty=1, skip_special_tokens=True):
 
