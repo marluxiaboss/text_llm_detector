@@ -27,7 +27,6 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
     metric = evaluate.load("accuracy")
 
     def compute_metrics(eval_pred):
-        print("OK")
         logits, labels = eval_pred
         predictions = np.argmax(logits, axis=-1)
         print("labels", labels)
@@ -37,7 +36,7 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        output_dir="./results",
+        #output_dir="./results",
         num_train_epochs=num_epochs,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
@@ -45,33 +44,31 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
         weight_decay=weight_decay,
         learning_rate=learning_rate,
         logging_steps=50,
-        eval_steps=1,
+        eval_steps=100,
         # This is important to set evaluation strategy, otherwise there will be no evaluation
         evaluation_strategy="steps",
         save_steps=200,
         save_total_limit=4,
-        logging_dir="./logs",
+        #logging_dir="./logs",
         #report_to="wandb",
-        seed=42
-
-
+        seed=42,
+        fp16=True,
     )
 
+    """
     class CustomCallback(TrainerCallback):
-        """
-        Adds metric for training
-        """
         
         def __init__(self, trainer) -> None:
             super().__init__()
             self._trainer = trainer
         
         def on_evaluate(self, args, state, control, **kwargs):
-            if control.should_evaluate:
-                print("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
-                control_copy = deepcopy(control)
-                self._trainer.evaluate(eval_dataset=self._trainer.train_dataset, metric_key_prefix="train")
-                return control_copy
+            control_copy = deepcopy(control)
+            self._trainer.evaluate(eval_dataset=self._trainer.train_dataset, metric_key_prefix="train")
+            return control_copy
+    """
+        
+
     
     """
     class CustomTrainer(Trainer):
@@ -121,7 +118,7 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
         compute_metrics=compute_metrics,
         data_collator=data_collator
     )
-    trainer.add_callback(CustomCallback(trainer))
+    #trainer.add_callback(CustomCallback(trainer))
     trainer.train()
 
 
@@ -136,36 +133,44 @@ if __name__ == "__main__":
     parser.add_argument("--warmup_ratio", type=float, help="Warmup ratio for the model", default=0.1)
     parser.add_argument("--weight_decay", type=float, help="Weight decay for the model", default=0.01)
     parser.add_argument("--device", type=str, help="Device to train the model", default="cuda")
-    parser.add_argument("--evaluation_mode", type=bool, help="Evaluation mode for the model", default="False")
+    parser.add_argument("--evaluation", type=str, help="Evaluation mode for the model: True or False", default="False")
     parser.add_argument("--model_path", type=str, help="Path to the model to evaluate", default="model")
-    parser.add_argument("--offline", type=bool, help="Offline mode for wandb", default="False")
+    parser.add_argument("--log_mode", type=str, help="'offline' or 'online' (wandb)", default="offline")
+    parser.add_argument("--freeze_base", type=str, help="Whether to freeze the base model", default="False")
     args = parser.parse_args()
 
 
     os.environ["WANDB_PROJECT"] = "gen_detector"  # name your W&B project
     os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
+
     # set wandb to offline mode
-    if args.offline:
+    if args.log_mode == "offline":
+        print("Nooo")
         os.environ["WANDB_MODE"] = "offline"
-    else:
+    elif args.log_mode == "online":
+        print("whoaa")
         os.environ["WANDB_MODE"] = "online"
+    else:
+        raise ValueError("Log mode must be either 'offline' or 'online'")
     
     dataset = load_from_disk(args.dataset_path)
 
-    #if not args.evaluation_mode:
-    if args.detector == "roberta":
-        detector_path = "openai-community/roberta-base-openai-detector"
-        detector_model = RobertaForSequenceClassification.from_pretrained(detector_path).to(args.device)
-        bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
-        detector = LLMDetector(detector_model, bert_tokenizer, 2)
-    else:
-        raise ValueError("No other detector currently supported")
+    if args.evaluation == "False":
+        if args.detector == "roberta":
+            #detector_path = "openai-community/roberta-base-openai-detector"
+            #detector_path = "FacebookAI/roberta-large"
+            detector_path = "FacebookAI/roberta-base"
+            detector_model = RobertaForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+        else:
+            raise ValueError("No other detector currently supported")
 
-    dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
-    run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size)
+        dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
+        run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size)
 
-    """
-    else:
+ 
+    elif args.evaluation == "True":
         model = RobertaForSequenceClassification.from_pretrained(args.model_path).to(args.device)
         # tokenize text
         detector_path = "openai-community/roberta-base-openai-detector"
@@ -191,7 +196,9 @@ if __name__ == "__main__":
             eval_dataset=dataset["valid"]
         )
         trainer.evaluate()
-    """
+
+    else:
+        raise ValueError("Evaluation mode must be either True or False")
 
     
 
