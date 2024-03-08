@@ -38,6 +38,10 @@
 
 - Test transferability + compare
 - Create a table for each detector with detector trained on specific geneartor on x-axis and generator on y axis 
+
+
+
+                                            
 |                                              | generator_1 | generator_2 | generator_3 | ... |   | generator_1_FT_chat | generator_not_seen | generator_not_seen_FT_chat |   |
 |----------------------------------------------|-------------|-------------|-------------|-----|---|---------------------|--------------------|----------------------------|---|
 | detector_1_trained_on_gen1                   |             |             |             |     |   |                     |                    |                            |   |
@@ -45,6 +49,9 @@
 | detector_1_trained_on_gen3                   |             |             |             |     |   |                     |                    |                            |   |
 | ...                                          |             |             |             |     |   |                     |                    |                            |   |
 | detector_1_trained_on_gen1,2,3 (Round Robin) |             |             |             |     |   |                     |                    |                            |   |
+
+
+
 
 
 - Train until degradation threshold (depending on experience 2)
