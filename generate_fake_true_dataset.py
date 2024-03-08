@@ -244,13 +244,22 @@ def format_merged_dataset(merged_dataset):
 
     return merged_dataset
 
+def format_news_dataset(true_dataset, prefix_cutoff=10):
+    true_dataset["instuction"] = true_dataset["article"].apply(lambda x: " ".join(x.split()[:prefix_cutoff]))
+    true_dataset["context"] = ""
+    true_dataset["response"] = true_dataset["article"].apply(lambda x: " ".join(x.split()[prefix_cutoff:]))
+    true_dataset["category"] = "news"
+    true_dataset = true_dataset.remove_columns(["article"])
+    true_dataset = true_dataset.remove_columns(["highlights"])
+    return true_dataset
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--true_dataset_path", type=str, help="Path to the true dataset (hugginface dataset path)", default="databricks/databricks-dolly-15k")
     parser.add_argument("--fake_dataset_size", type=int, help="Size of the fake dataset", default=10)
     parser.add_argument("--max_nb_tokens_input", type=int, help="Max number of tokens for input", default=100)
-    parser.add_argument("--generator", type=str, help="Generator model name between 'qwen', 'phi', 'gemma', 'mistral', 'gpt2', default="qwen")
+    parser.add_argument("--generator", type=str, help="Generator model name between 'qwen', 'phi', 'gemma', 'mistral', 'gpt2'", default="qwen")
     parser.add_argument("--device", type=str, help="Device to use for the generator", default="cuda")
     parser.add_argument("--validation_size", type=float, help="Size of the validation set", default=0.1)
     parser.add_argument("--test_size", type=float, help="Size of the test set", default=0.1)
@@ -311,8 +320,20 @@ if __name__ == "__main__":
         # no other generator is supported for now
         raise ValueError("Generator not supported")
     
-    # load true dataset
-    true_dataset = load_dataset(args.true_dataset_path)
+
+    if args.true_dataset_path == "databricks/databricks-dolly-15k":
+        # load true dataset
+        true_dataset = load_dataset(args.true_dataset_path)
+
+    elif args.true_dataset_path == 'cnn_dailymail':
+        # load true dataset from disk
+        true_dataset = load_dataset(args.true_dataset_path, "3.0.0")
+
+        # format dataset to have the same columns as the other datasets: "instruction", "context", "response", "category"
+        true_dataset = format_news_dataset(true_dataset["train"])        
+
+    else:
+        raise ValueError("Dataset not supported")
 
     # generate fake dataset
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
