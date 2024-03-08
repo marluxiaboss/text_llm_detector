@@ -250,7 +250,7 @@ if __name__ == "__main__":
     parser.add_argument("--true_dataset_path", type=str, help="Path to the true dataset (hugginface dataset path)", default="databricks/databricks-dolly-15k")
     parser.add_argument("--fake_dataset_size", type=int, help="Size of the fake dataset", default=10)
     parser.add_argument("--max_nb_tokens_input", type=int, help="Max number of tokens for input", default=100)
-    parser.add_argument("--generator", type=str, help="Generator model name between 'QWEN' and TODO", default="qwen")
+    parser.add_argument("--generator", type=str, help="Generator model name between 'qwen', 'phi', 'gemma', 'mistral', 'gpt2', default="qwen")
     parser.add_argument("--device", type=str, help="Device to use for the generator", default="cuda")
     parser.add_argument("--validation_size", type=float, help="Size of the validation set", default=0.1)
     parser.add_argument("--test_size", type=float, help="Size of the test set", default=0.1)

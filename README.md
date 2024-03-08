@@ -7,8 +7,6 @@
 - train or use different techniques to make the generator evade the detector
 
 
-
-
 ## File structure
 
 
@@ -21,3 +19,40 @@
 
 ### 2. Training an LLM to detect LLM generated responses
 - `train_detector.py`: finetune a pretrained detector on the dataset generated using `generate_fake_true_dataset.py` 
+
+
+## Experiences
+
+### Experience 1
+
+- Finetune classification head only to detect LLM generated response
+- Compare performance of BERT, Roberta, Electra et T5
+
+### Experience 2
+
+- Full finetuning of the detector
+- Detect degradation of MLM task using JudgeLLM (check each 1000 samples for example) and correct degradation
+
+### Experience 3
+
+- Test transferability + compare
+- Create a table for each detector with detector trained on specific geneartor on x-axis and generator on y axis 
+|                                              | generator_1 | generator_2 | generator_3 | ... |   | generator_1_FT_chat | generator_not_seen | generator_not_seen_FT_chat |   |
+|----------------------------------------------|-------------|-------------|-------------|-----|---|---------------------|--------------------|----------------------------|---|
+| detector_1_trained_on_gen1                   |             |             |             |     |   |                     |                    |                            |   |
+| detector_1_trained_on_gen2                   |             |             |             |     |   |                     |                    |                            |   |
+| detector_1_trained_on_gen3                   |             |             |             |     |   |                     |                    |                            |   |
+| ...                                          |             |             |             |     |   |                     |                    |                            |   |
+| detector_1_trained_on_gen1,2,3 (Round Robin) |             |             |             |     |   |                     |                    |                            |   |
+
+
+- Train until degradation threshold (depending on experience 2)
+
+### Experience 4
+- Same but add evasive prompt
+
+
+## Dataset used
+
+- EMNLP news
+- Instruction dataset (dolly), not sure
