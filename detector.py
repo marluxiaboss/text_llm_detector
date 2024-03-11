@@ -40,5 +40,5 @@ class LLMDetector(nn.Module):
   @staticmethod
   def freeze_base(bert_model):
     for name, param in bert_model.named_parameters():
-      if not name.startswith("classifier"):
+      if not name.startswith("classifier") and not name.startswith("classification_head"):
         param.requires_grad = False

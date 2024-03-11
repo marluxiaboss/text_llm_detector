@@ -28,10 +28,17 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
 
     def compute_metrics(eval_pred):
         logits, labels = eval_pred
+
+        # special case for the T5 model
+        if type(logits) is tuple:
+            logits = logits[0]
+
         predictions = np.argmax(logits, axis=-1)
         print("labels", labels)
         print("predictions", predictions)
-        return metric.compute(predictions=predictions, references=labels)
+        acc = metric.compute(predictions=predictions, references=labels)
+        eval_acc_logs.append(acc)
+        return acc
     
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
@@ -121,6 +128,8 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
     #trainer.add_callback(CustomCallback(trainer))
     trainer.train()
 
+    print("eval_acc_logs", eval_acc_logs)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -179,10 +188,6 @@ if __name__ == "__main__":
             detector_path = "google-t5/t5-base"
             detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
-            print("T5 model: ", detector_model)
-            # check what requires_grad is set to
-            for name, param in detector_model.named_parameters():
-                print(name, param.requires_grad)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
 
         else:
@@ -191,8 +196,6 @@ if __name__ == "__main__":
 
         if args.freeze_base == "True":
             LLMDetector.freeze_base(detector_model)
-            for name, param in detector_model.named_parameters():
-                print(name, param.requires_grad)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
         run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
