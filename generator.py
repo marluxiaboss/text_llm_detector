@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class LLMGenerator(nn.Module):
-  def __init__(self, gpt_model, tokenizer, device=None):
+  def __init__(self, gpt_model, tokenizer, device=None, gen_params=None):
     super().__init__()
 
     # gpt should already be trained
@@ -12,6 +12,16 @@ class LLMGenerator(nn.Module):
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     else:
       self.device = device
+
+    self.default_gen_params = {
+        "max_length": 512,
+        "max_new_tokens": 100,
+        "temperature": 0.8,
+        "top_p": 0.8,
+        "repetition_penalty": 1
+    }
+    self.gen_params = gen_params if gen_params is not None else self.default_gen_params
+       
 
   def forward_old(self, text, max_length=512, max_new_tokens=100, temperature=1, top_k=50, top_p=0.9, repetition_penalty=1, skip_special_tokens=True):
 
@@ -41,14 +51,18 @@ class LLMGenerator(nn.Module):
     return decoded_output
   
 
-  def forward(self, samples, max_length=512, max_new_tokens=100, temperature=1, top_k=50, top_p=0.9, repetition_penalty=1, skip_special_tokens=True):
+  def forward(self, samples, max_new_tokens=100):
+
+    max_length = self.gen_params["max_length"]
+    self.gen_params["max_new_tokens"] = max_new_tokens
 
     encoding = self.tokenizer.batch_encode_plus(samples, return_tensors='pt', padding=True, truncation=True, max_length=max_length)
     input_ids = encoding['input_ids'].to(self.device)
 
     # generate text using the gpt model
     with torch.no_grad():
-        output_ids = self.gpt.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
+      #output_ids = self.gpt.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_p=top_p, repetition_penalty=repetition_penalty)
+      output_ids = self.gpt.generate(input_ids, **self.gen_params)
 
     # decode the generated text
     #decoded_outputs = self.tokenizer.batch_decode(output_ids, skip_special_tokens=skip_special_tokens)

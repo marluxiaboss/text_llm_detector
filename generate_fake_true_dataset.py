@@ -69,15 +69,15 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         output = generator(text, skip_special_tokens=False, max_new_tokens=max_new_tokens)
         
         fake_responses.append(output)
-    """
+    """ 
 
     # batch generation
     batch_size = batch_size
     # transform into chat template
     def transform_chat_template(sample, use_chat_template=False):
 
-        text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
         if use_chat_template:
+            text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
             match template_type:
                 case "system_user":
                     messages = [
@@ -97,6 +97,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
                 add_generation_prompt=True
             )
         else:
+            text_instruction = sample["instruction"]
             text_template = text_instruction
         return {"text_template": text_template}
     
@@ -105,7 +106,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     
     for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
         batch = true_dataset_list[i:i+batch_size]
-        responses = generator(batch, max_new_tokens=max_new_tokens, skip_special_tokens=True)
+        responses = generator(batch, max_new_tokens=max_new_tokens)
         fake_responses.extend(responses)
     return fake_responses
 
@@ -175,7 +176,7 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
 
     return fake_dataset
 
-def process_fake_dataset(fake_dataset, gen_tokenizer):
+def process_fake_dataset(fake_dataset, gen_tokenizer, max_response_length=-1):
 
     # filter out instruction from generated_response
     fake_dataset = fake_dataset.map(lambda x: filter_instruction(x))
@@ -188,6 +189,11 @@ def process_fake_dataset(fake_dataset, gen_tokenizer):
     # rename generated_response to response
     fake_dataset = fake_dataset.rename_column("generated_response", "text")
     fake_dataset = fake_dataset.select_columns(["text", "label", "instruction", "context"])
+
+
+    ## cut responses to max_response_length characters
+    #if max_response_length > 0:
+    #    fake_dataset = fake_dataset.map(lambda x: {"text": x["text"][:max_response_length]})
 
     return fake_dataset
 
@@ -225,49 +231,99 @@ def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
 
     return merged_dataset
 
-def format_merged_dataset(merged_dataset):
+def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_length_char=500):
     """
-    Format the text into a template
+    Format the text into a template.
     """
 
     def format_text(sample):
 
         text = sample["text"]
-        modified_text = f"Instruction: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
+        if use_chat_template:
+            modified_text = f"Instruction: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
+        else:
+            modified_text = sample["context"] + " " + sample["instruction"] + " " + text
 
         return {"text": modified_text}
     
     merged_dataset = merged_dataset.map(format_text)
-    
+
+    # if max_repsonse_length_char > 0, cut the response to max_repsonse_length_char characters, even if it cuts a word
+    if max_repsonse_length_char > 0:
+        merged_dataset = merged_dataset.map(lambda x: {"text": x["text"][:max_repsonse_length_char]})
+
+        len_before_discard = len(merged_dataset)
+        # discard the samples that are not max_repsonse_length_char
+        merged_dataset = merged_dataset.filter(lambda x: len(x["text"]) == max_repsonse_length_char)
+        len_after_discard = len(merged_dataset)
+        print(f"Percent of data discarded after filtering out input not equal to max_repsonse_length_char: {100*(1 - len_after_discard/len_before_discard):.2f}%")
+
+        # check if the number of samples with label 0 and 1 are the same, if not, discard the extra samples
+        label_0 = merged_dataset.filter(lambda x: x["label"] == 0)
+        label_1 = merged_dataset.filter(lambda x: x["label"] == 1)
+
+        if len(label_0) > len(label_1):
+            label_0 = label_0.select(range(len(label_1)))
+            merged_dataset = concatenate_datasets([label_0, label_1])
+        elif len(label_1) > len(label_0):
+            label_1 = label_1.select(range(len(label_0)))
+            merged_dataset = concatenate_datasets([label_0, label_1])
+
+        nb_label_0 = len(merged_dataset.filter(lambda x: x["label"] == 0))
+        nb_label_1 = len(merged_dataset.filter(lambda x: x["label"] == 1))
+        print("Number of samples with label 0:", nb_label_0)
+        print("Number of samples with label 1:", nb_label_1)
+
     # only keep text and label
     merged_dataset = merged_dataset.select_columns(["text", "label"])
 
     return merged_dataset
 
-def format_news_dataset(true_dataset, prefix_cutoff=10):
-    true_dataset["instuction"] = true_dataset["article"].apply(lambda x: " ".join(x.split()[:prefix_cutoff]))
-    true_dataset["context"] = ""
-    true_dataset["response"] = true_dataset["article"].apply(lambda x: " ".join(x.split()[prefix_cutoff:]))
-    true_dataset["category"] = "news"
+def format_news_dataset(true_dataset, prefix_cutoff=20, max_response_length_char=500):
+
+    def format_news(sample):
+        
+        sample["instruction"] = " ".join(sample["article"].split()[:prefix_cutoff])
+        sample["context"] = ""
+        sample["response"] = " ".join(sample["article"].split()[prefix_cutoff:])
+        # cut response to max_response_length_char, even if it cuts a word
+        sample["response"] = sample["response"][:max_response_length_char]
+        sample["category"] = "news"
+        return sample
+    
+    def remove_bloat(sample):
+        print("Instruction: ", sample["instruction"])
+        print("text_bef: ", sample["response"])
+        nb_separator = sample["response"].count("--")
+        filtered_text = sample["response"].split("--", 1)[1] if nb_separator > 0 else sample["response"]
+        print("text_aft: ", sample["response"])
+        return {"instruction": sample["instruction"], "context": sample["context"], "response": filtered_text, "category": sample["category"]}
+    
+    true_dataset = true_dataset.map(format_news)
+    true_dataset = true_dataset.map(remove_bloat)
     true_dataset = true_dataset.remove_columns(["article"])
     true_dataset = true_dataset.remove_columns(["highlights"])
+
+    true_dataset = DatasetDict({"train": true_dataset})
     return true_dataset
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--true_dataset_path", type=str, help="Path to the true dataset (hugginface dataset path)", default="databricks/databricks-dolly-15k")
+    parser.add_argument("--true_dataset_path", type=str, help="Path to the true dataset (hugginface dataset path)", default="cnn_dailymail")
     parser.add_argument("--fake_dataset_size", type=int, help="Size of the fake dataset", default=10)
     parser.add_argument("--max_nb_tokens_input", type=int, help="Max number of tokens for input", default=100)
-    parser.add_argument("--generator", type=str, help="Generator model name between 'qwen', 'phi', 'gemma', 'mistral', 'gpt2'", default="qwen")
+    parser.add_argument("--generator", type=str, help="Generator model name between 'qwen', 'phi', 'gemma', 'mistral', 'gpt2'", default="gpt2")
     parser.add_argument("--device", type=str, help="Device to use for the generator", default="cuda")
     parser.add_argument("--validation_size", type=float, help="Size of the validation set", default=0.1)
     parser.add_argument("--test_size", type=float, help="Size of the test set", default=0.1)
-    parser.add_argument("--max_new_tokens", type=int, help="Max length of the generated response", default=512)
+    parser.add_argument("--max_new_tokens", type=int, help="Max length of the generated response", default=200)
     parser.add_argument("--seed", type=int, help="Seed for random number generator", default=42)
     parser.add_argument("--batch_size", type=int, help="Batch size for generation", default=2)
     parser.add_argument("--experiment_name", type=str, help="Name of the experiment", default="test_experiment")
     parser.add_argument("--access_token", type=str, help="Huggingface access token used for Llama and Gemma", default="")
+    parser.add_argument("--max_response_length", type=int, help="Max length of the response in characters", default=500)
+    parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=20)
 
     args = parser.parse_args()
 
@@ -276,29 +332,49 @@ if __name__ == "__main__":
         or os.path.exists(f"fake_dataset_{args.experiment_name}")
         or os.path.exists(f"fake_true_dataset_{args.experiment_name}")):
         print("Warning: dataset already exists for the given experiment name, do you want to overwrite it?")
-        answer = input("yes/no: ")
-        if answer != "yes":
+        answer = input("[y/n]: ")
+        if answer != "y":
             exit()
 
-
+    # set default parameters for generation
+    default_gen_params = {
+        "max_length": 512,
+        "max_new_tokens": 100,
+        "temperature": 0.8,
+        "top_p": 0.8,
+        "repetition_penalty": 1
+    }
     # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 
     # load generator
-    if args.generator == "qwen":
+    if args.generator == "qwen_chat":
         gen_path = "Qwen/Qwen1.5-0.5B-Chat"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
-        generator = LLMGenerator(gen_model, gen_tokenizer)
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
         #template for chat
         use_chat_template = True
         template_type ="system_user"
 
+    elif args.generator == "qwen_0.5b":
+        gen_path = "Qwen/Qwen1.5-0.5B"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
+
+        #template for chat
+        use_chat_template = False
+        template_type = None        
+
     elif args.generator == "gpt2":
         gen_path = "openai-community/gpt2"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
-        generator = LLMGenerator(gen_model, gen_tokenizer)
+
+        gen_params = default_gen_params
+        gen_params["repetition_penalty"] = 2.0
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
         # special for gpt2
         gen_tokenizer.pad_token = gen_tokenizer.eos_token
@@ -307,11 +383,21 @@ if __name__ == "__main__":
         #template for chat
         use_chat_template = False
         template_type = None
-    elif args.generator == "gemma_2b":
+    elif args.generator == "gemma_2b_chat":
         gen_path = "google/gemma-2b-it"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token, torch_dtype=torch.bfloat16).to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=args.access_token)
-        generator = LLMGenerator(gen_model, gen_tokenizer, args.device)
+        generator = LLMGenerator(gen_model, gen_tokenizer, args.device, gen_params=default_gen_params)
+
+        #template for chat
+        use_chat_template = True
+        template_type ="user"
+
+    elif args.generator == "gemma_2b_chat":
+        gen_path = "google/gemma-2b-it"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token, torch_dtype=torch.bfloat16).to(args.device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=args.access_token)
+        generator = LLMGenerator(gen_model, gen_tokenizer, args.device, gen_params=default_gen_params)
 
         #template for chat
         use_chat_template = True
@@ -329,28 +415,33 @@ if __name__ == "__main__":
         # load true dataset from disk
         true_dataset = load_dataset(args.true_dataset_path, "3.0.0")
 
+        # only keep number of samples in true dataset according to fake_dataset_size
+        true_dataset = true_dataset.shuffle(seed=args.seed)
+        true_dataset = true_dataset["train"].select(range(args.fake_dataset_size))
+
         # format dataset to have the same columns as the other datasets: "instruction", "context", "response", "category"
-        true_dataset = format_news_dataset(true_dataset["train"])        
+        true_dataset = format_news_dataset(true_dataset, prefix_cutoff=args.prefix_cutoff, max_response_length_char=args.max_response_length)     
 
     else:
         raise ValueError("Dataset not supported")
 
     # generate fake dataset
+    #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
 
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
-    true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
+    #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
 
     # process fake dataset
-    fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer)
-    fake_dataset.save_to_disk(f"fake_dataset_{args.experiment_name}")
+    fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer, args.max_response_length)
+    #fake_dataset.save_to_disk(f"fake_dataset_{args.experiment_name}")
 
     # merge true and fake dataset
     merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset, args.seed)
 
     # format merged dataset into a template
-    merged_dataset = format_merged_dataset(merged_dataset)
+    merged_dataset = format_merged_dataset(merged_dataset, use_chat_template, args.max_response_length)
 
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
