@@ -15,7 +15,7 @@ class LLMGenerator(nn.Module):
 
     self.default_gen_params = {
         "max_length": 512,
-        "max_new_tokens": 100,
+        #"max_new_tokens": 100,
         "temperature": 0.8,
         "top_p": 0.8,
         "repetition_penalty": 1
@@ -54,15 +54,14 @@ class LLMGenerator(nn.Module):
   def forward(self, samples, max_new_tokens=100):
 
     max_length = self.gen_params["max_length"]
-    self.gen_params["max_new_tokens"] = max_new_tokens
-
+    #self.gen_params["max_new_tokens"] = max_new_tokens
     encoding = self.tokenizer.batch_encode_plus(samples, return_tensors='pt', padding=True, truncation=True, max_length=max_length)
     input_ids = encoding['input_ids'].to(self.device)
 
     # generate text using the gpt model
     with torch.no_grad():
       #output_ids = self.gpt.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_p=top_p, repetition_penalty=repetition_penalty)
-      output_ids = self.gpt.generate(input_ids, **self.gen_params)
+      output_ids = self.gpt.generate(input_ids, pad_token_id = self.tokenizer.pad_token_id, **self.gen_params)
 
     # decode the generated text
     #decoded_outputs = self.tokenizer.batch_decode(output_ids, skip_special_tokens=skip_special_tokens)

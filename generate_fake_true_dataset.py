@@ -12,6 +12,13 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceCl
 from generator import LLMGenerator
 
 
+def create_train_from_dataset(dataset):
+
+    dataset_dict = DatasetDict()
+    dataset_dict["train"] = dataset
+
+    return dataset_dict
+
 def create_random_subset(dataset, n=10, seed=42):
     """
     Create a random subset of the dataset
@@ -242,7 +249,12 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
         if use_chat_template:
             modified_text = f"Instruction: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
         else:
-            modified_text = sample["context"] + " " + sample["instruction"] + " " + text
+            if sample["label"] == 0:
+                modified_text = sample["context"] + "" + sample["instruction"] + " " + text
+            elif sample["label"] == 1:
+                modified_text = sample["context"] + "" + sample["instruction"] + "" + text
+            else:
+                raise ValueError("Label not supported")
 
         return {"text": modified_text}
     
@@ -259,18 +271,31 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
         print(f"Percent of data discarded after filtering out input not equal to max_repsonse_length_char: {100*(1 - len_after_discard/len_before_discard):.2f}%")
 
         # check if the number of samples with label 0 and 1 are the same, if not, discard the extra samples
-        label_0 = merged_dataset.filter(lambda x: x["label"] == 0)
-        label_1 = merged_dataset.filter(lambda x: x["label"] == 1)
+        label_0 = merged_dataset.filter(lambda x: x["label"] == 0)["train"]
+        label_1 = merged_dataset.filter(lambda x: x["label"] == 1)["train"]
+        nb_label_0 = len(label_0["text"])
+        nb_label_1 = len(label_1["text"])
 
-        if len(label_0) > len(label_1):
-            label_0 = label_0.select(range(len(label_1)))
+        if nb_label_0 > nb_label_1:
+            label_0 = label_0.select(range(nb_label_1))
+            #print("label_0: ", label_0)
+            #print("label_1: ", label_1)
+            #print("label_0 after: ", create_train_from_dataset(label_0))
+            #print("label_1 after: ", create_train_from_dataset(label_1))
+            #merged_dataset = concatenate_datasets([create_train_from_dataset(label_0), create_train_from_dataset(label_1)])
             merged_dataset = concatenate_datasets([label_0, label_1])
-        elif len(label_1) > len(label_0):
-            label_1 = label_1.select(range(len(label_0)))
-            merged_dataset = concatenate_datasets([label_0, label_1])
+            merged_dataset = create_train_from_dataset(merged_dataset)
 
-        nb_label_0 = len(merged_dataset.filter(lambda x: x["label"] == 0))
-        nb_label_1 = len(merged_dataset.filter(lambda x: x["label"] == 1))
+        elif nb_label_1 > nb_label_0:
+            label_1 = label_1.select(range(nb_label_0))
+            #merged_dataset = concatenate_datasets([create_train_from_dataset(label_0), create_train_from_dataset(label_1)])
+            merged_dataset = concatenate_datasets([label_0, label_1])
+            merged_dataset = create_train_from_dataset(merged_dataset)
+
+
+        nb_label_0 = len(merged_dataset.filter(lambda x: x["label"] == 0)["train"]["text"])
+        nb_label_1 = len(merged_dataset.filter(lambda x: x["label"] == 1)["train"]["text"])
+
         print("Number of samples with label 0:", nb_label_0)
         print("Number of samples with label 1:", nb_label_1)
 
@@ -281,6 +306,21 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
 
 def format_news_dataset(true_dataset, prefix_cutoff=20, max_response_length_char=500):
 
+    def remove_bloat(sample):
+        filtered_text = sample["article"]
+        nb_separator = filtered_text.count("--")
+        if nb_separator > 0:
+            filtered_text = filtered_text.split("--", 1)[1].strip()
+
+        # heurstic to handle cases where the instruction contains an input of this type:
+        # By . Jill Reilly . PUBLISHED: . 08:21 EST, 6 December 2012 . | . UPDATED: . 16:19 EST, 6
+        if "EST," in filtered_text.split():
+            split_est = filtered_text.split("EST,")
+            count_est = len(split_est)
+            filtered_text = split_est[count_est-1].split()[4:]
+            filtered_text = " ".join(filtered_text)
+        return {"article": filtered_text}
+
     def format_news(sample):
         
         sample["instruction"] = " ".join(sample["article"].split()[:prefix_cutoff])
@@ -290,17 +330,10 @@ def format_news_dataset(true_dataset, prefix_cutoff=20, max_response_length_char
         sample["response"] = sample["response"][:max_response_length_char]
         sample["category"] = "news"
         return sample
+
     
-    def remove_bloat(sample):
-        print("Instruction: ", sample["instruction"])
-        print("text_bef: ", sample["response"])
-        nb_separator = sample["response"].count("--")
-        filtered_text = sample["response"].split("--", 1)[1] if nb_separator > 0 else sample["response"]
-        print("text_aft: ", sample["response"])
-        return {"instruction": sample["instruction"], "context": sample["context"], "response": filtered_text, "category": sample["category"]}
-    
-    true_dataset = true_dataset.map(format_news)
     true_dataset = true_dataset.map(remove_bloat)
+    true_dataset = true_dataset.map(format_news)
     true_dataset = true_dataset.remove_columns(["article"])
     true_dataset = true_dataset.remove_columns(["highlights"])
 
@@ -323,7 +356,7 @@ if __name__ == "__main__":
     parser.add_argument("--experiment_name", type=str, help="Name of the experiment", default="test_experiment")
     parser.add_argument("--access_token", type=str, help="Huggingface access token used for Llama and Gemma", default="")
     parser.add_argument("--max_response_length", type=int, help="Max length of the response in characters", default=500)
-    parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=20)
+    parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=10)
 
     args = parser.parse_args()
 
@@ -339,10 +372,11 @@ if __name__ == "__main__":
     # set default parameters for generation
     default_gen_params = {
         "max_length": 512,
-        "max_new_tokens": 100,
+        #"max_new_tokens": 200,
         "temperature": 0.8,
         "top_p": 0.8,
-        "repetition_penalty": 1
+        "repetition_penalty": 1,
+        "do_sample": True,
     }
     # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 
@@ -374,11 +408,12 @@ if __name__ == "__main__":
 
         gen_params = default_gen_params
         gen_params["repetition_penalty"] = 2.0
-        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
-
+        
         # special for gpt2
         gen_tokenizer.pad_token = gen_tokenizer.eos_token
         gen_tokenizer.padding_side = 'left'
+
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
         #template for chat
         use_chat_template = False
