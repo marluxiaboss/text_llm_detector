@@ -4,7 +4,7 @@ import torch.nn as nn
 import numpy as np
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer, DataCollatorWithPadding,
-    TrainerCallback)
+    TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer)
 from copy import deepcopy
 
 
@@ -23,7 +23,7 @@ def tokenize_text(x, tokenizer):
 
 def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
 
-
+    eval_acc_logs = []
     metric = evaluate.load("accuracy")
 
     def compute_metrics(eval_pred):
@@ -161,12 +161,38 @@ if __name__ == "__main__":
             detector_path = "FacebookAI/roberta-base"
             detector_model = RobertaForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
-            if args.freeze_base == "True":
-                LLMDetector.freeze_base(detector_model)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+        elif args.detector == "bert":
+            detector_path = "bert-base-uncased"
+            detector_model = BertForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = BertTokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+        elif args.detector == "electra":
+            detector_path = "google/electra-base-discriminator"
+            detector_model = ElectraForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+        elif args.detector == "t5":
+            detector_path = "google-t5/t5-base"
+            detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
+            print("T5 model: ", detector_model)
+            # check what requires_grad is set to
+            for name, param in detector_model.named_parameters():
+                print(name, param.requires_grad)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
 
         else:
             raise ValueError("No other detector currently supported")
+        
+
+        if args.freeze_base == "True":
+            LLMDetector.freeze_base(detector_model)
+            for name, param in detector_model.named_parameters():
+                print(name, param.requires_grad)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
         run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)

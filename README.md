@@ -25,8 +25,8 @@
 
 ### Experience 1
 
-- Finetune classification head only to detect LLM generated response (adapter method)
-- Compare performance of BERT, Roberta, Electra et T5
+- Finetune classification head only to detect LLM generated response
+- Compare performance of BERT, Roberta, Electra and T5
 - In this experience, check possible distribution shift between human and LLM responses to prevent shortcuts
 
 ### Experience 2
