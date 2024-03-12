@@ -371,7 +371,7 @@ if __name__ == "__main__":
 
     # set default parameters for generation
     default_gen_params = {
-        "max_length": 512,
+        "max_length": 150,
         "max_new_tokens": None,
         "temperature": 0.8,
         "top_p": 0.8,

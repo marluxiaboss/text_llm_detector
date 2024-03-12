@@ -1,11 +1,14 @@
 import torch
+from torch.utils.data import DataLoader
 import torch.nn.functional as F
 import torch.nn as nn
 import numpy as np
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer, DataCollatorWithPadding,
     TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer)
+from torch.optim import AdamW
 from copy import deepcopy
+from tqdm import tqdm
 
 
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
@@ -14,12 +17,14 @@ import wandb
 import os
 import argparse
 
+from datetime import datetime
+
 from detector import LLMDetector
 
 
 
 def tokenize_text(x, tokenizer):
-    return tokenizer(x["text"], truncation=True, padding="max_length")
+    return tokenizer(x["text"], truncation=True, padding="max_length", return_tensors="pt")
 
 def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
 
@@ -131,6 +136,143 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
     print("eval_acc_logs", eval_acc_logs)
 
 
+
+def process_tokenized_dataset(dataset):
+    dataset = dataset.remove_columns(["text"])
+    dataset = dataset.rename_column("label", "labels")
+    dataset.set_format("torch")
+    return dataset
+
+def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device)
+
+    optimizer = AdamW((param for param in model.parameters() if param.requires_grad), lr=learning_rate, weight_decay=weight_decay)
+
+    #shuffle the datasets
+    #train_dataset = train_dataset.shuffle(seed=42)
+    #val_dataset = val_dataset.shuffle(seed=42)
+
+    # process both datasets
+    train_dataset = process_tokenized_dataset(train_dataset)
+    val_dataset = process_tokenized_dataset(val_dataset)
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
+
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+
+    # how many samples seen before evaluating the model per epoch
+    log_loss_steps = 200
+    eval_steps= 1000
+
+    # round both up to the nearest multiple of batch_size
+    log_loss_steps = (log_loss_steps + batch_size - 1) // batch_size * batch_size
+    eval_steps = (eval_steps + batch_size - 1) // batch_size * batch_size
+    print("log_loss_steps", log_loss_steps)
+    print("eval_steps", eval_steps)
+
+    """
+    def compute_loss(self, model, inputs, return_outputs=False):
+        if self.label_smoother is not None and "labels" in inputs:
+            labels = inputs.pop("labels")
+        else:
+            labels = None
+        outputs = model(**inputs)
+        # Save past state if it exists
+        # TODO: this needs to be fixed and made cleaner later.
+        if self.args.past_index >= 0:
+            self._past = outputs[self.args.past_index]
+
+        if labels is not None:
+            unwrapped_model = unwrap_model(model)
+            if _is_peft_model(unwrapped_model):
+                model_name = unwrapped_model.base_model.model._get_name()
+            else:
+                model_name = unwrapped_model._get_name()
+            if model_name in MODEL_FOR_CAUSAL_LM_MAPPING_NAMES.values():
+                loss = self.label_smoother(outputs, labels, shift_labels=True)
+            else:
+                loss = self.label_smoother(outputs, labels)
+        else:
+            if isinstance(outputs, dict) and "loss" not in outputs:
+                raise ValueError(
+                    "The model did not return a loss from the inputs, only the following keys: "
+                    f"{','.join(outputs.keys())}. For reference, the inputs it received are {','.join(inputs.keys())}."
+                )
+            # We don't use .loss here since the model may return tuples instead of ModelOutput.
+            loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
+
+        return (loss, outputs) if return_outputs else loss
+    """
+    
+    num_training_steps = len(train_loader) * num_epochs
+    progress_bar = tqdm(range(num_training_steps))
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0
+        for i, batch in enumerate(train_loader):
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time before transfer to gpu =", current_time)
+            input_ids = batch["input_ids"].to(device)
+            attention_mask = batch["attention_mask"].to(device)
+            labels = batch["labels"].to(device)
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time after transfer to gpu =", current_time)
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time before gen =", current_time)
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time after gen =", current_time)
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time before loss =", current_time)
+            #loss = outputs.loss
+            # create a fake loss of 0
+            #loss = torch.tensor(0.0, requires_grad=True).to(device)
+            #running_loss += loss.detach().item()
+            running_loss += 0
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time after loss =", current_time)
+
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time before backward =", current_time)
+            #loss.backward()
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time after backward =", current_time)
+            optimizer.step()
+            optimizer.zero_grad()
+            progress_bar.update(1)
+
+            print("i: ", i)
+            print("i + 1 * batch_size: ", (i + 1) * batch_size)
+            if ((i + 1) * batch_size) % log_loss_steps == 0:
+                print(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {running_loss/log_loss_steps:.4f}')
+                running_loss = 0
+
+            if ((i + 1) * batch_size) % eval_steps == 0:
+                model.eval()
+                total, correct = 0, 0
+                for batch in val_loader:
+                    with torch.no_grad():
+                        inputs = tokenizer(batch["text"], truncation=True, padding="max_length", return_tensors='pt').to(device)
+                        labels = batch["label"].to(device)
+                        outputs = model(**inputs, labels=labels)
+                        _, predicted = torch.max(outputs.logits, 1)
+                        total += labels.size(0)
+                        correct += (predicted == labels).sum().item()
+
+                print(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {correct/total:.4f}')
+
+    torch.save(model.state_dict(), os.path.join(save_dir, 'model.pt'))
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -198,7 +340,9 @@ if __name__ == "__main__":
             LLMDetector.freeze_base(detector_model)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
-        run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
+        #run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
+        run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"], args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
+
 
  
     elif args.evaluation == "True":

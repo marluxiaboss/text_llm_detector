@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from datetime import datetime
+
 class LLMGenerator(nn.Module):
   def __init__(self, gpt_model, tokenizer, device=None, gen_params=None):
     super().__init__()
@@ -14,7 +16,7 @@ class LLMGenerator(nn.Module):
       self.device = device
 
     self.default_gen_params = {
-        "max_length": 512,
+        "max_length": 150,
         #"max_new_tokens": 100,
         "temperature": 0.8,
         "top_p": 0.8,
