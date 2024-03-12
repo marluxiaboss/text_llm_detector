@@ -9,6 +9,7 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceCl
 from torch.optim import AdamW
 from copy import deepcopy
 from tqdm import tqdm
+from accelerate import Accelerator
 
 
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
@@ -29,6 +30,14 @@ def tokenize_text(x, tokenizer):
 def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
 
     eval_acc_logs = []
+    eval_steps = 0.05
+    total_nb_steps = len(dataset["train"]) * num_epochs
+    training_steps = int(total_nb_steps // batch_size)
+
+    # list of number of steps at which to evaluate the model
+    eval_milestones = list(range(0, training_steps, int(training_steps * eval_steps)))
+    eval_milestones_samples = [step * batch_size for step in eval_milestones]
+
     metric = evaluate.load("accuracy")
 
     def compute_metrics(eval_pred):
@@ -56,7 +65,7 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
         weight_decay=weight_decay,
         learning_rate=learning_rate,
         logging_steps=0.05,
-        eval_steps=0.1,
+        eval_steps=eval_steps,
         # This is important to set evaluation strategy, otherwise there will be no evaluation
         evaluation_strategy="steps",
         save_steps=0.2,
@@ -133,7 +142,10 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
     #trainer.add_callback(CustomCallback(trainer))
     trainer.train()
 
-    print("eval_acc_logs", eval_acc_logs)
+    eval_acc_logs_milestones_samples = {
+        eval_milestones_samples[i]: eval_acc_logs[i] for i in range(len(eval_milestones_samples))
+    }
+    print("eval_acc_logs", eval_acc_logs_milestones_samples)
 
 
 
@@ -143,11 +155,14 @@ def process_tokenized_dataset(dataset):
     dataset.set_format("torch")
     return dataset
 
+
 def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
     optimizer = AdamW((param for param in model.parameters() if param.requires_grad), lr=learning_rate, weight_decay=weight_decay)
+    fp16 = True
+    accelerator = Accelerator(mixed_precision='fp16')
 
     #shuffle the datasets
     #train_dataset = train_dataset.shuffle(seed=42)
@@ -158,8 +173,11 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     val_dataset = process_tokenized_dataset(val_dataset)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
-
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+
+
+    model, optimizer, train_loader = accelerator.prepare(model, optimizer, train_loader)
+    val_loader = accelerator.prepare(val_loader)
 
     # how many samples seen before evaluating the model per epoch
     log_loss_steps = 200
@@ -171,39 +189,6 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     print("log_loss_steps", log_loss_steps)
     print("eval_steps", eval_steps)
 
-    """
-    def compute_loss(self, model, inputs, return_outputs=False):
-        if self.label_smoother is not None and "labels" in inputs:
-            labels = inputs.pop("labels")
-        else:
-            labels = None
-        outputs = model(**inputs)
-        # Save past state if it exists
-        # TODO: this needs to be fixed and made cleaner later.
-        if self.args.past_index >= 0:
-            self._past = outputs[self.args.past_index]
-
-        if labels is not None:
-            unwrapped_model = unwrap_model(model)
-            if _is_peft_model(unwrapped_model):
-                model_name = unwrapped_model.base_model.model._get_name()
-            else:
-                model_name = unwrapped_model._get_name()
-            if model_name in MODEL_FOR_CAUSAL_LM_MAPPING_NAMES.values():
-                loss = self.label_smoother(outputs, labels, shift_labels=True)
-            else:
-                loss = self.label_smoother(outputs, labels)
-        else:
-            if isinstance(outputs, dict) and "loss" not in outputs:
-                raise ValueError(
-                    "The model did not return a loss from the inputs, only the following keys: "
-                    f"{','.join(outputs.keys())}. For reference, the inputs it received are {','.join(inputs.keys())}."
-                )
-            # We don't use .loss here since the model may return tuples instead of ModelOutput.
-            loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
-
-        return (loss, outputs) if return_outputs else loss
-    """
     
     num_training_steps = len(train_loader) * num_epochs
     progress_bar = tqdm(range(num_training_steps))
@@ -211,41 +196,16 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
         model.train()
         running_loss = 0
         for i, batch in enumerate(train_loader):
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time before transfer to gpu =", current_time)
-            input_ids = batch["input_ids"].to(device)
-            attention_mask = batch["attention_mask"].to(device)
-            labels = batch["labels"].to(device)
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time after transfer to gpu =", current_time)
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time before gen =", current_time)
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time after gen =", current_time)
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time before loss =", current_time)
-            #loss = outputs.loss
-            # create a fake loss of 0
-            #loss = torch.tensor(0.0, requires_grad=True).to(device)
-            #running_loss += loss.detach().item()
-            running_loss += 0
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time after loss =", current_time)
 
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time before backward =", current_time)
-            #loss.backward()
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time after backward =", current_time)
+            input_ids = batch["input_ids"]
+            attention_mask = batch["attention_mask"]
+            labels = batch["labels"]
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+
+            loss = outputs.loss
+            running_loss += loss.detach().item()
+
+            accelerator.backward(loss)
             optimizer.step()
             optimizer.zero_grad()
             progress_bar.update(1)
@@ -261,9 +221,10 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                 total, correct = 0, 0
                 for batch in val_loader:
                     with torch.no_grad():
-                        inputs = tokenizer(batch["text"], truncation=True, padding="max_length", return_tensors='pt').to(device)
-                        labels = batch["label"].to(device)
-                        outputs = model(**inputs, labels=labels)
+                        input_ids = batch["input_ids"]
+                        labels = batch["labels"]
+                        attention_mask = batch["attention_mask"]
+                        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
                         _, predicted = torch.max(outputs.logits, 1)
                         total += labels.size(0)
                         correct += (predicted == labels).sum().item()
