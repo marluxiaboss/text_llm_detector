@@ -28,7 +28,7 @@ import sys
 from datetime import datetime
 
 from detector import LLMDetector
-from utils import create_logger
+from utils import create_logger, Signal
 
 
 
@@ -173,6 +173,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
 
     log = create_logger(__name__, silent=False, to_disk=True,
                                  log_file=f"training_logs/detector/{detector_name}_{current_time}.log.txt")
+    sig = Signal("run_signal.txt")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
@@ -192,7 +193,12 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     optimizer = AdamW((param for param in model.parameters() if param.requires_grad), lr=learning_rate, weight_decay=weight_decay)
     #scheduler = lr_scheduler.LinearLR(optimizer, warmup_ratio)
     
-    accelerator = Accelerator(mixed_precision='fp16')
+    fp16 = True
+    if fp16:
+        accelerator = Accelerator(mixed_precision='fp16')
+    else:
+        accelerator = Accelerator()
+    
 
     num_training_steps = math.ceil(num_epochs * len(train_loader))
     warmup_steps = math.ceil(num_training_steps * warmup_ratio)
@@ -227,73 +233,81 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0
-        for i, batch in enumerate(train_loader):
+        log.info(f"----------------Epoch {epoch+1}/{num_epochs}----------------")
+        sig.update()
+        if sig.training_sig:
+            for i, batch in enumerate(train_loader):
+                sig.update()
 
-            input_ids = batch["input_ids"]
-            attention_mask = batch["attention_mask"]
-            labels = batch["labels"]
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                input_ids = batch["input_ids"]
+                attention_mask = batch["attention_mask"]
+                labels = batch["labels"]
+                outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                loss = outputs.loss
+                running_loss += loss.detach().item()
 
-            loss = outputs.loss
-            running_loss += loss.detach().item()
+                accelerator.backward(loss)
+                optimizer.step()
+                optimizer.zero_grad()
+                scheduler.step()
+                progress_bar.update(1)
 
-            accelerator.backward(loss)
-            optimizer.step()
-            optimizer.zero_grad()
-            scheduler.step()
-            progress_bar.update(1)
+                if ((i + 1) * batch_size) % log_loss_steps == 0:
+                    avg_loss = running_loss/ (i + 1)
+                    log.info(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {avg_loss:.4f}')
+                    metrics = {}
+                    metrics["train/loss"] = avg_loss
+                    metrics["train/learning_rate"] = scheduler.get_last_lr()[0]
+                    metrics["train/epoch"] = epoch
 
-            if ((i + 1) * batch_size) % log_loss_steps == 0:
-                avg_loss = running_loss/ (i + 1)
-                log.info(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {avg_loss:.4f}')
-                metrics = {}
-                metrics["train/loss"] = avg_loss
-                metrics["train/learning_rate"] = scheduler.get_last_lr()[0]
-                metrics["train/epoch"] = epoch
+                    run.log(metrics, step=i)
 
-                run.log(metrics, step=i)
+                    running_loss = 0
 
-                running_loss = 0
+                if ((i + 1) * batch_size) % eval_steps == 0:
+                    model.eval()
+                    total, correct = 0, 0
+                    for batch in val_loader:
+                        with torch.no_grad():
+                            input_ids = batch["input_ids"]
+                            labels = batch["labels"]
+                            attention_mask = batch["attention_mask"]
+                            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                            _, predicted = torch.max(outputs.logits, 1)
+                            total += labels.size(0)
+                            correct += (predicted == labels).sum().item()
 
-            if ((i + 1) * batch_size) % eval_steps == 0:
-                model.eval()
-                total, correct = 0, 0
-                for batch in val_loader:
-                    with torch.no_grad():
-                        input_ids = batch["input_ids"]
-                        labels = batch["labels"]
-                        attention_mask = batch["attention_mask"]
-                        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-                        _, predicted = torch.max(outputs.logits, 1)
-                        total += labels.size(0)
-                        correct += (predicted == labels).sum().item()
+                    eval_acc = correct / total
+                    log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {eval_acc:.4f}')
+                    run.log({"eval/accuracy": eval_acc}, step=i)
+                    eval_acc_logs.append({"samples": i*batch_size, "accuracy": eval_acc})
 
-                eval_acc = correct / total
-                log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {eval_acc:.4f}')
-                run.log({"eval/accuracy": eval_acc}, step=i)
-                eval_acc_logs.append({"samples": i*batch_size, "accuracy": eval_acc})
+                    # save the model if it is in the top 3
+                    if models_ranking[-1] is None or eval_acc > models_ranking[-1]["eval_acc"]:
+                        # find the rank of the model
+                        rank = 3
+                        for j in range(3):
+                            if models_ranking[-1] is None or eval_acc > models_ranking[j]["eval_acc"]:
+                                rank = j + 1
+                                # move the other models down
+                                for k in range(2, j, -1):
+                                    if models_ranking[k-1] is not None:
+                                        models_ranking[k] = models_ranking[k-1]
+                                        # rename the model path of the models
+                                        model_path = models_ranking[k]["model_path"]
+                                        new_model_path = f"./trained_models/model_{k}_{models_ranking[k]['samples']}.pt"
+                                        os.rename(model_path, new_model_path)
+                                        models_ranking[k]["model_path"] = new_model_path
+                                break
+                        
+                        log.info(f"Model with eval accuracy {eval_acc} with {i*batch_size} samples seen is ranked {rank} and will be saved")
+                        model_path = f"./trained_models/model_{rank}_{i*batch_size}.pt"
+                        torch.save(model.state_dict(), model_path)
 
-                # save the model if it is in the top 3
-                if models_ranking[-1] is None or eval_acc > models_ranking[-1]["eval_acc"]:
-                    # find the rank of the model
-                    rank = 3
-                    for j in range(3):
-                        if models_ranking[-1] is None or eval_acc > models_ranking[j]["eval_acc"]:
-                            rank = j + 1
-                            # move the other models down
-                            for k in range(2, j, -1):
-                                if models_ranking[k-1] is not None:
-                                    models_ranking[k] = models_ranking[k-1]
-                                    # rename the model path of the models
-                                    model_path = models_ranking[k]["model_path"]
-                                    new_model_path = f"./trained_models/model_{k}_{models_ranking[k]['samples']}.pt"
-                                    os.rename(model_path, new_model_path)
-                                    models_ranking[k]["model_path"] = new_model_path
-                            break
-                    
-                    log.info(f"Model with accuracy {eval_acc} with {i*batch_size} samples seen is ranked {rank} and will be saved")
-                    model_path = f"./trained_models/model_{rank}_{i*batch_size}.pt"
-                    torch.save(model.state_dict(), model_path)
+
+        else:
+            log.info("Training signal is False, stopping training")
+            break
 
     log.info("eval_acc_logs", eval_acc_logs)
     torch.save(model.state_dict(), os.path.join(save_dir, 'model.pt'))
@@ -369,7 +383,9 @@ if __name__ == "__main__":
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
 
         elif args.detector == "t5":
-            detector_path = "google-t5/t5-base"
+            #detector_path = "google-t5/t5-base"
+            # the path above has issues when fp16 is set to True
+            detector_path = "google/t5-v1_1-base"
             detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
