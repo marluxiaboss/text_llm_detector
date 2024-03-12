@@ -2,14 +2,20 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 import torch.nn as nn
+import torch.optim.lr_scheduler as lr_scheduler
+
 import numpy as np
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer, DataCollatorWithPadding,
-    TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer)
+    TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer, get_scheduler)
 from torch.optim import AdamW
 from copy import deepcopy
 from tqdm import tqdm
 from accelerate import Accelerator
+import math
+
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
@@ -157,12 +163,10 @@ def process_tokenized_dataset(dataset):
 
 
 def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
+
+    log = create_logger(save_dir)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
-
-    optimizer = AdamW((param for param in model.parameters() if param.requires_grad), lr=learning_rate, weight_decay=weight_decay)
-    fp16 = True
-    accelerator = Accelerator(mixed_precision='fp16')
 
     #shuffle the datasets
     #train_dataset = train_dataset.shuffle(seed=42)
@@ -176,7 +180,17 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
 
 
-    model, optimizer, train_loader = accelerator.prepare(model, optimizer, train_loader)
+    optimizer = AdamW((param for param in model.parameters() if param.requires_grad), lr=learning_rate, weight_decay=weight_decay)
+    #scheduler = lr_scheduler.LinearLR(optimizer, warmup_ratio)
+    
+    accelerator = Accelerator(mixed_precision='fp16')
+
+    num_training_steps = math.ceil(num_epochs * len(train_loader))
+    warmup_steps = math.ceil(num_training_steps * warmup_ratio)
+    scheduler = get_scheduler("linear", optimizer, num_warmup_steps=warmup_steps, num_training_steps=num_training_steps)
+
+
+    model, optimizer, train_loader, scheduler = accelerator.prepare(model, optimizer, train_loader, scheduler)
     val_loader = accelerator.prepare(val_loader)
 
     # how many samples seen before evaluating the model per epoch
@@ -189,9 +203,18 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     print("log_loss_steps", log_loss_steps)
     print("eval_steps", eval_steps)
 
+    eval_acc_logs = []
+
+    max_num_model_save = 3
+
+    # ordered list of best models with list of dicts {nb_samples: int, eval_acc: float, model_path: str}
+    # where model_path is "./trained_models/model_{rank_in_list}_{nb_samples}.pt"
+    models_ranking = [None for i in range(max_num_model_save)]
+
     
     num_training_steps = len(train_loader) * num_epochs
     progress_bar = tqdm(range(num_training_steps))
+    run = wandb.init()
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0
@@ -208,12 +231,19 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
             accelerator.backward(loss)
             optimizer.step()
             optimizer.zero_grad()
+            scheduler.step()
             progress_bar.update(1)
 
-            print("i: ", i)
-            print("i + 1 * batch_size: ", (i + 1) * batch_size)
             if ((i + 1) * batch_size) % log_loss_steps == 0:
-                print(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {running_loss/log_loss_steps:.4f}')
+                avg_loss = running_loss/ (i + 1)
+                print(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {avg_loss:.4f}')
+                metrics = {}
+                metrics["train/loss"] = avg_loss
+                metrics["train/learning_rate"] = scheduler.get_last_lr()[0]
+                metrics["train/epoch"] = epoch
+
+                run.log(metrics, step=i)
+
                 running_loss = 0
 
             if ((i + 1) * batch_size) % eval_steps == 0:
@@ -229,9 +259,50 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                         total += labels.size(0)
                         correct += (predicted == labels).sum().item()
 
-                print(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {correct/total:.4f}')
+                eval_acc = correct / total
+                print(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {eval_acc:.4f}')
+                run.log({"eval/accuracy": eval_acc}, step=i)
+                eval_acc_logs.append({"samples": i*batch_size, "accuracy": eval_acc})
 
+                # save the model if it is in the top 3
+                if models_ranking[-1] is None or eval_acc > models_ranking[-1]["eval_acc"]:
+                    # find the rank of the model
+                    rank = 3
+                    for j in range(3):
+                        if models_ranking[-1] is None or eval_acc > models_ranking[j]["eval_acc"]:
+                            rank = j + 1
+                            # move the other models down
+                            for k in range(2, j, -1):
+                                if models_ranking[k-1] is not None:
+                                    models_ranking[k] = models_ranking[k-1]
+                                    # rename the model path of the models
+                                    model_path = models_ranking[k]["model_path"]
+                                    new_model_path = f"./trained_models/model_{k}_{models_ranking[k]['samples']}.pt"
+                                    os.rename(model_path, new_model_path)
+                                    models_ranking[k]["model_path"] = new_model_path
+                            break
+                    
+                    model_path = f"./trained_models/model_{rank}_{i*batch_size}.pt"
+                    torch.save(model.state_dict(), model_path)
+
+    print("eval_acc_logs", eval_acc_logs)
     torch.save(model.state_dict(), os.path.join(save_dir, 'model.pt'))
+    run.finish()
+    plot_nb_samples_metrics(eval_acc_logs)
+
+
+
+
+
+
+def plot_nb_samples_metrics(eval_acc_logs):
+    # lineplot with nb_samples on x-axis and some metric on y-axis like accuracy
+    sns.lineplot(x="samples", y="accuracy", data=eval_acc_logs)
+
+    # save the plot
+    plt.savefig("result_plots/accuracy_vs_nb_samples.png")
+
+
 
 
 if __name__ == "__main__":
