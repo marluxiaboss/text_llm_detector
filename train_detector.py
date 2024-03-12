@@ -23,10 +23,12 @@ import evaluate
 import wandb
 import os
 import argparse
+import sys
 
 from datetime import datetime
 
 from detector import LLMDetector
+from utils import create_logger
 
 
 
@@ -162,9 +164,16 @@ def process_tokenized_dataset(dataset):
     return dataset
 
 
-def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
+def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir, detector_name):
 
-    log = create_logger(save_dir)
+    # create log file with current date and time as name
+    current_time = datetime.now().strftime("%d_%m_%H%M")
+    with open(f"training_logs/detector/{detector_name}_{current_time}.log.txt", "w") as f:
+        f.write("")
+
+    log = create_logger(__name__, silent=False, to_disk=True,
+                                 log_file=f"training_logs/detector/{detector_name}_{current_time}.log.txt")
+    
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
@@ -200,8 +209,8 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     # round both up to the nearest multiple of batch_size
     log_loss_steps = (log_loss_steps + batch_size - 1) // batch_size * batch_size
     eval_steps = (eval_steps + batch_size - 1) // batch_size * batch_size
-    print("log_loss_steps", log_loss_steps)
-    print("eval_steps", eval_steps)
+    log.info("log_loss_steps", log_loss_steps)
+    log.info("eval_steps", eval_steps)
 
     eval_acc_logs = []
 
@@ -236,7 +245,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
 
             if ((i + 1) * batch_size) % log_loss_steps == 0:
                 avg_loss = running_loss/ (i + 1)
-                print(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {avg_loss:.4f}')
+                log.info(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {avg_loss:.4f}')
                 metrics = {}
                 metrics["train/loss"] = avg_loss
                 metrics["train/learning_rate"] = scheduler.get_last_lr()[0]
@@ -260,7 +269,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                         correct += (predicted == labels).sum().item()
 
                 eval_acc = correct / total
-                print(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {eval_acc:.4f}')
+                log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {eval_acc:.4f}')
                 run.log({"eval/accuracy": eval_acc}, step=i)
                 eval_acc_logs.append({"samples": i*batch_size, "accuracy": eval_acc})
 
@@ -282,10 +291,11 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                                     models_ranking[k]["model_path"] = new_model_path
                             break
                     
+                    log.info(f"Model with accuracy {eval_acc} with {i*batch_size} samples seen is ranked {rank} and will be saved")
                     model_path = f"./trained_models/model_{rank}_{i*batch_size}.pt"
                     torch.save(model.state_dict(), model_path)
 
-    print("eval_acc_logs", eval_acc_logs)
+    log.info("eval_acc_logs", eval_acc_logs)
     torch.save(model.state_dict(), os.path.join(save_dir, 'model.pt'))
     run.finish()
     plot_nb_samples_metrics(eval_acc_logs)
@@ -373,7 +383,7 @@ if __name__ == "__main__":
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
         #run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
-        run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"], args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
+        run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"], args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector)
 
 
  
