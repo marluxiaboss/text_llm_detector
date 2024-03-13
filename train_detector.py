@@ -209,7 +209,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
         f.write("")
 
     log = create_logger(__name__, silent=False, to_disk=True,
-                                 log_file=f"{experiment_path}.log.txt")
+                                 log_file=f"{experiment_path}/log.txt")
     sig = Signal("run_signal.txt")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -278,6 +278,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                 labels = batch["labels"]
                 outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
                 loss = outputs.loss
+                print("loss", loss)
                 running_loss += loss.detach().item()
 
                 accelerator.backward(loss)
@@ -287,7 +288,8 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                 progress_bar.update(1)
 
                 if ((i + 1) * batch_size) % log_loss_steps == 0:
-                    avg_loss = running_loss/ (i + 1)
+                    nb_steps_log = log_loss_steps // batch_size
+                    avg_loss = running_loss / nb_steps_log
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
                     log.info(f'Epoch {epoch+1}/{num_epochs}, Loss after {nb_samples_seen} samples: {avg_loss:.4f}')
                     train_loss_logs.append({"samples": nb_samples_seen, "loss": avg_loss})
@@ -323,8 +325,9 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                         best_model = {"eval_acc": eval_acc, "nb_samples": nb_samples_seen}
                         
                         # save the model
-                        torch.save(model.state_dict(), f"{experiment_saved_model_path}/best_model_{nb_samples_seen}.pt")
+                        torch.save(model.state_dict(), f"{experiment_saved_model_path}/best_model.pt")
                         log.info(f"Best model with eval accuracy {eval_acc} with {nb_samples_seen} samples seen is saved")
+                    model.train()
                                
 
         else:
@@ -345,6 +348,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
 def plot_nb_samples_metrics(eval_acc_logs, save_path):
     # transform to df
     eval_acc_logs_df = pd.DataFrame(eval_acc_logs)
+    plt.figure()
     # lineplot with nb_samples on x-axis and some metric on y-axis like accuracy
     sns.lineplot(x="samples", y="accuracy", data=eval_acc_logs_df)
 
@@ -354,6 +358,7 @@ def plot_nb_samples_metrics(eval_acc_logs, save_path):
 def plot_nb_samples_loss(train_loss_logs, save_path):
     # transform to df
     train_loss_logs_df = pd.DataFrame(train_loss_logs)
+    plt.figure()
     # lineplot with nb_samples on x-axis and loss on y-axis
     sns.lineplot(x="samples", y="loss", data=train_loss_logs_df)
 
@@ -378,7 +383,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_path", type=str, help="Path to the model to evaluate", default="model")
     parser.add_argument("--log_mode", type=str, help="'offline' or 'online' (wandb)", default="offline")
     parser.add_argument("--freeze_base", type=str, help="Whether to freeze the base model", default="False")
-    parser.add_argument("--save_dir", type=str, help="Directory to save the model and logs", default="./training_logs/detector")
+    parser.add_argument("--save_dir", type=str, help="Directory to save the model and logs", default="./training_logs/detector_freeze_base")
     args = parser.parse_args()
 
 
