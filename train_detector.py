@@ -16,6 +16,7 @@ import math
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
@@ -163,16 +164,52 @@ def process_tokenized_dataset(dataset):
     dataset.set_format("torch")
     return dataset
 
+def create_experiment_folder(model_name, experiment_args):
 
-def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir, detector_name):
+    # create a folder with the folowing elements:
+    # log, description of training with all the args, model folder with all the saved models
 
-    # create log file with current date and time as name
-    current_time = datetime.now().strftime("%d_%m_%H%M")
-    with open(f"training_logs/detector/{detector_name}_{current_time}.log.txt", "w") as f:
+    base_path = experiment_args.save_dir
+    # check if there exists a subfolder already for the model_name
+    if not os.path.isdir(f"{base_path}/{model_name}"):
+        os.makedirs(f"{base_path}/{model_name}")
+    
+    experiment_path = f"{base_path}/{model_name}/{datetime.now().strftime('%d_%m_%H%M')}"
+    os.makedirs(experiment_path)
+    experiment_saved_model_path = f"{experiment_path}/saved_models"
+    os.makedirs(experiment_saved_model_path)
+    plots_path = f"{experiment_path}/plots"
+    os.makedirs(plots_path)
+
+    # create a file args_log.txt with all the args
+    with open(f"{experiment_path}/args_log.txt", "w") as f:
+        f.write(f"Model: {model_name}\n")
+        f.write(f"dataset_path: {experiment_args.dataset_path}\n")
+        f.write(f"num_epochs: {experiment_args.num_epochs}\n")
+        f.write(f"batch_size: {experiment_args.batch_size}\n")
+        f.write(f"learning_rate: {experiment_args.learning_rate}\n")
+        f.write(f"warmup_ratio: {experiment_args.warmup_ratio}\n")
+        f.write(f"weight_decay: {experiment_args.weight_decay}\n")
+        f.write(f"device: {experiment_args.device}\n")
+        f.write(f"evaluation: {experiment_args.evaluation}\n")
+        f.write(f"model_path: {experiment_args.model_path}\n")
+        f.write(f"log_mode: {experiment_args.log_mode}\n")
+        f.write(f"freeze_base: {experiment_args.freeze_base}\n")
+        f.write(f"save_dir: {experiment_args.save_dir}\n")
+
+    return experiment_path
+
+
+def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir, detector_name, experiment_path):
+
+    experiment_saved_model_path = f"{experiment_path}/saved_models"
+
+    # create log file
+    with open(f"{experiment_path}/log.txt", "w") as f:
         f.write("")
 
     log = create_logger(__name__, silent=False, to_disk=True,
-                                 log_file=f"training_logs/detector/{detector_name}_{current_time}.log.txt")
+                                 log_file=f"{experiment_path}.log.txt")
     sig = Signal("run_signal.txt")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -193,7 +230,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     optimizer = AdamW((param for param in model.parameters() if param.requires_grad), lr=learning_rate, weight_decay=weight_decay)
     #scheduler = lr_scheduler.LinearLR(optimizer, warmup_ratio)
     
-    fp16 = True
+    fp16 = True 
     if fp16:
         accelerator = Accelerator(mixed_precision='fp16')
     else:
@@ -215,8 +252,8 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     # round both up to the nearest multiple of batch_size
     log_loss_steps = (log_loss_steps + batch_size - 1) // batch_size * batch_size
     eval_steps = (eval_steps + batch_size - 1) // batch_size * batch_size
-    log.info("log_loss_steps", log_loss_steps)
-    log.info("eval_steps", eval_steps)
+    log.info(f"log_loss_steps: {log_loss_steps}")
+    log.info(f"eval_steps: {eval_steps}")
 
     eval_acc_logs = []
 
@@ -260,7 +297,10 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                     metrics["train/learning_rate"] = scheduler.get_last_lr()[0]
                     metrics["train/epoch"] = epoch
 
-                    run.log(metrics, step=i)
+                    print("i: ", i)
+                    print("epoch: ", epoch)
+                    print("step: ", (i + 1) * (epoch + 1))
+                    run.log(metrics, step=(i + 1) * (epoch + 1))
 
                     running_loss = 0
 
@@ -279,7 +319,11 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
 
                     eval_acc = correct / total
                     log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {eval_acc:.4f}')
-                    run.log({"eval/accuracy": eval_acc}, step=i)
+                    
+                    print("i: ", i)
+                    print("epoch: ", epoch)
+                    print("step: ", (i + 1) * (epoch + 1))
+                    run.log({"eval/accuracy": eval_acc}, step= (i + 1) * (epoch + 1))
                     eval_acc_logs.append({"samples": i*batch_size, "accuracy": eval_acc})
 
                     # save the model if it is in the top 3
@@ -295,13 +339,14 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                                         models_ranking[k] = models_ranking[k-1]
                                         # rename the model path of the models
                                         model_path = models_ranking[k]["model_path"]
-                                        new_model_path = f"./trained_models/model_{k}_{models_ranking[k]['samples']}.pt"
+                                        #new_model_path = f"./trained_models/model_{k}_{models_ranking[k]['samples']}.pt"
+                                        new_model_path = f"{{experiment_saved_model_path}}/model_{k}_{models_ranking[k]['samples']}.pt"
                                         os.rename(model_path, new_model_path)
                                         models_ranking[k]["model_path"] = new_model_path
                                 break
                         
                         log.info(f"Model with eval accuracy {eval_acc} with {i*batch_size} samples seen is ranked {rank} and will be saved")
-                        model_path = f"./trained_models/model_{rank}_{i*batch_size}.pt"
+                        model_path = f"{experiment_saved_model_path}/model_{rank}_{i*batch_size}.pt"
                         torch.save(model.state_dict(), model_path)
 
 
@@ -309,22 +354,24 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
             log.info("Training signal is False, stopping training")
             break
 
-    log.info("eval_acc_logs", eval_acc_logs)
+    log.info(f"Evaluation accuracy logs: {eval_acc_logs}")
     torch.save(model.state_dict(), os.path.join(save_dir, 'model.pt'))
     run.finish()
-    plot_nb_samples_metrics(eval_acc_logs)
+    plot_nb_samples_metrics(eval_acc_logs, save_path=f"{experiment_path}/plots")
 
 
 
 
 
 
-def plot_nb_samples_metrics(eval_acc_logs):
+def plot_nb_samples_metrics(eval_acc_logs, save_path):
+    # transform to df
+    eval_acc_logs_df = pd.DataFrame(eval_acc_logs)
     # lineplot with nb_samples on x-axis and some metric on y-axis like accuracy
-    sns.lineplot(x="samples", y="accuracy", data=eval_acc_logs)
+    sns.lineplot(x="samples", y="accuracy", data=eval_acc_logs_df)
 
     # save the plot
-    plt.savefig("result_plots/accuracy_vs_nb_samples.png")
+    plt.savefig(f"{save_path}/accuracy_vs_nb_samples.png")
 
 
 
@@ -344,7 +391,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_path", type=str, help="Path to the model to evaluate", default="model")
     parser.add_argument("--log_mode", type=str, help="'offline' or 'online' (wandb)", default="offline")
     parser.add_argument("--freeze_base", type=str, help="Whether to freeze the base model", default="False")
-    parser.add_argument("--save_dir", type=str, help="Directory to save the model", default="./outputs")
+    parser.add_argument("--save_dir", type=str, help="Directory to save the model and logs", default="./training_logs/detector")
     args = parser.parse_args()
 
 
@@ -398,8 +445,10 @@ if __name__ == "__main__":
             LLMDetector.freeze_base(detector_model)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
-        #run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)
-        run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"], args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector)
+        #run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)       
+        experiment_path = create_experiment_folder(args.detector, args)
+        run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
+                           args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path)
 
 
  
