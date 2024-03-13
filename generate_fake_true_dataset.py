@@ -5,6 +5,7 @@ import argparse
 from tqdm import tqdm
 import os
 import torch
+import pandas as pd
 
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
@@ -481,6 +482,19 @@ if __name__ == "__main__":
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
     merged_dataset.save_to_disk(f"fake_true_dataset_{args.experiment_name}")
+
+    # load to pandas train split
+    df_train = pd.DataFrame(merged_dataset['train'])
+    df_eval = pd.DataFrame(merged_dataset['eval'])
+
+    # transform text to list by splitting on \n
+    df_train["text"] = df_train["text"].apply(lambda x: x.split("\n"))
+    df_eval["text"] = df_eval["text"].apply(lambda x: x.split("\n"))
+
+    # dump to json
+    df_train.to_json(f"fake_true_dataset_{args.experiment_name}_train.json", force_ascii=False, indent=4)
+    df_eval.to_json(f"fake_true_dataset_{args.experiment_name}_eval.json", force_ascii=False, indent=4)
+
 
 
 
