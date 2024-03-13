@@ -1,4 +1,4 @@
-from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
+from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets, disable_progress_bar, enable_progress_bar
 import numpy as np
 import pandas
 import argparse
@@ -34,11 +34,11 @@ def create_random_subset(dataset, n=10, seed=42):
 def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     #dataset = load_dataset(dataset_path)
 
-    true_dataset = true_dataset.select_columns(["response", "instruction", "context"])
+    true_dataset = true_dataset.select_columns(["response", "instruction", "context", "id"])
     true_dataset = true_dataset.rename_column("response", "text")
 
     # select random samples from true_dataset to match fake_dataset size
-    true_dataset = true_dataset.shuffle(seed=seed)
+    #true_dataset = true_dataset.shuffle(seed=seed)
     #true_dataset = true_dataset.select(range(len(fake_dataset["train"])))
     #true_dataset = true_dataset.select(range(fake_dataset_size))
     true_dataset["train"] = true_dataset["train"].select(range(fake_dataset_size))
@@ -162,6 +162,8 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
 
+    ids = true_dataset["train"]["id"]
+
     # tokenize the instructions
     true_dataset = true_dataset.map(lambda x: {"tokenized_instruction": gen_tokenizer(x["instruction"])})
     true_dataset = true_dataset.map(lambda x: {"tokenized_context": gen_tokenizer(x["context"])})
@@ -171,13 +173,17 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     print(f"Percent of data discarded after filtering out input > max_nb_tokens: {100*(1 - dataset_after_len/dataset_before_len):.2f}%")
 
     subset_size = fake_dataset_size
-    train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
+    #train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
+    train_subset = true_dataset["train"].select(range(subset_size))
 
     
     fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type)
 
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
-    "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"]})
+    "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"], "id": ids})
+
+    # add ids again
+    #fake_responses_train = fake_responses_train.add_column(ids, "id")
 
     fake_dataset = DatasetDict()
     fake_dataset["train"] = fake_responses_train
@@ -196,7 +202,7 @@ def process_fake_dataset(fake_dataset, gen_tokenizer, max_response_length=-1):
 
     # rename generated_response to response
     fake_dataset = fake_dataset.rename_column("generated_response", "text")
-    fake_dataset = fake_dataset.select_columns(["text", "label", "instruction", "context"])
+    fake_dataset = fake_dataset.select_columns(["text", "label", "instruction", "context", "id"])
 
 
     ## cut responses to max_response_length characters
@@ -212,14 +218,42 @@ def merge_true_fake_dataset(true_dataset, fake_dataset, seed=42):
     merged_dataset["train"] = merged
 
     # shuffle the dataset
-    merged_dataset = merged_dataset.shuffle(seed=seed)
+    #merged_dataset = merged_dataset.shuffle(seed=seed)
 
     # save merged dataset
     #merged_dataset.save_to_disk("merged_dataset")
 
     return merged_dataset
+def regroup_pairs(merged_dataset, seed=42):
+    """
+    Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split
+    """
 
-def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
+    # shuffle the dataset
+    merged_dataset = merged_dataset.shuffle(seed=seed)
+
+    # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
+    ids = set(merged_dataset["train"]["id"])
+    list_pairs = []
+    
+    # temporarly disable progress bar to avoid too many progress bars
+    disable_progress_bar()
+    for id in ids:
+        pair = merged_dataset["train"].filter(lambda x: x["id"] == id)
+
+        # shuffle elements within the pair so that the true and fake responses are not always in the same order
+        pair = pair.shuffle(seed=seed)
+        list_pairs.append(pair)
+    enable_progress_bar()
+
+    merged_dataset = concatenate_datasets(list_pairs)
+
+    # remove id column
+    merged_dataset = merged_dataset.remove_columns(["id"])
+    merged_dataset = create_train_from_dataset(merged_dataset)
+
+    return merged_dataset
+def split_merged_dataset_random(merged_dataset, eval_size=0.1, test_size=0.1):
     """
     from https://discuss.huggingface.co/t/how-to-split-main-dataset-into-train-dev-test-as-datasetdict/1090/6
     """
@@ -236,6 +270,26 @@ def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
     print("Train size:", len(merged_dataset['train']))
     print("Eval size:", len(test_valid['train']))
     print("Test size:", len(test_valid['test']))
+
+    return merged_dataset
+
+def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
+    """
+    Same as above, but assumes that the dataset is already shuffled
+    """
+
+    train_size = len(merged_dataset["train"])
+    eval_size = int(train_size * eval_size)
+    test_size = int(train_size * test_size)
+
+    merged_dataset = DatasetDict({
+    'train': merged_dataset["train"].select(range(train_size - eval_size - test_size)),
+    'valid': merged_dataset["train"].select(range(train_size - eval_size - test_size, train_size - test_size)),
+    'test': merged_dataset["train"].select(range(train_size - test_size, train_size))})
+
+    print("Train size:", len(merged_dataset['train']))
+    print("Eval size:", len(merged_dataset['valid']))
+    print("Test size:", len(merged_dataset['test']))
 
     return merged_dataset
 
@@ -301,7 +355,7 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
         print("Number of samples with label 1:", nb_label_1)
 
     # only keep text and label
-    merged_dataset = merged_dataset.select_columns(["text", "label"])
+    merged_dataset = merged_dataset.select_columns(["text", "label", "id"])
 
     return merged_dataset
 
@@ -338,6 +392,8 @@ def format_news_dataset(true_dataset, prefix_cutoff=20, max_response_length_char
     true_dataset = true_dataset.remove_columns(["article"])
     true_dataset = true_dataset.remove_columns(["highlights"])
 
+    # keep id column
+
     true_dataset = DatasetDict({"train": true_dataset})
     return true_dataset
 
@@ -366,9 +422,9 @@ if __name__ == "__main__":
         or os.path.exists(f"fake_dataset_{args.experiment_name}")
         or os.path.exists(f"fake_true_dataset_{args.experiment_name}")):
         print("Warning: dataset already exists for the given experiment name, do you want to overwrite it?")
-        answer = input("[y/n]: ")
-        if answer != "y":
-            exit()
+        #   answer = input("[y/n]: ")
+        #if answer != "y":
+        #    exit()
 
     # set default parameters for generation
     default_gen_params = {
@@ -466,11 +522,12 @@ if __name__ == "__main__":
         true_dataset = load_dataset(args.true_dataset_path, "3.0.0")
 
         # only keep number of samples in true dataset according to fake_dataset_size
-        true_dataset = true_dataset.shuffle(seed=args.seed)
+        #true_dataset = true_dataset.shuffle(seed=args.seed)
         true_dataset = true_dataset["train"].select(range(args.fake_dataset_size))
 
         # format dataset to have the same columns as the other datasets: "instruction", "context", "response", "category"
         true_dataset = format_news_dataset(true_dataset, prefix_cutoff=args.prefix_cutoff, max_response_length_char=args.max_response_length)     
+        print("true_dataset: ", true_dataset)
 
     else:
         raise ValueError("Dataset not supported")
@@ -478,7 +535,6 @@ if __name__ == "__main__":
     # generate fake dataset
     #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
-
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
     #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
@@ -493,21 +549,28 @@ if __name__ == "__main__":
     # format merged dataset into a template
     merged_dataset = format_merged_dataset(merged_dataset, use_chat_template, args.max_response_length)
 
+    # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
+    merged_dataset = regroup_pairs(merged_dataset)
+
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
     merged_dataset.save_to_disk(f"fake_true_dataset_{args.experiment_name}")
 
     # load to pandas train split
     df_train = pd.DataFrame(merged_dataset['train'])
-    df_eval = pd.DataFrame(merged_dataset['eval'])
+    df_eval = pd.DataFrame(merged_dataset['valid'])
+    df_test = pd.DataFrame(merged_dataset['test'])
 
     # transform text to list by splitting on \n
     df_train["text"] = df_train["text"].apply(lambda x: x.split("\n"))
     df_eval["text"] = df_eval["text"].apply(lambda x: x.split("\n"))
+    df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
 
     # dump to json
     df_train.to_json(f"fake_true_dataset_{args.experiment_name}_train.json", force_ascii=False, indent=4)
     df_eval.to_json(f"fake_true_dataset_{args.experiment_name}_eval.json", force_ascii=False, indent=4)
+    df_test.to_json(f"fake_true_dataset_{args.experiment_name}_test.json", force_ascii=False, indent=4)
+
 
 
 
