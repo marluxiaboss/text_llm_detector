@@ -441,9 +441,12 @@ if __name__ == "__main__":
 
     elif args.generator == "mistral":
         gen_path = "mistralai/Mistral-7B-v0.1"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.float16).to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
         generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
+
+        # special for mistral
+        gen_tokenizer.pad_token = gen_tokenizer.eos_token
 
         #template for chat
         use_chat_template = False
