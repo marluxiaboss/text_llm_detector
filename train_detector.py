@@ -180,6 +180,8 @@ def create_experiment_folder(model_name, experiment_args):
     os.makedirs(experiment_saved_model_path)
     plots_path = f"{experiment_path}/plots"
     os.makedirs(plots_path)
+    test_path = f"{experiment_path}/test"
+    os.makedirs(test_path)
 
     # create a file args_log.txt with all the args
     with open(f"{experiment_path}/args_log.txt", "w") as f:
@@ -374,6 +376,7 @@ def test_model(model, batch_size, dataset, experiment_path, log):
         model=model,
         args=TrainingArguments(
             per_device_eval_batch_size=batch_size,
+            output_dir=f"{experiment_path}/test",
         ),
         compute_metrics=compute_metrics,
         eval_dataset=dataset["test"]
