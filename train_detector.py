@@ -402,7 +402,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str, help="Path to the fake true dataset (generated with generate_fake_true_dataset.py)", default="fake_true_dataset")
     parser.add_argument("--batch_size", type=int, help="Batch size to train the model", default=8)
     parser.add_argument("--num_epochs", type=int, help="Number of epochs to train the model", default=3)
-    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=1e-3)
+    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=5e-3)
     parser.add_argument("--warmup_ratio", type=float, help="Warmup ratio for the model", default=0.1)
     parser.add_argument("--weight_decay", type=float, help="Weight decay for the model", default=0.01)
     parser.add_argument("--device", type=str, help="Device to train the model", default="cuda")
