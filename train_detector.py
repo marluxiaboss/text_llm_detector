@@ -452,7 +452,7 @@ if __name__ == "__main__":
         elif args.detector == "t5":
             #detector_path = "google-t5/t5-base"
             # the path above has issues when fp16 is set to True
-            detector_path = "google/t5-base"
+            detector_path = "google-t5/t5-base"
             detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
