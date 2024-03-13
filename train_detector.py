@@ -200,16 +200,10 @@ def create_experiment_folder(model_name, experiment_args):
     return experiment_path
 
 
-def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir, detector_name, experiment_path):
+def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
+                       learning_rate, warmup_ratio, weight_decay, batch_size, save_dir, detector_name, experiment_path, dataset_path, fp16=True, log=None):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
-
-    # create log file
-    with open(f"{experiment_path}/log.txt", "w") as f:
-        f.write("")
-
-    log = create_logger(__name__, silent=False, to_disk=True,
-                                 log_file=f"{experiment_path}/log.txt")
     sig = Signal("run_signal.txt")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -230,7 +224,6 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     optimizer = AdamW((param for param in model.parameters() if param.requires_grad), lr=learning_rate, weight_decay=weight_decay)
     #scheduler = lr_scheduler.LinearLR(optimizer, warmup_ratio)
     
-    fp16 = True 
     if fp16:
         accelerator = Accelerator(mixed_precision='fp16')
     else:
@@ -263,7 +256,11 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     
     num_training_steps = len(train_loader) * num_epochs
     progress_bar = tqdm(range(num_training_steps))
-    run = wandb.init()
+
+    tags = [detector_name, dataset_path]
+    if fp16:
+        tags.append("fp16")
+    run = wandb.init(project="detector_training", tags=tags, dir=experiment_path)
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0
@@ -278,7 +275,6 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                 labels = batch["labels"]
                 outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
                 loss = outputs.loss
-                print("loss", loss)
                 running_loss += loss.detach().item()
 
                 accelerator.backward(loss)
@@ -333,16 +329,14 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
         else:
             log.info("Training signal is False, stopping training")
             break
-
+    
+    log.info(f"Training finished")
+    log.info(f"Best model: {best_model}")
+    log.info(f"Training loss logs: {train_loss_logs}")
     log.info(f"Evaluation accuracy logs: {eval_acc_logs}")
-    torch.save(model.state_dict(), os.path.join(save_dir, 'model.pt'))
     run.finish()
     plot_nb_samples_metrics(eval_acc_logs, save_path=f"{experiment_path}/plots")
     plot_nb_samples_loss(train_loss_logs, save_path=f"{experiment_path}/plots")
-
-
-
-
 
 
 def plot_nb_samples_metrics(eval_acc_logs, save_path):
@@ -366,6 +360,33 @@ def plot_nb_samples_loss(train_loss_logs, save_path):
     plt.savefig(f"{save_path}/loss_vs_nb_samples.png")
 
 
+def test_model(model, batch_size, dataset, experiment_path, log):
+
+    metric = evaluate.combine(["accuracy", "f1", "precision", "recall"])
+
+    def compute_metrics(eval_pred):
+        logits, labels = eval_pred
+        predictions = np.argmax(logits, axis=-1)
+        return metric.compute(predictions=predictions, references=labels)
+
+    # load trainer
+    trainer = Trainer(
+        model=model,
+        args=TrainingArguments(
+            per_device_eval_batch_size=batch_size,
+        ),
+        compute_metrics=compute_metrics,
+        eval_dataset=dataset["test"]
+    )
+    
+    log.info("Evaluating the model on the test set...")
+    predictions = trainer.predict(dataset["test"])
+    preds = np.argmax(predictions.predictions, axis=-1)
+    results = metric.compute(predictions=preds, references=predictions.label_ids)
+    
+    log.info("Test metrics:")
+    for key, value in results.items():
+        log.info(f"{key}: {value}")
 
 
 if __name__ == "__main__":
@@ -384,10 +405,11 @@ if __name__ == "__main__":
     parser.add_argument("--log_mode", type=str, help="'offline' or 'online' (wandb)", default="offline")
     parser.add_argument("--freeze_base", type=str, help="Whether to freeze the base model", default="False")
     parser.add_argument("--save_dir", type=str, help="Directory to save the model and logs", default="./training_logs/detector_freeze_base")
+    parser.add_argument("--fp16", type=str, help="Whether to use fp16", default="True")
     args = parser.parse_args()
 
 
-    os.environ["WANDB_PROJECT"] = "gen_detector"  # name your W&B project
+    os.environ["WANDB_PROJECT"] = "detector_training"  # name your W&B project
     os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
 
     # set wandb to offline mode
@@ -424,10 +446,13 @@ if __name__ == "__main__":
         elif args.detector == "t5":
             #detector_path = "google-t5/t5-base"
             # the path above has issues when fp16 is set to True
-            detector_path = "google/t5-v1_1-base"
+            detector_path = "google/t5-base"
             detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+            # set fp16 to False for T5 model, t5 has issues with fp16
+            args.fp16 = False
 
         else:
             raise ValueError("No other detector currently supported")
@@ -439,8 +464,18 @@ if __name__ == "__main__":
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
         #run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)       
         experiment_path = create_experiment_folder(args.detector, args)
+
+        # create log file
+        with open(f"{experiment_path}/log.txt", "w") as f:
+            f.write("")
+
+        log = create_logger(__name__, silent=False, to_disk=True,
+                                    log_file=f"{experiment_path}/log.txt")
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
-                           args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path)
+                           args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
+                           args.fp16, log)
+        
+        test_model(detector_model, args.batch_size, dataset, experiment_path, log)
 
 
  
@@ -451,32 +486,7 @@ if __name__ == "__main__":
         bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
-        metric = evaluate.combine(["accuracy", "f1", "precision", "recall"])
-
-        def compute_metrics(eval_pred):
-            logits, labels = eval_pred
-            predictions = np.argmax(logits, axis=-1)
-            return metric.compute(predictions=predictions, references=labels)
-
-        # load trainer
-        trainer = Trainer(
-            model=model,
-            args=TrainingArguments(
-                per_device_eval_batch_size=8,
-                #report_to="wandb",
-                output_dir="./results",
-            ),
-            compute_metrics=compute_metrics,
-            eval_dataset=dataset["test"]
-        )
-        
-        predictions = trainer.predict(dataset["test"])
-        preds = np.argmax(predictions.predictions, axis=-1)
-        results = metric.compute(predictions=preds, references=predictions.label_ids)
-        
-        print("Test metrics:")
-        for key, value in results.items():
-            print(f"{key}: {value}")
+        test_model(model, args.batch_size, dataset, args.model_path, args.device)
     else:
         raise ValueError("Evaluation mode must be either True or False")
 

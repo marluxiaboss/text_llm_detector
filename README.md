@@ -29,6 +29,9 @@
 - Compare performance of BERT, Roberta, Electra and T5
 - In this experience, check possible distribution shift between human and LLM responses to prevent shortcuts
 
+- Results saved in `save_dir/{model_name}/{current_time}`
+- Creates log files, `plots` dir and `saved_models` dir saving the model with the best eval accuracy
+
 ### Experience 2
 
 - Full finetuning of the detector
