@@ -256,12 +256,9 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     log.info(f"eval_steps: {eval_steps}")
 
     eval_acc_logs = []
+    train_loss_logs = []
 
-    max_num_model_save = 3
-
-    # ordered list of best models with list of dicts {nb_samples: int, eval_acc: float, model_path: str}
-    # where model_path is "./trained_models/model_{rank_in_list}_{nb_samples}.pt"
-    models_ranking = [None for i in range(max_num_model_save)]
+    best_model = None
 
     
     num_training_steps = len(train_loader) * num_epochs
@@ -291,16 +288,15 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
 
                 if ((i + 1) * batch_size) % log_loss_steps == 0:
                     avg_loss = running_loss/ (i + 1)
-                    log.info(f'Epoch {epoch+1}/{num_epochs}, Loss after {i*batch_size} samples: {avg_loss:.4f}')
+                    nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
+                    log.info(f'Epoch {epoch+1}/{num_epochs}, Loss after {nb_samples_seen} samples: {avg_loss:.4f}')
+                    train_loss_logs.append({"samples": nb_samples_seen, "loss": avg_loss})
                     metrics = {}
                     metrics["train/loss"] = avg_loss
                     metrics["train/learning_rate"] = scheduler.get_last_lr()[0]
                     metrics["train/epoch"] = epoch
 
-                    print("i: ", i)
-                    print("epoch: ", epoch)
-                    print("step: ", (i + 1) * (epoch + 1))
-                    run.log(metrics, step=(i + 1) * (epoch + 1))
+                    run.log(metrics, step=nb_samples_seen)
 
                     running_loss = 0
 
@@ -318,37 +314,18 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
                             correct += (predicted == labels).sum().item()
 
                     eval_acc = correct / total
-                    log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {i*batch_size} samples: {eval_acc:.4f}')
-                    
-                    print("i: ", i)
-                    print("epoch: ", epoch)
-                    print("step: ", (i + 1) * (epoch + 1))
-                    run.log({"eval/accuracy": eval_acc}, step= (i + 1) * (epoch + 1))
-                    eval_acc_logs.append({"samples": i*batch_size, "accuracy": eval_acc})
+                    nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
+                    log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {nb_samples_seen} samples: {eval_acc:.4f}')
+                    run.log({"eval/accuracy": eval_acc}, step=nb_samples_seen)
+                    eval_acc_logs.append({"samples": nb_samples_seen, "accuracy": eval_acc})
 
-                    # save the model if it is in the top 3
-                    if models_ranking[-1] is None or eval_acc > models_ranking[-1]["eval_acc"]:
-                        # find the rank of the model
-                        rank = 3
-                        for j in range(3):
-                            if models_ranking[-1] is None or eval_acc > models_ranking[j]["eval_acc"]:
-                                rank = j + 1
-                                # move the other models down
-                                for k in range(2, j, -1):
-                                    if models_ranking[k-1] is not None:
-                                        models_ranking[k] = models_ranking[k-1]
-                                        # rename the model path of the models
-                                        model_path = models_ranking[k]["model_path"]
-                                        #new_model_path = f"./trained_models/model_{k}_{models_ranking[k]['samples']}.pt"
-                                        new_model_path = f"{{experiment_saved_model_path}}/model_{k}_{models_ranking[k]['samples']}.pt"
-                                        os.rename(model_path, new_model_path)
-                                        models_ranking[k]["model_path"] = new_model_path
-                                break
+                    if best_model is None or eval_acc > best_model["eval_acc"]:
+                        best_model = {"eval_acc": eval_acc, "nb_samples": nb_samples_seen}
                         
-                        log.info(f"Model with eval accuracy {eval_acc} with {i*batch_size} samples seen is ranked {rank} and will be saved")
-                        model_path = f"{experiment_saved_model_path}/model_{rank}_{i*batch_size}.pt"
-                        torch.save(model.state_dict(), model_path)
-
+                        # save the model
+                        torch.save(model.state_dict(), f"{experiment_saved_model_path}/best_model_{nb_samples_seen}.pt")
+                        log.info(f"Best model with eval accuracy {eval_acc} with {nb_samples_seen} samples seen is saved")
+                               
 
         else:
             log.info("Training signal is False, stopping training")
@@ -358,6 +335,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset, 
     torch.save(model.state_dict(), os.path.join(save_dir, 'model.pt'))
     run.finish()
     plot_nb_samples_metrics(eval_acc_logs, save_path=f"{experiment_path}/plots")
+    plot_nb_samples_loss(train_loss_logs, save_path=f"{experiment_path}/plots")
 
 
 
@@ -372,6 +350,15 @@ def plot_nb_samples_metrics(eval_acc_logs, save_path):
 
     # save the plot
     plt.savefig(f"{save_path}/accuracy_vs_nb_samples.png")
+
+def plot_nb_samples_loss(train_loss_logs, save_path):
+    # transform to df
+    train_loss_logs_df = pd.DataFrame(train_loss_logs)
+    # lineplot with nb_samples on x-axis and loss on y-axis
+    sns.lineplot(x="samples", y="loss", data=train_loss_logs_df)
+
+    # save the plot
+    plt.savefig(f"{save_path}/loss_vs_nb_samples.png")
 
 
 
