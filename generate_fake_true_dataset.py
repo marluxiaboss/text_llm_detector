@@ -438,6 +438,17 @@ if __name__ == "__main__":
         #template for chat
         use_chat_template = True
         template_type ="user"
+
+    elif args.generator == "mistral":
+        gen_path = "mistralai/Mistral-7B-v0.1"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
+
+        #template for chat
+        use_chat_template = False
+        template_type = None  
+
     else:
         # no other generator is supported for now
         raise ValueError("Generator not supported")
