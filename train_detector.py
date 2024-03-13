@@ -364,6 +364,9 @@ def plot_nb_samples_loss(train_loss_logs, save_path):
 
 def test_model(model, batch_size, dataset, experiment_path, log):
 
+    # load best model
+    model.load_state_dict(torch.load(f"{experiment_path}/saved_models/best_model.pt"))
+    model.eval()
     metric = evaluate.combine(["accuracy", "f1", "precision", "recall"])
 
     def compute_metrics(eval_pred):
@@ -382,7 +385,7 @@ def test_model(model, batch_size, dataset, experiment_path, log):
         eval_dataset=dataset["test"]
     )
     
-    log.info("Evaluating the model on the test set...")
+    log.info("Evaluating the best model on the test set...")
     predictions = trainer.predict(dataset["test"])
     preds = np.argmax(predictions.predictions, axis=-1)
     results = metric.compute(predictions=preds, references=predictions.label_ids)
