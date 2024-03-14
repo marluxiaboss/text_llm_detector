@@ -115,9 +115,9 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     true_dataset_list = true_dataset["text_template"]
     
     batches_all =[]
-    for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
+    for i in range(0, len(true_dataset_list), batch_size):
         batch = true_dataset_list[i:i+batch_size]
-        batches.append(batch)
+        batches_all.append(batch)
         #responses = generator(batch, max_new_tokens=max_new_tokens)
         #fake_responses.extend(responses)
 
@@ -125,7 +125,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
 
     with accelerator.split_between_processes(batches_all) as batches:
         results = []
-        batches_with_bar = tqdm(batches, disable=(not accelerator.is_local_main_process))
+        batches_with_bar = tqdm(batches, disable=(not accelerator.is_local_main_process), desc="generating fake responses")
         for batch in batches_with_bar:
             responses = generator(batch, max_new_tokens=max_new_tokens)
             results.append(responses)
@@ -133,7 +133,10 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         results = [results]
     
     results_gathered = gather_object(results)
-    fake_responses = results_gathered[0]
+    if accelerator.is_main_process:
+        fake_responses = [item[0] for sublist in results_gathered for item in sublist]
+        print("len fake responses", len(fake_responses))
+        print("fake responses: ", fake_responses)
     
     return fake_responses
 
@@ -317,6 +320,10 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
     Format the text into a template.
     """
 
+    def remove_double_space(text):
+        corrected_text = text.replace(".  ", ". ")
+        return corrected_text
+
     def format_text(sample):
 
         text = sample["text"]
@@ -326,7 +333,12 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
             if sample["label"] == 0:
                 modified_text = sample["context"] + "" + sample["instruction"] + " " + text
             elif sample["label"] == 1:
-                modified_text = sample["context"] + "" + sample["instruction"] + "" + text
+                if sample["instruction"][-1] == " ":
+                    modified_text = sample["context"] + "" + sample["instruction"] + "" + text
+                else:
+                    modified_text = sample["context"] + "" + sample["instruction"] + " " + text
+
+                modified_text = remove_double_space(modified_text)
             else:
                 raise ValueError("Label not supported")
 
