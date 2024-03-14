@@ -219,7 +219,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
     train_dataset = process_tokenized_dataset(train_dataset)
     val_dataset = process_tokenized_dataset(val_dataset)
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
 
 
@@ -273,6 +273,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                 sig.update()
 
                 input_ids = batch["input_ids"]
+                print("input_ids: ", input_ids)
                 attention_mask = batch["attention_mask"]
                 labels = batch["labels"]
                 outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
