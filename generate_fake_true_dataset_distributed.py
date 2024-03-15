@@ -123,20 +123,21 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
 
     accelerator.wait_for_everyone()   
 
-    with accelerator.split_between_processes(batches_all) as batches:
-        results = []
-        batches_with_bar = tqdm(batches, disable=(not accelerator.is_local_main_process), desc="generating fake responses")
-        for batch in batches_with_bar:
-            responses = generator(batch, max_new_tokens=max_new_tokens)
-            results.append(responses)
+    with open("fake_responses.txt", "w") as fake_responses_cache:
 
-        results = [results]
-    
+        with accelerator.split_between_processes(batches_all) as batches:
+            results = []
+            batches_with_bar = tqdm(batches, disable=(not accelerator.is_local_main_process), desc="generating fake responses")
+            for batch in batches_with_bar:
+                responses = generator(batch, max_new_tokens=max_new_tokens)
+                results.append(responses)
+                fake_responses_cache.write(f"{responses}\n")
+
+            results = [results]
+        
     results_gathered = gather_object(results)
     if accelerator.is_main_process:
         fake_responses = [item[0] for sublist in results_gathered for item in sublist]
-        print("len fake responses", len(fake_responses))
-        print("fake responses: ", fake_responses)
     
     return fake_responses
 
@@ -568,6 +569,9 @@ if __name__ == "__main__":
     # generate fake dataset
     #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
+    fake_dataset.save_to_disk(f"fake_dataset_{args.experiment_name}")
+
+
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
     #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
