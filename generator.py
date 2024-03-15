@@ -76,7 +76,7 @@ class LLMGenerator(nn.Module):
         for special_token in special_tokens:
             decoded_output = decoded_output.replace(special_token, "")
         decoded_outputs[i] = decoded_output
-
+        
     return decoded_outputs
   
 

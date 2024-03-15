@@ -14,6 +14,9 @@ from generator import LLMGenerator
 
 
 def create_train_from_dataset(dataset):
+    """
+    Create a train split from a dataset
+    """
 
     dataset_dict = DatasetDict()
     dataset_dict["train"] = dataset
@@ -32,6 +35,10 @@ def create_random_subset(dataset, n=10, seed=42):
     return subset
 
 def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
+    """
+    Process the true dataset by creating the necessary columns and selecting a size according to
+    the fake dataset size
+    """
     #dataset = load_dataset(dataset_path)
 
     true_dataset = true_dataset.select_columns(["response", "instruction", "context", "id"])
@@ -485,15 +492,29 @@ if __name__ == "__main__":
         use_chat_template = True
         template_type ="user"
 
-    elif args.generator == "gemma_2b_chat":
-        gen_path = "google/gemma-2b-it"
+    elif args.generator == "gemma_2b":
+        gen_path = "google/gemma-2b"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token, torch_dtype=torch.bfloat16).to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=args.access_token)
         generator = LLMGenerator(gen_model, gen_tokenizer, args.device, gen_params=default_gen_params)
 
         #template for chat
-        use_chat_template = True
-        template_type ="user"
+        use_chat_template = False
+        template_type = None  
+
+    elif args.generator == "phi":
+        gen_path = "microsoft/phi-2"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.float16).to(args.device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path)
+        generator = LLMGenerator(gen_model, gen_tokenizer, args.device, gen_params=default_gen_params)
+
+        # special for phi
+        gen_tokenizer.pad_token = gen_tokenizer.eos_token
+        gen_tokenizer.padding_side = 'left'
+
+        #template for chat
+        use_chat_template = False
+        template_type = None  
 
     elif args.generator == "mistral":
         gen_path = "mistralai/Mistral-7B-v0.1"
