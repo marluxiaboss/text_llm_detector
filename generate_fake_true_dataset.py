@@ -59,70 +59,66 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     return true_dataset
 
 
-def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens, batch_size=2, use_chat_template=False, template_type=None):
+def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens, batch_size=2, use_chat_template=False,
+                             template_type=None, load_from_cache=False):
     """
     Traverse dataset and generate responses for each instruction
     """
 
     fake_responses = []
-    """
-    # TODO: improve this loop by parallelizing/batch
-    for data in tqdm(true_dataset, desc="Generating fake responses"):
-        # Create query in the format that the generator expects
-        text_instruction = f"Context: {data['context']} \n {data['instruction']}"
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"{text_instruction}"},
-        ]
-        text = gen_tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
 
-        # Generate response
-        output = generator(text, skip_special_tokens=False, max_new_tokens=max_new_tokens)
-        
-        fake_responses.append(output)
-    """ 
+    if load_from_cache == "True":
+        cache_dir = "./fake_responses_cache"
 
-    # batch generation
-    batch_size = batch_size
-    # transform into chat template
-    def transform_chat_template(sample, use_chat_template=False):
-
-        if use_chat_template:
-            text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
-            match template_type:
-                case "system_user":
-                    messages = [
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": f"{text_instruction}"},
-                    ]
-                case "user":
-                    messages = [
-                    {"role": "user", "content": f"{text_instruction}"},
-                    ]
-                case _:
-                    raise ValueError("Template type not supported")
-
-            text_template = gen_tokenizer.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True
-            )
+        if os.path.exists(cache_dir):
+            
+            # iterate over all files in the cache directory
+            for file in os.listdir(cache_dir):
+                if file.endswith(".txt"):
+                    # load the file
+                    with open(os.path.join(cache_dir, file), "r") as f:
+                        fake_responses.extend(f.readlines())
         else:
-            text_instruction = sample["instruction"]
-            text_template = text_instruction
-        return {"text_template": text_template}
-    
-    true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
-    true_dataset_list = true_dataset["text_template"]
-    
-    for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
-        batch = true_dataset_list[i:i+batch_size]
-        responses = generator(batch, max_new_tokens=max_new_tokens)
-        fake_responses.extend(responses)
+            raise ValueError("Cache directory does not exist")
+        
+    else:
+        # batch generation
+        batch_size = batch_size
+        # transform into chat template
+        def transform_chat_template(sample, use_chat_template=False):
+
+            if use_chat_template:
+                text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
+                match template_type:
+                    case "system_user":
+                        messages = [
+                        {"role": "system", "content": "You are a helpful assistant."},
+                        {"role": "user", "content": f"{text_instruction}"},
+                        ]
+                    case "user":
+                        messages = [
+                        {"role": "user", "content": f"{text_instruction}"},
+                        ]
+                    case _:
+                        raise ValueError("Template type not supported")
+
+                text_template = gen_tokenizer.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True
+                )
+            else:
+                text_instruction = sample["instruction"]
+                text_template = text_instruction
+            return {"text_template": text_template}
+        
+        true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
+        true_dataset_list = true_dataset["text_template"]
+        
+        for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
+            batch = true_dataset_list[i:i+batch_size]
+            responses = generator(batch, max_new_tokens=max_new_tokens)
+            fake_responses.extend(responses)
     return fake_responses
 
 def filter_instruction(sample):
@@ -164,7 +160,8 @@ def filter_instruction(sample):
 
     return {"generated_response": response_without_instruction}
 
-def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100, max_new_tokens=100, seed=42, batch_size=2, use_chat_template=False, template_type=None):
+def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100,
+                           max_new_tokens=100, seed=42, batch_size=2, use_chat_template=False, template_type=None, load_from_cache=False):
     
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
@@ -184,7 +181,7 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     train_subset = true_dataset["train"].select(range(subset_size))
 
     
-    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type)
+    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache)
 
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
     "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"], "id": ids})
@@ -421,6 +418,7 @@ if __name__ == "__main__":
     parser.add_argument("--access_token", type=str, help="Huggingface access token used for Llama and Gemma", default="")
     parser.add_argument("--max_response_length", type=int, help="Max length of the response in characters", default=500)
     parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=10)
+    parser.add_argument("--from_cache", type=str, help="Load mutiple datasets chunk from cache", default="False")
 
     args = parser.parse_args()
 
@@ -553,9 +551,13 @@ if __name__ == "__main__":
     else:
         raise ValueError("Dataset not supported")
 
+
+
     # generate fake dataset
     #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
-    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
+    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
+                                          args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.from_cache)
+    
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
     #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")

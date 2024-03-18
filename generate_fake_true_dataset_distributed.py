@@ -123,17 +123,26 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
 
     accelerator.wait_for_everyone()   
 
-    with open("fake_responses.txt", "w") as fake_responses_cache:
+    #with open("fake_responses.txt", "w") as fake_responses_cache:
 
-        with accelerator.split_between_processes(batches_all) as batches:
-            results = []
-            batches_with_bar = tqdm(batches, disable=(not accelerator.is_local_main_process), desc="generating fake responses")
-            for batch in batches_with_bar:
-                responses = generator(batch, max_new_tokens=max_new_tokens)
-                results.append(responses)
-                fake_responses_cache.write(f"{responses}\n")
+    # open 1 file for each gpu:
+    fake_response_caches = [open(f"fake_responses_{i}.txt", "w") for i in range(accelerator.num_processes)]
 
-            results = [results]
+
+    with accelerator.split_between_processes(batches_all) as batches:
+        results = []
+        batches_with_bar = tqdm(batches, disable=(not accelerator.is_local_main_process), desc="generating fake responses")
+        for batch in batches_with_bar:
+            responses = generator(batch, max_new_tokens=max_new_tokens)
+            results.append(responses)
+
+            # each gpu writes to its own file
+            fake_responses_cache = fake_response_caches[accelerator.process_index]
+            fake_responses_cache.write(f"{responses}\n")
+            fake_responses_cache.flush()
+
+
+        results = [results]
         
     results_gathered = gather_object(results)
     if accelerator.is_main_process:
