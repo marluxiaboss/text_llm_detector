@@ -6,6 +6,8 @@ from tqdm import tqdm
 import os
 import torch
 import pandas as pd
+import json
+import jsonlines
 
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
@@ -113,11 +115,17 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     
     true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
     true_dataset_list = true_dataset["text_template"]
+    true_dataset_instruction = true_dataset["instruction"]
     
     batches_all =[]
     for i in range(0, len(true_dataset_list), batch_size):
         batch = true_dataset_list[i:i+batch_size]
-        batches_all.append(batch)
+        batch_instruction = true_dataset_instruction[i:i+batch_size]
+        
+        # record position of instructions
+        instruction_positions = list(range(i, i+batch_size))
+        batches_all.append((batch, batch_instruction, instruction_positions))
+        #batches_all_instruction.append(batch_instruction)
         #responses = generator(batch, max_new_tokens=max_new_tokens)
         #fake_responses.extend(responses)
 
@@ -126,28 +134,42 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     #with open("fake_responses.txt", "w") as fake_responses_cache:
 
     # open 1 file for each gpu:
-    fake_response_caches = [open(f"fake_responses_{i}.txt", "w") for i in range(accelerator.num_processes)]
+    fake_response_caches = [jsonlines.open(f"fake_responses_{i}.json", "w") for i in range(accelerator.num_processes)]
 
 
     with accelerator.split_between_processes(batches_all) as batches:
         results = []
         batches_with_bar = tqdm(batches, disable=(not accelerator.is_local_main_process), desc="generating fake responses")
-        for batch in batches_with_bar:
-            responses = generator(batch, max_new_tokens=max_new_tokens)
+        for i, batch in enumerate(batches_with_bar):
+            batch_query = batch[0]
+            responses = generator(batch_query, max_new_tokens=max_new_tokens)
             results.append(responses)
 
             # each gpu writes to its own file
             fake_responses_cache = fake_response_caches[accelerator.process_index]
-            fake_responses_cache.write(f"{responses}\n")
-            fake_responses_cache.flush()
+            instructions = batch[1]
+            instruction_positions = batch[2]
 
+            responses_with_instruction = []
+            for i in range(len(responses)):
+                #new_response = (f"{instructions[i]} {responses[i]}", instruction_positions[i])
+                new_response = {"instruction": instructions[i], "response": responses[i], "position": instruction_positions[i]}
+                responses_with_instruction.append(new_response)
 
+            #fake_responses_cache.write("\n".join([f"{instruction}\t{response}" for instruction, response in instruction_responses]) + "\n")
+            #json.dump(responses_with_instruction, fake_responses_cache)
+            fake_responses_cache.write_all(responses_with_instruction)
+            #fake_responses_cache.write(f"{responses_with_instruction}\n")
+            
         results = [results]
         
     results_gathered = gather_object(results)
     if accelerator.is_main_process:
         fake_responses = [item[0] for sublist in results_gathered for item in sublist]
     
+    # close all files
+    for fake_responses_cache in fake_response_caches:
+        fake_responses_cache.close()
     return fake_responses
 
 def filter_instruction(sample):
@@ -261,28 +283,57 @@ def regroup_pairs(merged_dataset, seed=42):
     Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split
     """
 
+    def fix_ids(dataset):
+        """
+        Fix the ids of the dataset
+        """
+        fake_responses_dataset = dataset.filter(lambda x: x["label"] == 1)["train"]
+        true_responses_dataset = dataset.filter(lambda x: x["label"] == 0)["train"]
+
+        fake_responses_text = fake_responses_dataset["text"]
+        true_responses_text = true_responses_dataset["text"]
+
+        correct_text_ordering = []
+
+        for i in tqdm(range(len(fake_responses_text)), desc="Correcting ids..."):
+
+            fake_response = fake_responses_text[i]
+
+            # find the prefix in true_dataset
+            prefix = fake_response[:10]
+
+            for i in range(len(true_responses_text)):
+                if true_responses_text[i][:10] == prefix:
+                    #correct_ids_fake_dataset.append(true_reponses_labels[i])
+                    correct_text_ordering.append(i)
+                    break
+        
+        # reorganize the fake responses according to the correct order
+        fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering)
+
+        # sort both datasets by id to allign them, otherwise concat doesn't work
+        true_responses_dataset = true_responses_dataset.sort("id")
+        fake_responses_dataset = fake_responses_dataset.sort("id")
+
+        dataset = concatenate_datasets([true_responses_dataset, fake_responses_dataset])
+        dataset = create_train_from_dataset(dataset)
+
+        return dataset
+    
     # shuffle the dataset
     merged_dataset = merged_dataset.shuffle(seed=seed)
 
-    # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
-    ids = set(merged_dataset["train"]["id"])
-    list_pairs = []
+    # ids may be incorrect for label 1, we need to fix them
+    merged_dataset = fix_ids(merged_dataset)
+
+    # sort the dataset by id
+    merged_dataset = merged_dataset.sort("id")
     
-    # temporarly disable progress bar to avoid too many progress bars
-    disable_progress_bar()
-    for id in ids:
-        pair = merged_dataset["train"].filter(lambda x: x["id"] == id)
-
-        # shuffle elements within the pair so that the true and fake responses are not always in the same order
-        pair = pair.shuffle(seed=seed)
-        list_pairs.append(pair)
-    enable_progress_bar()
-
-    merged_dataset = concatenate_datasets(list_pairs)
 
     # remove id column
     merged_dataset = merged_dataset.remove_columns(["id"])
-    merged_dataset = create_train_from_dataset(merged_dataset)
+    #merged_dataset = create_train_from_dataset(merged_dataset)
+    print("merged_dataset: ", merged_dataset)
 
     return merged_dataset
 def split_merged_dataset_random(merged_dataset, eval_size=0.1, test_size=0.1):

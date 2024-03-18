@@ -6,6 +6,7 @@ from tqdm import tqdm
 import os
 import torch
 import pandas as pd
+import json
 
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
@@ -65,7 +66,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     Traverse dataset and generate responses for each instruction
     """
 
-    fake_responses = []
+    fake_responses_with_pos = []
 
     if load_from_cache == "True":
         cache_dir = "./fake_responses_cache"
@@ -74,13 +75,25 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
             
             # iterate over all files in the cache directory
             for file in tqdm(os.listdir(cache_dir), desc="Loading fake responses from cache..."):
-                if file.endswith(".txt"):
+                if file.endswith(".json"):
                     # load the file
                     with open(os.path.join(cache_dir, file), "r") as f:
-                        fake_responses.extend(f.readlines())
+                        # interpret each line as a json object
+                        for line in f:
+                            # interpret the line as a json object
+                            fake_responses_with_pos.append(json.loads(line))
         else:
             raise ValueError("Cache directory does not exist")
-        
+
+
+        # format: {"instruction": "instruction", "response": "response", "posistion": "position"}
+        #fake_responses_with_pos = [(f"{x["instruction"]} {x["response"]}", x["position"]) for x in fake_responses_with_pos]
+        fake_responses_with_pos = [(f"{x["response"]}", x["position"]) for x in fake_responses_with_pos]
+        # fake_responses_with pos is of the format [(response_1, pos_1), (response_2, pos_2), ...]
+        # we need to sort the list by pos
+        fake_responses_with_pos = sorted(fake_responses_with_pos, key=lambda x: x[1])
+        fake_responses = [x[0] for x in fake_responses_with_pos]
+            
     else:
         # batch generation
         batch_size = batch_size
@@ -179,7 +192,6 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     subset_size = fake_dataset_size
     #train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
     train_subset = true_dataset["train"].select(range(subset_size))
-
     
     fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache)
 
@@ -278,31 +290,7 @@ def regroup_pairs(merged_dataset, seed=42):
 
     # sort the dataset by id
     merged_dataset = merged_dataset.sort("id")
-
-    # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
-    #list_pairs = []
     
-    """
-    # iterate over the dataset two by two
-    for i in range(0, len(merged_dataset["train"]), 2):
-        pair_1 = merged_dataset["train"].select([i])
-        pair_2 = merged_dataset["train"].select([i+1])
-
-        pair = merged_dataset["train"].select([i, i+1])
-
-        # shuffle elements within the pair so that the true and fake responses are not always in the same order
-        #rand_int = np.random.randint(0, 2)
-        #if rand_int == 0:
-        #    pair = {"text": pair_1["text"], "label": pair_1["label"], "id": pair_1["id"], "text_2": pair_2["text"], "label_2": pair_2["label"], "id_2": pair_2["id"]}
-        #else:
-        #    pair = {"text": pair_2["text"], "label": pair_2["label"], "id": pair_2["id"], "text_2": pair_1["text"], "label_2": pair_1["label"], "id_2": pair_1["id"]}
-        pair = pair.shuffle(seed=seed)
-
-        list_pairs.append(pair)
-
-
-    merged_dataset = concatenate_datasets(list_pairs)
-    """
 
     # remove id column
     merged_dataset = merged_dataset.remove_columns(["id"])
@@ -366,7 +354,7 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
             if sample["label"] == 0:
                 modified_text = sample["context"] + "" + sample["instruction"] + " " + text
             elif sample["label"] == 1:
-                modified_text = sample["context"] + "" + sample["instruction"] + "" + text
+                modified_text = sample["context"] + "" + sample["instruction"] + " " + text
             else:
                 raise ValueError("Label not supported")
 
