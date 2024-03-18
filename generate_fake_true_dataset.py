@@ -73,7 +73,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         if os.path.exists(cache_dir):
             
             # iterate over all files in the cache directory
-            for file in os.listdir(cache_dir):
+            for file in tqdm(os.listdir(cache_dir), desc="Loading fake responses from cache..."):
                 if file.endswith(".txt"):
                     # load the file
                     with open(os.path.join(cache_dir, file), "r") as f:
@@ -233,30 +233,85 @@ def regroup_pairs(merged_dataset, seed=42):
     Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split
     """
 
+    def fix_ids(dataset):
+        """
+        Fix the ids of the dataset
+        """
+        fake_responses_dataset = dataset.filter(lambda x: x["label"] == 1)["train"]
+        true_responses_dataset = dataset.filter(lambda x: x["label"] == 0)["train"]
+
+        fake_responses_text = fake_responses_dataset["text"]
+        true_responses_text = true_responses_dataset["text"]
+
+        correct_text_ordering = []
+
+        for i in tqdm(range(len(fake_responses_text)), desc="Correcting ids..."):
+
+            fake_response = fake_responses_text[i]
+
+            # find the prefix in true_dataset
+            prefix = fake_response[:10]
+
+            for i in range(len(true_responses_text)):
+                if true_responses_text[i][:10] == prefix:
+                    #correct_ids_fake_dataset.append(true_reponses_labels[i])
+                    correct_text_ordering.append(i)
+                    break
+        
+        # reorganize the fake responses according to the correct order
+        fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering)
+
+        # sort both datasets by id to allign them, otherwise concat doesn't work
+        true_responses_dataset = true_responses_dataset.sort("id")
+        fake_responses_dataset = fake_responses_dataset.sort("id")
+
+        dataset = concatenate_datasets([true_responses_dataset, fake_responses_dataset])
+        dataset = create_train_from_dataset(dataset)
+
+        return dataset
+    
     # shuffle the dataset
     merged_dataset = merged_dataset.shuffle(seed=seed)
 
+    # ids may be incorrect for label 1, we need to fix them
+    merged_dataset = fix_ids(merged_dataset)
+
+    # sort the dataset by id
+    merged_dataset = merged_dataset.sort("id")
+
     # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
-    ids = set(merged_dataset["train"]["id"])
-    list_pairs = []
+    #list_pairs = []
     
-    # temporarly disable progress bar to avoid too many progress bars
-    disable_progress_bar()
-    for id in ids:
-        pair = merged_dataset["train"].filter(lambda x: x["id"] == id)
+    """
+    # iterate over the dataset two by two
+    for i in range(0, len(merged_dataset["train"]), 2):
+        pair_1 = merged_dataset["train"].select([i])
+        pair_2 = merged_dataset["train"].select([i+1])
+
+        pair = merged_dataset["train"].select([i, i+1])
 
         # shuffle elements within the pair so that the true and fake responses are not always in the same order
+        #rand_int = np.random.randint(0, 2)
+        #if rand_int == 0:
+        #    pair = {"text": pair_1["text"], "label": pair_1["label"], "id": pair_1["id"], "text_2": pair_2["text"], "label_2": pair_2["label"], "id_2": pair_2["id"]}
+        #else:
+        #    pair = {"text": pair_2["text"], "label": pair_2["label"], "id": pair_2["id"], "text_2": pair_1["text"], "label_2": pair_1["label"], "id_2": pair_1["id"]}
         pair = pair.shuffle(seed=seed)
+
         list_pairs.append(pair)
-    enable_progress_bar()
+
 
     merged_dataset = concatenate_datasets(list_pairs)
+    """
 
     # remove id column
     merged_dataset = merged_dataset.remove_columns(["id"])
-    merged_dataset = create_train_from_dataset(merged_dataset)
+    #merged_dataset = create_train_from_dataset(merged_dataset)
+    print("merged_dataset: ", merged_dataset)
 
     return merged_dataset
+
+
 def split_merged_dataset_random(merged_dataset, eval_size=0.1, test_size=0.1):
     """
     from https://discuss.huggingface.co/t/how-to-split-main-dataset-into-train-dev-test-as-datasetdict/1090/6
@@ -418,7 +473,7 @@ if __name__ == "__main__":
     parser.add_argument("--access_token", type=str, help="Huggingface access token used for Llama and Gemma", default="")
     parser.add_argument("--max_response_length", type=int, help="Max length of the response in characters", default=500)
     parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=10)
-    parser.add_argument("--from_cache", type=str, help="Load mutiple datasets chunk from cache", default="False")
+    parser.add_argument("--load_from_cache", type=str, help="Load mutiple datasets chunk from cache", default="False")
 
     args = parser.parse_args()
 
@@ -556,7 +611,7 @@ if __name__ == "__main__":
     # generate fake dataset
     #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
-                                          args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.from_cache)
+                                          args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.load_from_cache)
     
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
