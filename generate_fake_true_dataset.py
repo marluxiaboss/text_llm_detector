@@ -35,6 +35,21 @@ def create_random_subset(dataset, n=10, seed=42):
     subset = dataset.select(indices)
     return subset
 
+def filter_duplicates(dataset, column):
+    """
+    Filter out the duplicates in the dataset
+    """
+    
+    dataset_df = pd.DataFrame(dataset)
+    len_before_discard = dataset_df.shape[0]
+
+    dataset_df = dataset_df.drop_duplicates(subset=[column])
+
+    len_after_discard = dataset_df.shape[0]
+    print(f"Percent of data discarded after removing duplicate {column}: {100*(1 - len_after_discard/len_before_discard):.2f}%")
+
+    return Dataset.from_pandas(dataset_df)
+
 def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     """
     Process the true dataset by creating the necessary columns and selecting a size according to
@@ -67,6 +82,8 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
 
     # transform back to dataset
     true_dataset = Dataset.from_pandas(true_dataset_df)
+
+    true_dataset = create_train_from_dataset(true_dataset)
 
     return true_dataset
 
@@ -291,15 +308,17 @@ def regroup_pairs(merged_dataset, seed=42):
             fake_response = fake_responses_text[i]
 
             # find the prefix in true_dataset
-            prefix = fake_response[:10]
+            prefix = " ".join(fake_response.split()[:10])
 
             for i in range(len(true_responses_text)):
-                if true_responses_text[i][:10] == prefix:
+                if " ".join(true_responses_text[i].split()[:10]) == prefix:
                     #correct_ids_fake_dataset.append(true_reponses_labels[i])
                     correct_text_ordering.append(i)
                     break
         
         # reorganize the fake responses according to the correct order
+        print("len(correct_text_ordering): ", len(correct_text_ordering))
+        print("len(set(correct_text_ordering)): ", len(set(correct_text_ordering)))
         fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering)
 
         # sort both datasets by id to allign them, otherwise concat doesn't work
@@ -320,7 +339,6 @@ def regroup_pairs(merged_dataset, seed=42):
     # sort the dataset by id
     merged_dataset = merged_dataset.sort("id")
     
-
     # remove id column
     merged_dataset = merged_dataset.remove_columns(["id"])
     #merged_dataset = create_train_from_dataset(merged_dataset)
@@ -631,25 +649,33 @@ if __name__ == "__main__":
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
                                           args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.load_from_cache)
     
+    print("fake_dataset['train']['instruction'][0:6]: ", fake_dataset["train"]["instruction"][0:6])
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
+    print("true_dataset['train']['instruction'][0:6]: ", true_dataset["train"]["instruction"][0:6])
     #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
 
     # process fake dataset
     fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer, args.max_response_length)
+    print("fake_dataset['train']['text'][0:6]: ", fake_dataset["train"]["text"][0:6])
     #fake_dataset.save_to_disk(f"fake_dataset_{args.experiment_name}")
 
     # merge true and fake dataset
     merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset, args.seed)
+    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
+
 
     # format merged dataset into a template
     merged_dataset = format_merged_dataset(merged_dataset, use_chat_template, args.max_response_length)
+    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
 
     # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
     merged_dataset = regroup_pairs(merged_dataset)
+    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
 
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
+    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
     merged_dataset.save_to_disk(f"fake_true_dataset_{args.experiment_name}")
 
     # load to pandas train split
