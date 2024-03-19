@@ -7,7 +7,8 @@ import torch.optim.lr_scheduler as lr_scheduler
 import numpy as np
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer, DataCollatorWithPadding,
-    TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer, get_scheduler)
+    TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer, get_scheduler,
+    RobertaConfig, AutoConfig)
 from torch.optim import AdamW
 from copy import deepcopy
 from tqdm import tqdm
@@ -273,7 +274,6 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                 sig.update()
 
                 input_ids = batch["input_ids"]
-                print("input_ids: ", input_ids)
                 attention_mask = batch["attention_mask"]
                 labels = batch["labels"]
                 outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
@@ -363,10 +363,10 @@ def plot_nb_samples_loss(train_loss_logs, save_path):
     plt.savefig(f"{save_path}/loss_vs_nb_samples.png")
 
 
-def test_model(model, batch_size, dataset, experiment_path, log):
+def test_model(model, batch_size, dataset, experiment_path, log, dataset_path):
 
     # load best model
-    model.load_state_dict(torch.load(f"{experiment_path}/saved_models/best_model.pt"))
+    #model.load_state_dict(torch.load(f"{experiment_path}/saved_models/best_model.pt"))
     model.eval()
     metric = evaluate.combine(["accuracy", "f1", "precision", "recall"])
 
@@ -386,7 +386,7 @@ def test_model(model, batch_size, dataset, experiment_path, log):
         eval_dataset=dataset["test"]
     )
     
-    log.info("Evaluating the best model on the test set...")
+    log.info(f"Evaluating the best model on the test set of dataset {dataset_path}...")
     predictions = trainer.predict(dataset["test"])
     preds = np.argmax(predictions.predictions, axis=-1)
     results = metric.compute(predictions=preds, references=predictions.label_ids)
@@ -487,13 +487,29 @@ if __name__ == "__main__":
 
  
     elif args.evaluation == "True":
-        model = RobertaForSequenceClassification.from_pretrained(args.model_path).to(args.device)
+        config= AutoConfig.from_pretrained("FacebookAI/roberta-base")
+        model = RobertaForSequenceClassification(config)
+        model.load_state_dict(torch.load(args.model_path))
+        model = model.to(args.device)
+        #model = RobertaForSequenceClassification.from_pretrained(args.model_path).to(args.device)
         # tokenize text
-        detector_path = "openai-community/roberta-base-openai-detector"
+        detector_path = "FacebookAI/roberta-base"
         bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
-        test_model(model, args.batch_size, dataset, args.model_path, args.device)
+
+        # if args.model_path is experiment_path/saved_models/best_model.pt, then the experiment_path is experiment_path
+        experiment_path = args.model_path.split("/saved_models")[0]
+
+
+        # create log file
+        with open(f"{experiment_path}/test/log_{args.dataset_path}.txt", "w") as f:
+            f.write("")
+
+        log = create_logger(__name__, silent=False, to_disk=True,
+                                    log_file=f"{experiment_path}/test/log_{args.dataset_path}.txt")
+
+        test_model(model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
     else:
         raise ValueError("Evaluation mode must be either True or False")
 
