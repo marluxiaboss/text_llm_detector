@@ -57,6 +57,17 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     # save dataset
     #true_dataset.save_to_disk("true_dataset")
 
+
+    # drop duplicates on instruction by transforming to pandas dataframe
+    true_dataset_df = pd.DataFrame(true_dataset["train"])
+    len_before_discard = len(true_dataset_df)
+    true_dataset_df = true_dataset_df.drop_duplicates(subset=["instruction"])
+    len_after_discard = len(true_dataset_df)
+    print(f"Percent of data discarded after removing duplicate instructs from true_dataset_df: {100*(1 - len_after_discard/len_before_discard):.2f}%")
+
+    # transform back to dataset
+    true_dataset = Dataset.from_pandas(true_dataset_df)
+
     return true_dataset
 
 
@@ -197,6 +208,24 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
 
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
     "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"], "id": ids})
+    
+    # transform to pandas dataframe
+    fake_responses_train_df = pd.DataFrame(fake_responses_train)
+
+    # remove rows with duplicate instructions from df
+    len_before_discard = len(fake_responses_train_df)
+    fake_responses_train_df = fake_responses_train_df.drop_duplicates(subset=["instruction"])
+    len_after_discard = len(fake_responses_train_df)
+    print(f"Percent of data discarded after removing duplicate instructs from fake_responses_train_df: {100*(1 - len_after_discard/len_before_discard):.2f}%")
+
+    # remove rows with duplicate responses from df
+    len_before_discard = len(fake_responses_train_df)
+    fake_responses_train_df = fake_responses_train_df.drop_duplicates(subset=["generated_response"])
+    len_after_discard = len(fake_responses_train_df)
+    print(f"Percent of data discarded after removing duplicate responses from fake_responses_train_df: {100*(1 - len_after_discard/len_before_discard):.2f}%")
+
+    # transform back to dataset
+    fake_responses_train = Dataset.from_pandas(fake_responses_train_df)
 
     # add ids again
     #fake_responses_train = fake_responses_train.add_column(ids, "id")
@@ -359,6 +388,7 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
                 raise ValueError("Label not supported")
 
         return {"text": modified_text}
+        
     
     merged_dataset = merged_dataset.map(format_text)
 

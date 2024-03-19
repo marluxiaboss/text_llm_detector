@@ -482,7 +482,7 @@ if __name__ == "__main__":
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
                            args.fp16, log)
         
-        test_model(detector_model, args.batch_size, dataset, experiment_path, log)
+        test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
 
 
  
