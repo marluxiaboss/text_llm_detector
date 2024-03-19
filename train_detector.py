@@ -243,7 +243,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
     # how many samples seen before evaluating the model per epoch
     log_loss_steps = 200
-    eval_steps= 1000
+    eval_steps= 200
 
     # round both up to the nearest multiple of batch_size
     log_loss_steps = (log_loss_steps + batch_size - 1) // batch_size * batch_size
@@ -487,14 +487,38 @@ if __name__ == "__main__":
 
  
     elif args.evaluation == "True":
-        config= AutoConfig.from_pretrained("FacebookAI/roberta-base")
-        model = RobertaForSequenceClassification(config)
+
+        if args.detector == "roberta":
+            detector_path = "FacebookAI/roberta-base"
+            config = AutoConfig.from_pretrained(detector_path)
+            model = RobertaForSequenceClassification(config)
+            bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+
+        elif args.detector == "bert":
+            detector_path = "bert-base-uncased"
+            config = AutoConfig.from_pretrained(detector_path)
+            model = BertForSequenceClassification(config)
+            bert_tokenizer = BertTokenizer.from_pretrained(detector_path)
+
+        elif args.detector == "electra":
+            detector_path = "google/electra-base-discriminator"
+            config = AutoConfig.from_pretrained(detector_path)
+            detector_model = ElectraForSequenceClassification(config)
+            bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
+
+        elif args.detector == "t5":
+            detector_path = "google-t5/t5-base"
+            config = AutoConfig.from_pretrained(detector_path)
+            detector_model = T5ForSequenceClassification(config)
+            bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
+
+        else:
+            raise ValueError("No other detector currently supported")
+
+
+        # load the trained weights
         model.load_state_dict(torch.load(args.model_path))
         model = model.to(args.device)
-        #model = RobertaForSequenceClassification.from_pretrained(args.model_path).to(args.device)
-        # tokenize text
-        detector_path = "FacebookAI/roberta-base"
-        bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
 
