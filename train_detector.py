@@ -63,6 +63,7 @@ def prepare_dataset_for_checking_degradation(detector_name, tokenizer, batch_siz
 
     if detector_name == "bert":
         questions_masked = [q + " [MASK]." for q in questions]
+
     elif detector_name == "roberta":
         questions_masked = [q + " <mask>." for q in questions]
 
@@ -272,7 +273,7 @@ def create_experiment_folder(model_name, experiment_args):
 def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                        learning_rate, warmup_ratio, weight_decay, batch_size,
                         save_dir, detector_name, experiment_path, dataset_path,
-                        fp16=True, log=None, check_degradation=0):
+                        fp16=True, log=None, check_degradation=0, degradation_check_batches=None):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     sig = Signal("run_signal.txt")
@@ -398,7 +399,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                                
                 if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
-                    check_degradation(batches, nb_samples_seen, log)
+                    check_degradation(degradation_check_batches, nb_samples_seen, log)
 
 
         else:
@@ -549,11 +550,16 @@ if __name__ == "__main__":
         with open(f"{experiment_path}/log.txt", "w") as f:
             f.write("")
 
+        batches = None   
         log = create_logger(__name__, silent=False, to_disk=True,
                                     log_file=f"{experiment_path}/log.txt")
+        if args.check_degradation > 0:
+            degradation_check_batches = prepare_dataset_for_checking_degradation(args.detector, bert_tokenizer, args.batch_size, seed=42)
+            ref_degredation_loss = check_model_degradation(detector_model, bert_tokenizer, batches, args.check_degradation, log)
+
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
-                           args.fp16, log, args.check_degradation)
+                           args.fp16, log, args.check_degradation, degradation_check_batches)
         
         test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
 
