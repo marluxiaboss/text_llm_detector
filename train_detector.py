@@ -37,6 +37,72 @@ from utils import create_logger, Signal
 def tokenize_text(x, tokenizer):
     return tokenizer(x["text"], truncation=True, padding="max_length", return_tensors="pt")
 
+
+def prepare_dataset_for_checking_degradation(detector_name, tokenizer, batch_size, seed):
+
+    fact_completion_dataset = load_dataset('Polyglot-or-Not/Fact-Completion')["English"]
+
+    # filter out questions where the answer is not a single word for the tokenizer
+    len_before = len(fact_completion_dataset)
+    #fact_completion_dataset = fact_completion_dataset.filter(lambda x: len(x["true"].split()) == 1)
+
+    # this number seems to be 3 for all models of interest
+    single_word_answer_token_size = 3
+    fact_completion_dataset = fact_completion_dataset.filter(lambda x: len(tokenizer(x["true"]).input_ids) == single_word_answer_token_size)
+    len_after = len(fact_completion_dataset)
+    #print(f"Filtered out {len_before - len_after} questions out of {len_before}")
+
+    nb_samples_test_degradation = 1000
+    fact_completion_dataset = fact_completion_dataset.shuffle(seed=seed)
+    fact_completion_dataset = fact_completion_dataset.select(range(nb_samples_test_degradation))
+    questions = fact_completion_dataset["stem"]
+    answers = fact_completion_dataset["true"]
+
+    # add [MASK] at the end of each question
+    # we also add a ".", this is very important for bert models
+
+    if detector_name == "bert":
+        questions_masked = [q + " [MASK]." for q in questions]
+    elif detector_name == "roberta":
+        questions_masked = [q + " <mask>." for q in questions]
+
+    else:
+        raise ValueError("No other detector currently supported")
+    
+
+    batches_questions_masked = [questions_masked[i:i + batch_size] for i in range(0, len(questions_masked), batch_size)]
+    question_with_answers = [questions[i] + " " + answers[i] + "." for i in range(len(questions))]
+    batches_answers = [question_with_answers[i:i + batch_size] for i in range(0, len(question_with_answers), batch_size)]
+
+    batches = list(zip(batches_questions_masked, batches_answers))
+    
+    return batches
+
+def check_model_degradation(model, tokenizer, batches, nb_samples, log):
+
+    losses = []
+    model.eval()
+
+    with torch.no_grad():
+        for batch_question, batch_answer in tqdm(batches, desc="Answering fact completion questions..."):
+        #for batch_question, batch_answer in batches:
+            inputs = tokenizer(batch_question, return_tensors='pt', padding=True, truncation=True)
+
+            questions_with_answer = batch_answer
+            #questions_with_answer = [questions[i] + " " + answers[i] + "." for i in range(len(batch))]
+
+            labels = tokenizer(questions_with_answer, return_tensors='pt', padding=True, truncation=True)["input_ids"]
+            labels = torch.where(inputs.input_ids == tokenizer.mask_token_id, labels, -100)
+
+            outputs = model(**inputs, labels=labels)
+            loss = outputs.loss
+            losses.append(loss.item())
+
+    avg_loss = sum(losses) / len(losses)
+    log.info(f"Average Loss on fact answering task after {nb_samples} samples: {avg_loss:.4f}")
+
+    return avg_loss
+
 def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weight_decay, batch_size, save_dir):
 
     eval_acc_logs = []
@@ -204,7 +270,9 @@ def create_experiment_folder(model_name, experiment_args):
 
 
 def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
-                       learning_rate, warmup_ratio, weight_decay, batch_size, save_dir, detector_name, experiment_path, dataset_path, fp16=True, log=None):
+                       learning_rate, warmup_ratio, weight_decay, batch_size,
+                        save_dir, detector_name, experiment_path, dataset_path,
+                        fp16=True, log=None, check_degradation=0):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     sig = Signal("run_signal.txt")
@@ -328,6 +396,10 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                         log.info(f"Best model with eval accuracy {eval_acc} with {nb_samples_seen} samples seen is saved")
                     model.train()
                                
+                if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
+                    nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
+                    check_degradation(batches, nb_samples_seen, log)
+
 
         else:
             log.info("Training signal is False, stopping training")
@@ -413,6 +485,7 @@ if __name__ == "__main__":
     parser.add_argument("--freeze_base", type=str, help="Whether to freeze the base model", default="False")
     parser.add_argument("--save_dir", type=str, help="Directory to save the model and logs", default="./training_logs/detector_freeze_base")
     parser.add_argument("--fp16", type=str, help="Whether to use fp16", default="True")
+    parser.add_argument("--check_degradation", type=int, help="If set to > 0, then check for the degration of the model after each check_degradation steps", default=0)
     args = parser.parse_args()
 
 
@@ -480,7 +553,7 @@ if __name__ == "__main__":
                                     log_file=f"{experiment_path}/log.txt")
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
-                           args.fp16, log)
+                           args.fp16, log, args.check_degradation)
         
         test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
 
