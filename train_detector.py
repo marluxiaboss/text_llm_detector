@@ -8,7 +8,7 @@ import numpy as np
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer, DataCollatorWithPadding,
     TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer, get_scheduler,
-    RobertaConfig, AutoConfig)
+    RobertaConfig, AutoConfig, AutoModelForMaskedLM)
 from torch.optim import AdamW
 from copy import deepcopy
 from tqdm import tqdm
@@ -79,7 +79,41 @@ def prepare_dataset_for_checking_degradation(detector_name, tokenizer, batch_siz
     
     return batches
 
-def check_model_degradation(model, tokenizer, batches, nb_samples, log):
+def create_mlm_model(model_name, device):
+    if model_name == "roberta":
+        model = AutoModelForMaskedLM.from_pretrained("roberta-base").to(device)
+    
+    if model_name == "bert":
+        model = AutoModelForMaskedLM.from_pretrained("bert-base-uncased").to(device)
+    
+    if model_name == "electra":
+        model = AutoModelForMaskedLM.from_pretrained("google/electra-base-discriminator").to(device)
+
+    if model_name == "t5":
+        model = AutoModelForMaskedLM.from_pretrained("google-t5/t5-base").to(device)
+    
+    return model
+
+
+def adapt_model_to_mlm(classif_model, mlm_model, model_name):
+
+    # transfer the roberta weights to the MaskedLM model
+    if model_name == "bert":
+        mlm_model.bert = classif_model.bert
+
+    elif model_name == "roberta":
+        mlm_model.roberta = classif_model.roberta
+    else:
+        raise ValueError("No other detector currently supported")
+    
+    return mlm_model
+
+
+
+def check_model_degradation(classif_model, tokenizer, batches, nb_samples, log, mlm_model, model_name):
+
+
+    model = adapt_model_to_mlm(classif_model, mlm_model, model_name)
 
     losses = []
     model.eval()
@@ -87,12 +121,12 @@ def check_model_degradation(model, tokenizer, batches, nb_samples, log):
     with torch.no_grad():
         for batch_question, batch_answer in tqdm(batches, desc="Answering fact completion questions..."):
         #for batch_question, batch_answer in batches:
-            inputs = tokenizer(batch_question, return_tensors='pt', padding=True, truncation=True)
+            inputs = tokenizer(batch_question, return_tensors='pt', padding=True, truncation=True).to(model.device)
 
             questions_with_answer = batch_answer
             #questions_with_answer = [questions[i] + " " + answers[i] + "." for i in range(len(batch))]
 
-            labels = tokenizer(questions_with_answer, return_tensors='pt', padding=True, truncation=True)["input_ids"]
+            labels = tokenizer(questions_with_answer, return_tensors='pt', padding=True, truncation=True)["input_ids"].to(model.device)
             labels = torch.where(inputs.input_ids == tokenizer.mask_token_id, labels, -100)
 
             outputs = model(**inputs, labels=labels)
@@ -273,7 +307,8 @@ def create_experiment_folder(model_name, experiment_args):
 def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                        learning_rate, warmup_ratio, weight_decay, batch_size,
                         save_dir, detector_name, experiment_path, dataset_path,
-                        fp16=True, log=None, check_degradation=0, degradation_check_batches=None):
+                        fp16=True, log=None, check_degradation=0, degradation_check_batches=None,
+                        mlm_model=None):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     sig = Signal("run_signal.txt")
@@ -312,7 +347,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
     # how many samples seen before evaluating the model per epoch
     log_loss_steps = 200
-    eval_steps= 200
+    eval_steps= 500
 
     # round both up to the nearest multiple of batch_size
     log_loss_steps = (log_loss_steps + batch_size - 1) // batch_size * batch_size
@@ -399,7 +434,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                                
                 if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
-                    check_degradation(degradation_check_batches, nb_samples_seen, log)
+                    check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
 
 
         else:
@@ -550,17 +585,24 @@ if __name__ == "__main__":
         with open(f"{experiment_path}/log.txt", "w") as f:
             f.write("")
 
-        batches = None   
+        degradation_check_batches = None   
+        mlm_model = None
         log = create_logger(__name__, silent=False, to_disk=True,
                                     log_file=f"{experiment_path}/log.txt")
+        
+        # test model loss on mlm eval before training
         if args.check_degradation > 0:
             degradation_check_batches = prepare_dataset_for_checking_degradation(args.detector, bert_tokenizer, args.batch_size, seed=42)
-            ref_degredation_loss = check_model_degradation(detector_model, bert_tokenizer, batches, args.check_degradation, log)
+            mlm_model = create_mlm_model(args.detector, args.device)
+            ref_degredation_loss = check_model_degradation(detector_model, bert_tokenizer, degradation_check_batches, args.check_degradation, log, mlm_model, args.detector)
+            
 
+        # run the training loop
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
-                           args.fp16, log, args.check_degradation, degradation_check_batches)
+                           args.fp16, log, args.check_degradation, degradation_check_batches, mlm_model)
         
+        # evaluate model on the test set after training by loading the best model
         test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
 
 
