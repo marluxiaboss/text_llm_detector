@@ -308,7 +308,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                        learning_rate, warmup_ratio, weight_decay, batch_size,
                         save_dir, detector_name, experiment_path, dataset_path,
                         fp16=True, log=None, check_degradation=0, degradation_check_batches=None,
-                        mlm_model=None):
+                        mlm_model=None, log_loss_steps=200, eval_steps=500):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     sig = Signal("run_signal.txt")
@@ -344,10 +344,6 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
     model, optimizer, train_loader, scheduler = accelerator.prepare(model, optimizer, train_loader, scheduler)
     val_loader = accelerator.prepare(val_loader)
-
-    # how many samples seen before evaluating the model per epoch
-    log_loss_steps = 200
-    eval_steps= 500
 
     # round both up to the nearest multiple of batch_size
     log_loss_steps = (log_loss_steps + batch_size - 1) // batch_size * batch_size
@@ -511,7 +507,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str, help="Path to the fake true dataset (generated with generate_fake_true_dataset.py)", default="fake_true_dataset")
     parser.add_argument("--batch_size", type=int, help="Batch size to train the model", default=8)
     parser.add_argument("--num_epochs", type=int, help="Number of epochs to train the model", default=3)
-    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=5e-3)
+    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=5e-5)
     parser.add_argument("--warmup_ratio", type=float, help="Warmup ratio for the model", default=0.1)
     parser.add_argument("--weight_decay", type=float, help="Weight decay for the model", default=0.01)
     parser.add_argument("--device", type=str, help="Device to train the model", default="cuda")
@@ -522,6 +518,8 @@ if __name__ == "__main__":
     parser.add_argument("--save_dir", type=str, help="Directory to save the model and logs", default="./training_logs/detector_freeze_base")
     parser.add_argument("--fp16", type=str, help="Whether to use fp16", default="True")
     parser.add_argument("--check_degradation", type=int, help="If set to > 0, then check for the degration of the model after each check_degradation steps", default=0)
+    parser.add_argument("--log_loss_steps", type=int, help="How many samples seen before logging the loss", default=200)
+    parser.add_argument("--eval_steps", type=int, help="How many samples seen before evaluating the model", default=500)
     args = parser.parse_args()
 
 
@@ -600,7 +598,7 @@ if __name__ == "__main__":
         # run the training loop
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
-                           args.fp16, log, args.check_degradation, degradation_check_batches, mlm_model)
+                           args.fp16, log, args.check_degradation, degradation_check_batches, mlm_model, args.log_loss_steps, args.eval_steps)
         
         # evaluate model on the test set after training by loading the best model
         test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
