@@ -5,7 +5,7 @@ import numpy as np
 
 
 class LLMDetector(nn.Module):
-  def __init__(self, bert_model, tokenizer, num_classes, freeze_bert=False, device=None):
+  def __init__(self, bert_model, tokenizer, num_classes, freeze_bert=False, device=None, add_more_layers=False):
     super().__init__()
 
     self.tokenizer = tokenizer
@@ -22,9 +22,12 @@ class LLMDetector(nn.Module):
     self.num_classes = num_classes
 
     if freeze_bert:
-      for name, param in self.bert.named_parameters():
-        if not name.startswith("classifier"):
-          param.requires_grad = False
+      # freeze the base model
+      self.freeze_base(self.bert)
+
+    if add_more_layers:
+      # add more layers to the classifier
+      self.bert = self.add_more_layers(self.bert)
 
   def forward(self, text):
 
@@ -42,3 +45,15 @@ class LLMDetector(nn.Module):
     for name, param in bert_model.named_parameters():
       if not name.startswith("classifier") and not name.startswith("classification_head"):
         param.requires_grad = False
+
+  @staticmethod
+  def add_more_layers(bert_model):
+    bert_model.classifier = nn.Sequential(
+      nn.Linear(bert_model.config.hidden_size, bert_model.config.hidden_size),
+      nn.Dropout(0.1),
+      nn.Linear(bert_model.config.hidden_size, bert_model.config.hidden_size),
+      nn.Dropout(0.1),
+      nn.Linear(bert_model.config.hidden_size, bert_model.num_classes)
+    )
+    return bert_model
+  

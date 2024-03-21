@@ -353,6 +353,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
     eval_acc_logs = []
     train_loss_logs = []
+    loss_degradation_logs = []
 
     best_model = None
 
@@ -364,11 +365,14 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
     if fp16:
         tags.append("fp16")
 
-    if freeze_base:
+    if freeze_base == "True":
         tags.append("freeze_base")
     else:
         tags.append("full_finetuning")
+
     run = wandb.init(project="detector_training", tags=tags, dir=experiment_path)
+
+
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0
@@ -435,7 +439,8 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                                
                 if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
-                    check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
+                    degradation_loss = check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
+                    loss_degradation_logs.append({"samples": nb_samples_seen, "loss": degradation_loss})
 
 
         else:
@@ -449,6 +454,9 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
     run.finish()
     plot_nb_samples_metrics(eval_acc_logs, save_path=f"{experiment_path}/plots")
     plot_nb_samples_loss(train_loss_logs, save_path=f"{experiment_path}/plots")
+
+    if check_degradation > 0:
+        plot_degradation_loss(loss_degradation_logs, save_path=f"{experiment_path}/plots")
 
 
 def plot_nb_samples_metrics(eval_acc_logs, save_path):
@@ -470,6 +478,16 @@ def plot_nb_samples_loss(train_loss_logs, save_path):
 
     # save the plot
     plt.savefig(f"{save_path}/loss_vs_nb_samples.png")
+
+def plot_degradation_loss(loss_degradation_logs, save_path):
+    # transform to df
+    loss_degradation_logs_df = pd.DataFrame(loss_degradation_logs)
+    plt.figure()
+    # lineplot with nb_samples on x-axis and loss on y-axis
+    sns.lineplot(x="samples", y="loss", data=loss_degradation_logs_df)
+
+    # save the plot
+    plt.savefig(f"{save_path}/degradation_loss_vs_nb_samples.png")
 
 
 def test_model(model, batch_size, dataset, experiment_path, log, dataset_path):
@@ -512,7 +530,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str, help="Path to the fake true dataset (generated with generate_fake_true_dataset.py)", default="fake_true_dataset")
     parser.add_argument("--batch_size", type=int, help="Batch size to train the model", default=8)
     parser.add_argument("--num_epochs", type=int, help="Number of epochs to train the model", default=3)
-    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=1e-3)
+    parser.add_argument("--learning_rate", type=float, help="Learning rate for the model", default=5e-5)
     parser.add_argument("--warmup_ratio", type=float, help="Warmup ratio for the model", default=0.1)
     parser.add_argument("--weight_decay", type=float, help="Weight decay for the model", default=0.01)
     parser.add_argument("--device", type=str, help="Device to train the model", default="cuda")
@@ -525,6 +543,7 @@ if __name__ == "__main__":
     parser.add_argument("--check_degradation", type=int, help="If set to > 0, then check for the degration of the model after each check_degradation steps", default=0)
     parser.add_argument("--log_loss_steps", type=int, help="How many samples seen before logging the loss", default=200)
     parser.add_argument("--eval_steps", type=int, help="How many samples seen before evaluating the model", default=500)
+    parser.add_argument("--add_more_layers", type=str, help="Whether to add more layers to the classifier", default="False")
     args = parser.parse_args()
 
 
@@ -579,6 +598,9 @@ if __name__ == "__main__":
 
         if args.freeze_base == "True":
             LLMDetector.freeze_base(detector_model)
+
+        if args.add_more_layers == "True":
+            LLMDetector.add_more_layers(detector_model)
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
         #run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)       
