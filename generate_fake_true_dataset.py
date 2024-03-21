@@ -117,6 +117,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         # format: {"instruction": "instruction", "response": "response", "posistion": "position"}
         #fake_responses_with_pos = [(f"{x["instruction"]} {x["response"]}", x["position"]) for x in fake_responses_with_pos]
         fake_responses_with_pos = [(f"{x["response"]}", x["position"]) for x in fake_responses_with_pos]
+
         # fake_responses_with pos is of the format [(response_1, pos_1), (response_2, pos_2), ...]
         # we need to sort the list by pos
         fake_responses_with_pos = sorted(fake_responses_with_pos, key=lambda x: x[1])
@@ -197,7 +198,10 @@ def filter_instruction(sample):
 
     response_without_instruction = sample["generated_response"]
     # remove newline characters
-    response_without_instruction = response_without_instruction.replace("\n", " ")
+    #response_without_instruction = response_without_instruction.replace("\n", " ")
+
+    # replace any number of newlines with a " "
+    response_without_instruction = " ".join(response_without_instruction.split())
 
     return {"generated_response": response_without_instruction}
 
@@ -317,8 +321,6 @@ def regroup_pairs(merged_dataset, seed=42):
                     break
         
         # reorganize the fake responses according to the correct order
-        print("len(correct_text_ordering): ", len(correct_text_ordering))
-        print("len(set(correct_text_ordering)): ", len(set(correct_text_ordering)))
         fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering)
 
         # sort both datasets by id to allign them, otherwise concat doesn't work
@@ -649,33 +651,25 @@ if __name__ == "__main__":
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
                                           args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.load_from_cache)
     
-    print("fake_dataset['train']['instruction'][0:6]: ", fake_dataset["train"]["instruction"][0:6])
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
-    print("true_dataset['train']['instruction'][0:6]: ", true_dataset["train"]["instruction"][0:6])
     #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
 
     # process fake dataset
     fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer, args.max_response_length)
-    print("fake_dataset['train']['text'][0:6]: ", fake_dataset["train"]["text"][0:6])
     #fake_dataset.save_to_disk(f"fake_dataset_{args.experiment_name}")
 
     # merge true and fake dataset
     merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset, args.seed)
-    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
-
 
     # format merged dataset into a template
     merged_dataset = format_merged_dataset(merged_dataset, use_chat_template, args.max_response_length)
-    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
 
     # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
     merged_dataset = regroup_pairs(merged_dataset)
-    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
 
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
-    print("merged_dataset['train']['text'][0:6]: ", merged_dataset["train"]["text"][0:6])
     merged_dataset.save_to_disk(f"fake_true_dataset_{args.experiment_name}")
 
     # load to pandas train split
