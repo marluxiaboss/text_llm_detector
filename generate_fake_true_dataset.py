@@ -64,7 +64,7 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
     #true_dataset = true_dataset.shuffle(seed=seed)
     #true_dataset = true_dataset.select(range(len(fake_dataset["train"])))
     #true_dataset = true_dataset.select(range(fake_dataset_size))
-    true_dataset["train"] = true_dataset["train"].select(range(fake_dataset_size))
+    #true_dataset["train"] = true_dataset["train"].select(range(fake_dataset_size))
 
     # create label = 0 for true responses and label = 1 for fake responses
     true_dataset = true_dataset.map(lambda x: {"label": 0})
@@ -94,9 +94,13 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
     Traverse dataset and generate responses for each instruction
     """
 
-    fake_responses_with_pos = []
 
+    fake_responses = []
+
+    # save to which instructions we have generated a reponse, use when loading from cache
+    instructions = []
     if load_from_cache == "True":
+        fake_responses_with_pos = []
         cache_dir = "./fake_responses_cache"
 
         if os.path.exists(cache_dir):
@@ -116,12 +120,23 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
 
         # format: {"instruction": "instruction", "response": "response", "posistion": "position"}
         #fake_responses_with_pos = [(f"{x["instruction"]} {x["response"]}", x["position"]) for x in fake_responses_with_pos]
-        fake_responses_with_pos = [(f"{x["response"]}", x["position"]) for x in fake_responses_with_pos]
+        
+        print("len before: ", len(fake_responses_with_pos))
+        # remove duplicates in instruction
+        fake_responses_with_pos_unique = []
+        for x in fake_responses_with_pos:
+            # check if there exists an element with same instruction
+            if not any(d["instruction"] == x["instruction"] for d in fake_responses_with_pos_unique):
+                fake_responses_with_pos_unique.append(x)
+        fake_responses_with_pos_unique = [(f"{x["response"]}", x["position"], x["instruction"]) for x in fake_responses_with_pos_unique]
+        print("len after: ", len(fake_responses_with_pos_unique))
 
         # fake_responses_with pos is of the format [(response_1, pos_1), (response_2, pos_2), ...]
         # we need to sort the list by pos
-        fake_responses_with_pos = sorted(fake_responses_with_pos, key=lambda x: x[1])
-        fake_responses = [x[0] for x in fake_responses_with_pos]
+        fake_responses_with_pos_unique = sorted(fake_responses_with_pos_unique, key=lambda x: x[1])
+        fake_responses = [x[0] for x in fake_responses_with_pos_unique]
+
+        instructions = [x[2] for x in fake_responses_with_pos_unique]
             
     else:
         # batch generation
@@ -161,7 +176,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
             batch = true_dataset_list[i:i+batch_size]
             responses = generator(batch, max_new_tokens=max_new_tokens)
             fake_responses.extend(responses)
-    return fake_responses
+    return fake_responses, instructions
 
 def filter_instruction(sample):
     """
@@ -211,24 +226,32 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
 
-    ids = true_dataset["train"]["id"]
+    #ids = true_dataset["train"]["id"]
 
     # tokenize the instructions
-    true_dataset = true_dataset.map(lambda x: {"tokenized_instruction": gen_tokenizer(x["instruction"])})
-    true_dataset = true_dataset.map(lambda x: {"tokenized_context": gen_tokenizer(x["context"])})
-    dataset_before_len = len(true_dataset["train"])
-    true_dataset = true_dataset.filter(lambda x: len(x["tokenized_instruction"]["input_ids"]) + len(x["tokenized_context"]["input_ids"]) <= max_nb_tokens_input)
-    dataset_after_len = len(true_dataset["train"])
-    print(f"Percent of data discarded after filtering out input > max_nb_tokens: {100*(1 - dataset_after_len/dataset_before_len):.2f}%")
+    #true_dataset = true_dataset.map(lambda x: {"tokenized_instruction": gen_tokenizer(x["instruction"])})
+    #true_dataset = true_dataset.map(lambda x: {"tokenized_context": gen_tokenizer(x["context"])})
+    #dataset_before_len = len(true_dataset["train"])
+    #true_dataset = true_dataset.filter(lambda x: len(x["tokenized_instruction"]["input_ids"]) + len(x["tokenized_context"]["input_ids"]) <= max_nb_tokens_input)
+    #dataset_after_len = len(true_dataset["train"])
+    #print(f"Percent of data discarded after filtering out input > max_nb_tokens: {100*(1 - dataset_after_len/dataset_before_len):.2f}%")
 
-    subset_size = fake_dataset_size
+    #subset_size = fake_dataset_size
     #train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
-    train_subset = true_dataset["train"].select(range(subset_size))
+    #train_subset = true_dataset["train"].select(range(subset_size))
+    train_subset = true_dataset["train"]
     
-    fake_responses_train = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache)
+    fake_responses_train, instructions = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache)
 
+    print("len fake_responses_train: ", len(fake_responses_train))
+    if instructions is not []:
+        print("LEN BEFORE: ", len(train_subset))
+        train_subset = train_subset.filter(lambda x: x["instruction"] in instructions)
+        print("LEN AFTER: ", len(train_subset))
+
+    
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
-    "context": train_subset["context"], "true_response": train_subset["response"], "category": train_subset["category"], "id": ids})
+                    "context": train_subset["context"], "true_response": train_subset["text"], "id": train_subset["id"]})
     
     # transform to pandas dataframe
     fake_responses_train_df = pd.DataFrame(fake_responses_train)
@@ -409,17 +432,16 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
 
         return {"text": modified_text}
         
-    
     merged_dataset = merged_dataset.map(format_text)
 
     # if max_repsonse_length_char > 0, cut the response to max_repsonse_length_char characters, even if it cuts a word
     if max_repsonse_length_char > 0:
+        
         merged_dataset = merged_dataset.map(lambda x: {"text": x["text"][:max_repsonse_length_char]})
-
-        len_before_discard = len(merged_dataset)
         # discard the samples that are not max_repsonse_length_char
+        len_before_discard = len(merged_dataset["train"])
         merged_dataset = merged_dataset.filter(lambda x: len(x["text"]) == max_repsonse_length_char)
-        len_after_discard = len(merged_dataset)
+        len_after_discard = len(merged_dataset["train"])
         print(f"Percent of data discarded after filtering out input not equal to max_repsonse_length_char: {100*(1 - len_after_discard/len_before_discard):.2f}%")
 
         # check if the number of samples with label 0 and 1 are the same, if not, discard the extra samples
@@ -427,6 +449,8 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
         label_1 = merged_dataset.filter(lambda x: x["label"] == 1)["train"]
         nb_label_0 = len(label_0["text"])
         nb_label_1 = len(label_1["text"])
+        print("Number of samples with label 0:", nb_label_0)
+        print("Number of samples with label 1:", nb_label_1)
 
         if nb_label_0 > nb_label_1:
             label_0 = label_0.select(range(nb_label_1))
@@ -526,12 +550,12 @@ if __name__ == "__main__":
 
     # set default parameters for generation
     default_gen_params = {
-        "max_length": 150,
+        "max_length": 200,
         "max_new_tokens": None,
         "temperature": 0.8,
         "top_p": 0.8,
         "repetition_penalty": 1,
-        "do_sample": True,
+        "do_sample": True
     }
     # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 
@@ -631,28 +655,35 @@ if __name__ == "__main__":
 
     elif args.true_dataset_path == 'cnn_dailymail':
         # load true dataset from disk
-        true_dataset = load_dataset(args.true_dataset_path, "3.0.0")
+        true_dataset = load_dataset(args.true_dataset_path, "3.0.0")["train"]
 
         # only keep number of samples in true dataset according to fake_dataset_size
         #true_dataset = true_dataset.shuffle(seed=args.seed)
-        true_dataset = true_dataset["train"].select(range(args.fake_dataset_size))
+
+        if 2 * args.fake_dataset_size < len(true_dataset):
+            # make the dataset smaller in most cases to speed up the processing
+            true_dataset = true_dataset.select(range(2 * args.fake_dataset_size))
 
         # format dataset to have the same columns as the other datasets: "instruction", "context", "response", "category"
-        true_dataset = format_news_dataset(true_dataset, prefix_cutoff=args.prefix_cutoff, max_response_length_char=args.max_response_length)     
+        true_dataset = format_news_dataset(true_dataset, prefix_cutoff=args.prefix_cutoff, max_response_length_char=args.max_response_length)    
+        true_dataset = filter_duplicates(true_dataset["train"], "instruction") 
+        true_dataset = true_dataset.select(range(args.fake_dataset_size))
+
+        true_dataset = create_train_from_dataset(true_dataset)
         print("true_dataset: ", true_dataset)
 
     else:
         raise ValueError("Dataset not supported")
 
 
+    # process true dataset
+    true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
 
     # generate fake dataset
     #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
                                           args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.load_from_cache)
     
-    # process true dataset
-    true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
     #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
 
     # process fake dataset
