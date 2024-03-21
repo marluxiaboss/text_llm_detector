@@ -4,6 +4,31 @@ import torch.nn as nn
 import numpy as np
 
 
+class AugmentedRobertaClassificationHead(nn.Module):
+  """Head for sentence-level classification tasks."""
+
+  def __init__(self, config):
+      super().__init__()
+      self.dense1 = nn.Linear(config.hidden_size, config.hidden_size)
+      classifier_dropout = (
+          config.classifier_dropout if config.classifier_dropout is not None else config.hidden_dropout_prob
+      )
+      self.dropout = nn.Dropout(classifier_dropout)
+      self.dense2 = nn.Linear(config.hidden_size, config.hidden_size)
+      self.out_proj = nn.Linear(config.hidden_size, config.num_labels)
+
+  def forward(self, features, **kwargs):
+      x = features[:, 0, :]  # take <s> token (equiv. to [CLS])
+      x = self.dropout(x)
+      x = self.dense1(x)
+      x = torch.tanh(x)
+      x = self.dropout(x)
+      x = self.dense2(x)
+      x = torch.tanh(x)
+      x = self.dropout(x)
+      x = self.out_proj(x)
+      return x
+
 class LLMDetector(nn.Module):
   def __init__(self, bert_model, tokenizer, num_classes, freeze_bert=False, device=None, add_more_layers=False):
     super().__init__()
@@ -48,12 +73,16 @@ class LLMDetector(nn.Module):
 
   @staticmethod
   def add_more_layers(bert_model):
+    """
     bert_model.classifier = nn.Sequential(
       nn.Linear(bert_model.config.hidden_size, bert_model.config.hidden_size),
       nn.Dropout(0.1),
       nn.Linear(bert_model.config.hidden_size, bert_model.config.hidden_size),
       nn.Dropout(0.1),
-      nn.Linear(bert_model.config.hidden_size, bert_model.num_classes)
+      nn.Linear(bert_model.config.hidden_size, num_classes)
     )
+    """
+    bert_model.classifier = AugmentedRobertaClassificationHead(bert_model.config)
     return bert_model
-  
+
+
