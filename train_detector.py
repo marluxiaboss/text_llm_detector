@@ -619,8 +619,9 @@ if __name__ == "__main__":
         if args.use_adapter == "True":
             adapters.init(detector_model)
             config = adapters.BnConfig(mh_adapter=True, output_adapter=True, reduction_factor=16, non_linearity="relu")
-            detector_model.add_adapter("fake_true_detection", config="...")
+            detector_model.add_adapter("fake_true_detection", config=config)
             detector_model.train_adapter("fake_true_detection")
+            detector_model.to(args.device)
 
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
@@ -691,7 +692,6 @@ if __name__ == "__main__":
 
         # if args.model_path is experiment_path/saved_models/best_model.pt, then the experiment_path is experiment_path
         experiment_path = args.model_path.split("/saved_models")[0]
-
 
         # create log file
         with open(f"{experiment_path}/test/log_{args.dataset_path}.txt", "w") as f:
