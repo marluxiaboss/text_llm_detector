@@ -26,6 +26,7 @@ import wandb
 import os
 import argparse
 import sys
+import adapters
 
 from datetime import datetime
 
@@ -37,8 +38,12 @@ from utils import create_logger, Signal
 def tokenize_text(x, tokenizer):
     return tokenizer(x["text"], truncation=True, padding="max_length", return_tensors="pt")
 
-
 def prepare_dataset_for_checking_degradation(detector_name, tokenizer, batch_size, seed):
+    """
+    Prepare the given dataset format for checking the degradation of the model.
+    We use MaskedLM task to check for degradation, so we need to add a mask token depending
+    on the detector model
+    """
 
     fact_completion_dataset = load_dataset('Polyglot-or-Not/Fact-Completion')["English"]
 
@@ -67,10 +72,12 @@ def prepare_dataset_for_checking_degradation(detector_name, tokenizer, batch_siz
     elif detector_name == "roberta":
         questions_masked = [q + " <mask>." for q in questions]
 
+    elif detector_name == "electra":
+        questions_masked = [q + " [MASK]." for q in questions]
+
     else:
         raise ValueError("No other detector currently supported")
     
-
     batches_questions_masked = [questions_masked[i:i + batch_size] for i in range(0, len(questions_masked), batch_size)]
     question_with_answers = [questions[i] + " " + answers[i] + "." for i in range(len(questions))]
     batches_answers = [question_with_answers[i:i + batch_size] for i in range(0, len(question_with_answers), batch_size)]
@@ -103,6 +110,10 @@ def adapt_model_to_mlm(classif_model, mlm_model, model_name):
 
     elif model_name == "roberta":
         mlm_model.roberta = classif_model.roberta
+
+    elif model_name == "electra":
+        mlm_model.electra = classif_model.electra
+
     else:
         raise ValueError("No other detector currently supported")
     
@@ -259,7 +270,6 @@ def run(num_epochs, model, tokenizer, dataset, learning_rate, warmup_ratio, weig
     print("eval_acc_logs", eval_acc_logs_milestones_samples)
 
 
-
 def process_tokenized_dataset(dataset):
     dataset = dataset.remove_columns(["text"])
     dataset = dataset.rename_column("label", "labels")
@@ -300,6 +310,9 @@ def create_experiment_folder(model_name, experiment_args):
         f.write(f"log_mode: {experiment_args.log_mode}\n")
         f.write(f"freeze_base: {experiment_args.freeze_base}\n")
         f.write(f"save_dir: {experiment_args.save_dir}\n")
+        f.write(f"fp16: {experiment_args.fp16}\n")
+        f.write(f"check_degradation: {experiment_args.check_degradation}\n")
+        f.write(f"add_more_layers: {experiment_args.add_more_layers}\n")
 
     return experiment_path
 
@@ -544,6 +557,7 @@ if __name__ == "__main__":
     parser.add_argument("--log_loss_steps", type=int, help="How many samples seen before logging the loss", default=200)
     parser.add_argument("--eval_steps", type=int, help="How many samples seen before evaluating the model", default=500)
     parser.add_argument("--add_more_layers", type=str, help="Whether to add more layers to the classifier", default="False")
+    parser.add_argument("--use_adapter", type=str, help="Whether to use adapter layers. If set to True, will use adapter and freeze the rest.", default="False")
     args = parser.parse_args()
 
 
@@ -601,6 +615,13 @@ if __name__ == "__main__":
 
         if args.add_more_layers == "True":
             LLMDetector.add_more_layers(detector_model)
+
+        if args.use_adapter == "True":
+            adapters.init(detector_model)
+            config = adapters.BnConfig(mh_adapter=True, output_adapter=True, reduction_factor=16, non_linearity="relu")
+            detector_model.add_adapter("fake_true_detection", config="...")
+            detector_model.train_adapter("fake_true_detection")
+
 
         dataset = dataset.map(lambda x: tokenize_text(x, bert_tokenizer), batched=True)
         #run(args.num_epochs, detector_model, bert_tokenizer, dataset, args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir)       
