@@ -513,7 +513,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
                     mean_degradation_loss = sum(degradation_losses) / len(degradation_losses)
                     std_degradation_loss = np.std(degradation_losses)
-                    loss_degradation_logs.append({"samples": nb_samples_seen, "loss": mean_degradation_loss, "std": std_degradation_loss})
+                    loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})
 
         else:
             log.info("Training signal is False, stopping training")
@@ -563,7 +563,7 @@ def plot_degradation_loss(loss_degradation_logs, save_path):
     loss_degradation_logs_df = pd.DataFrame(loss_degradation_logs)
     plt.figure()
     # lineplot with nb_samples on x-axis and loss on y-axis
-    sns.lineplot(x="samples", y="loss", data=loss_degradation_logs_df)
+    sns.lineplot(x="samples", y="degrad_loss", data=loss_degradation_logs_df)
 
     # save the plot
     plt.savefig(f"{save_path}/degradation_loss_vs_nb_samples.png")
