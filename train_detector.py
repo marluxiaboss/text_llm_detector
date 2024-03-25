@@ -33,7 +33,7 @@ import jsonlines
 from datetime import datetime
 
 from detector import LLMDetector
-from utils import create_logger, Signal, compute_bootstrap_acc
+from utils import create_logger, Signal, compute_bootstrap_acc, compute_bootstrap_metrics
 
 
 
@@ -595,7 +595,9 @@ def test_model(model, batch_size, dataset, experiment_path, log, dataset_path):
     log.info(f"Evaluating the best model on the test set of dataset {dataset_path}...")
     predictions = trainer.predict(dataset["test"])
     preds = np.argmax(predictions.predictions, axis=-1)
-    results = metric.compute(predictions=preds, references=predictions.label_ids)
+    #results = metric.compute(predictions=preds, references=predictions.label_ids)
+
+    results = compute_bootstrap_metrics(preds, predictions.label_ids)
     
     log.info("Test metrics:")
     for key, value in results.items():
@@ -605,7 +607,7 @@ def test_model(model, batch_size, dataset, experiment_path, log, dataset_path):
     #test_metrics_df.to_json(f"{experiment_path}/test/test_metrics.json")
         
     # save the results to a json file
-    with jsonlines.open(f"{experiment_path}/test/test_metrics.json", "w") as test_metrics_file:
+    with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_path}.json", "w") as test_metrics_file:
         test_metrics_file.write(results)
 
 

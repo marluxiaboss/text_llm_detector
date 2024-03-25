@@ -4,6 +4,8 @@ import sys
 
 import numpy as np
 
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
 def create_logger(name, silent=False, to_disk=False, log_file=None):
     """Create a new logger"""
     # setup logger
@@ -46,6 +48,55 @@ def compute_bootstrap_acc(data, n_bootstrap=1000):
     return (np.mean(accs), np.std(accs), lower_bound, upper_bound)
 
 
+def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
+
+    # compute false postives, false negatives, true positives, true negatives using bootstrap
+    nb_false_positives = np.zeros(n_bootstrap)
+    nb_false_negatives = np.zeros(n_bootstrap)
+    nb_true_positives = np.zeros(n_bootstrap)
+    nb_true_negatives = np.zeros(n_bootstrap)
+
+    for i in range(n_bootstrap):
+        bootstrap_sample = np.random.choice(range(len(data)), len(data), replace=True)
+        nb_false_positives[i] = np.sum((data[bootstrap_sample] == 1) & (labels[bootstrap_sample] == 0))
+        nb_false_negatives[i] = np.sum((data[bootstrap_sample] == 0) & (labels[bootstrap_sample] == 1))
+        nb_true_positives[i] = np.sum((data[bootstrap_sample] == 1) & (labels[bootstrap_sample] == 1))
+        nb_true_negatives[i] = np.sum((data[bootstrap_sample] == 0) & (labels[bootstrap_sample] == 0))
+    
+    metrics = ["accuracy", "precision", "recall", "f1_score"]
+    avg_metrics = {}
+    std_metrics = {}
+    for metric in metrics:
+        metric_results = np.zeros(n_bootstrap)
+        for i in range(n_bootstrap):
+            nb_false_positives_i = nb_false_positives[i]
+            nb_false_negatives_i = nb_false_negatives[i]
+            nb_true_positives_i = nb_true_positives[i]
+            nb_true_negatives_i = nb_true_negatives[i]
+
+            if metric == "accuracy":
+                metric_results[i] = (nb_true_positives_i + nb_true_negatives_i) / len(data)
+            elif metric == "precision":
+                metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_positives_i)
+            elif metric == "recall":
+                metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_negatives_i)
+            elif metric == "f1_score":
+                metric_results[i] = 2 * nb_true_positives_i / (2 * nb_true_positives_i + nb_false_positives_i + nb_false_negatives_i)
+
+        avg_metrics[metric] = np.mean(metric_results)
+        std_metrics[metric] = np.std(metric_results)
+
+    print("Average metrics: ", avg_metrics)
+    print("Standard deviation of metrics: ", std_metrics)
+
+    # change name of std_metrics as std_{metric_name}
+    for metric in metrics:
+        std_metrics["std_" + metric] = std_metrics[metric]
+        del std_metrics[metric]
+    
+    avg_metrics.update(std_metrics)
+    metrics_dict = avg_metrics
+    return metrics_dict
 
 class Signal:
     """Running signal to control training process"""
