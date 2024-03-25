@@ -18,6 +18,7 @@ import math
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.utils import resample
 
 
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
@@ -27,6 +28,7 @@ import os
 import argparse
 import sys
 import adapters
+import jsonlines
 
 from datetime import datetime
 
@@ -321,7 +323,8 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                        learning_rate, warmup_ratio, weight_decay, batch_size,
                         save_dir, detector_name, experiment_path, dataset_path,
                         fp16=True, log=None, check_degradation=0, degradation_check_batches=None,
-                        mlm_model=None, log_loss_steps=200, eval_steps=500, freeze_base=False):
+                        mlm_model=None, log_loss_steps=200, eval_steps=500, freeze_base=False,
+                        nb_error_bar_runs=5):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     sig = Signal("run_signal.txt")
@@ -337,6 +340,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
     train_dataset = process_tokenized_dataset(train_dataset)
     val_dataset = process_tokenized_dataset(val_dataset)
 
+    # we set shuffle to False for the train_loader, since we want to keep the order of the samples to preserve the pairing
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
 
@@ -425,22 +429,23 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
                 if ((i + 1) * batch_size) % eval_steps == 0:
                     model.eval()
-                    total, correct = 0, 0
-                    for batch in val_loader:
-                        with torch.no_grad():
-                            input_ids = batch["input_ids"]
-                            labels = batch["labels"]
-                            attention_mask = batch["attention_mask"]
-                            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-                            _, predicted = torch.max(outputs.logits, 1)
-                            total += labels.size(0)
-                            correct += (predicted == labels).sum().item()
-
-                    eval_acc = correct / total
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
-                    log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {nb_samples_seen} samples: {eval_acc:.4f}')
+                    for i in range(nb_error_bar_runs):
+                        total, correct = 0, 0
+                        for batch in val_loader:
+                            with torch.no_grad():
+                                input_ids = batch["input_ids"]
+                                labels = batch["labels"]
+                                attention_mask = batch["attention_mask"]
+                                outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                                _, predicted = torch.max(outputs.logits, 1)
+                                total += labels.size(0)
+                                correct += (predicted == labels).sum().item()
+
+                        eval_acc = correct / total
+                        log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {nb_samples_seen} samples: {eval_acc:.4f}')
+                        eval_acc_logs.append({"samples": nb_samples_seen, "accuracy": eval_acc})
                     run.log({"eval/accuracy": eval_acc}, step=nb_samples_seen)
-                    eval_acc_logs.append({"samples": nb_samples_seen, "accuracy": eval_acc})
 
                     if best_model is None or eval_acc > best_model["eval_acc"]:
                         best_model = {"eval_acc": eval_acc, "nb_samples": nb_samples_seen}
@@ -452,9 +457,9 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                                
                 if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
-                    degradation_loss = check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
-                    loss_degradation_logs.append({"samples": nb_samples_seen, "loss": degradation_loss})
-
+                    for i in range(nb_error_bar_runs):
+                        degradation_loss = check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
+                        loss_degradation_logs.append({"samples": nb_samples_seen, "loss": degradation_loss})
 
         else:
             log.info("Training signal is False, stopping training")
@@ -471,6 +476,13 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
     if check_degradation > 0:
         plot_degradation_loss(loss_degradation_logs, save_path=f"{experiment_path}/plots")
 
+
+    # combine all 3 logs list to a list of dictionaries with the following keys: nb_samples_seen, train_loss, eval_accuracy, degradation_loss
+    # this will be saved to a json file
+    combined_logs = eval_acc_logs + train_loss_logs + loss_degradation_logs
+    with jsonlines.open(f"{experiment_path}/training_logs.json", "w") as combined_logs_file:
+        for log in combined_logs:
+            combined_logs_file.write(log)
 
 def plot_nb_samples_metrics(eval_acc_logs, save_path):
     # transform to df
@@ -535,6 +547,13 @@ def test_model(model, batch_size, dataset, experiment_path, log, dataset_path):
     for key, value in results.items():
         log.info(f"{key}: {value}")
 
+    #test_metrics_df = pd.DataFrame(results.items(), columns=["metric", "value"])
+    #test_metrics_df.to_json(f"{experiment_path}/test/test_metrics.json")
+        
+    # save the results to a json file
+    with jsonlines.open(f"{experiment_path}/test/test_metrics.json", "w") as test_metrics_file:
+        test_metrics_file.write(results)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -558,6 +577,8 @@ if __name__ == "__main__":
     parser.add_argument("--eval_steps", type=int, help="How many samples seen before evaluating the model", default=500)
     parser.add_argument("--add_more_layers", type=str, help="Whether to add more layers to the classifier", default="False")
     parser.add_argument("--use_adapter", type=str, help="Whether to use adapter layers. If set to True, will use adapter and freeze the rest.", default="False")
+    parser.add_argument("--nb_error_bar_runs", type=int, help="Number of runs to calculate the error bars for the metrics", default=5)
+    parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     args = parser.parse_args()
 
 
@@ -573,6 +594,13 @@ if __name__ == "__main__":
         raise ValueError("Log mode must be either 'offline' or 'online'")
     
     dataset = load_from_disk(args.dataset_path)
+
+    if args.take_samples > 0:
+        print(f"Taking {args.take_samples} samples from the dataset")
+        dataset_train = dataset["train"].select(range(int(args.take_samples)))
+        dataset_valid = dataset["valid"].select(range(int(args.take_samples / 10)))
+        dataset_test = dataset["test"].select(range(int(args.take_samples / 10)))
+        dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
 
     if args.evaluation == "False":
         if args.detector == "roberta":
@@ -647,7 +675,8 @@ if __name__ == "__main__":
         # run the training loop
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
-                           args.fp16, log, args.check_degradation, degradation_check_batches, mlm_model, args.log_loss_steps, args.eval_steps, args.freeze_base)
+                           args.fp16, log, args.check_degradation, degradation_check_batches, mlm_model, args.log_loss_steps, args.eval_steps, args.freeze_base,
+                           args.nb_error_bar_runs)
         
         # evaluate model on the test set after training by loading the best model
         test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
