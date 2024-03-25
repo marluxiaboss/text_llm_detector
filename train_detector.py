@@ -33,20 +33,38 @@ import jsonlines
 from datetime import datetime
 
 from detector import LLMDetector
-from utils import create_logger, Signal
+from utils import create_logger, Signal, compute_bootstrap_acc
 
 
 
 def tokenize_text(x, tokenizer):
     return tokenizer(x["text"], truncation=True, padding="max_length", return_tensors="pt")
 
-def prepare_dataset_for_checking_degradation(detector_name, tokenizer, batch_size, seed):
+
+
+def prepare_fact_checking_dataset(tokenizer):
+
+    fact_completion_dataset = load_dataset('Polyglot-or-Not/Fact-Completion')["English"]
+
+    mask_token = tokenizer.mask_token + "."
+    mask_token_size = len(tokenizer(mask_token).input_ids)
+
+    # this number seems to be 3 for all models of interest
+    single_word_answer_token_size = 3
+    #fact_completion_dataset = fact_completion_dataset.filter(lambda x: len(tokenizer(x["true"]).input_ids) == single_word_answer_token_size)
+
+    # filter out samples where size of question with answer is not equal to the size of the question + mask size
+    fact_completion_dataset = fact_completion_dataset.filter(lambda x: len(tokenizer(x["stem"] + " " + x["true"] + ".").input_ids) == len(tokenizer(x["stem"] + " " + mask_token).input_ids))
+
+    return fact_completion_dataset
+
+def prepare_dataset_for_checking_degradation(detector_name, fact_completion_dataset, batch_size, nb_samples=1000):
     """
     Prepare the given dataset format for checking the degradation of the model.
     We use MaskedLM task to check for degradation, so we need to add a mask token depending
     on the detector model
     """
-
+    """
     fact_completion_dataset = load_dataset('Polyglot-or-Not/Fact-Completion')["English"]
 
     # filter out questions where the answer is not a single word for the tokenizer
@@ -58,9 +76,12 @@ def prepare_dataset_for_checking_degradation(detector_name, tokenizer, batch_siz
     fact_completion_dataset = fact_completion_dataset.filter(lambda x: len(tokenizer(x["true"]).input_ids) == single_word_answer_token_size)
     len_after = len(fact_completion_dataset)
     #print(f"Filtered out {len_before - len_after} questions out of {len_before}")
+    """
+    nb_samples_test_degradation = nb_samples
+    #fact_completion_dataset = fact_completion_dataset.shuffle(seed=42)
 
-    nb_samples_test_degradation = 1000
-    fact_completion_dataset = fact_completion_dataset.shuffle(seed=seed)
+    # we don't seed the shuffling to be able to measure the incertainty of the measure
+    fact_completion_dataset = fact_completion_dataset.shuffle()
     fact_completion_dataset = fact_completion_dataset.select(range(nb_samples_test_degradation))
     questions = fact_completion_dataset["stem"]
     answers = fact_completion_dataset["true"]
@@ -125,7 +146,6 @@ def adapt_model_to_mlm(classif_model, mlm_model, model_name):
 
 def check_model_degradation(classif_model, tokenizer, batches, nb_samples, log, mlm_model, model_name):
 
-
     model = adapt_model_to_mlm(classif_model, mlm_model, model_name)
 
     losses = []
@@ -138,7 +158,6 @@ def check_model_degradation(classif_model, tokenizer, batches, nb_samples, log, 
 
             questions_with_answer = batch_answer
             #questions_with_answer = [questions[i] + " " + answers[i] + "." for i in range(len(batch))]
-
             labels = tokenizer(questions_with_answer, return_tensors='pt', padding=True, truncation=True)["input_ids"].to(model.device)
             labels = torch.where(inputs.input_ids == tokenizer.mask_token_id, labels, -100)
 
@@ -322,8 +341,8 @@ def create_experiment_folder(model_name, experiment_args):
 def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                        learning_rate, warmup_ratio, weight_decay, batch_size,
                         save_dir, detector_name, experiment_path, dataset_path,
-                        fp16=True, log=None, check_degradation=0, degradation_check_batches=None,
-                        mlm_model=None, log_loss_steps=200, eval_steps=500, freeze_base=False,
+                        fp16=True, log=None, check_degradation=0,
+                        log_loss_steps=200, eval_steps=500, freeze_base=False,
                         nb_error_bar_runs=5):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
@@ -389,6 +408,25 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
     run = wandb.init(project="detector_training", tags=tags, dir=experiment_path)
 
+    # test model loss on mlm eval before training
+    mlm_model = None
+    degradation_check_batches = None
+    nb_samples_seen = 0
+
+    fact_completion_dataset = prepare_fact_checking_dataset(tokenizer)
+
+    if args.check_degradation > 0:
+        mlm_model = create_mlm_model(args.detector, args.device)
+        degradation_losses = []
+        for i in range(nb_error_bar_runs):           
+            degradation_check_batches = prepare_dataset_for_checking_degradation(args.detector, fact_completion_dataset, args.batch_size, nb_samples=1000)
+            ref_degredation_loss = check_model_degradation(detector_model, bert_tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, args.detector)
+            degradation_losses.append(ref_degredation_loss) 
+
+        mean_degradation_loss = sum(degradation_losses) / len(degradation_losses)
+        std_degradation_loss = np.std(degradation_losses)
+        
+        loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})
 
     for epoch in range(num_epochs):
         model.train()
@@ -430,21 +468,30 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                 if ((i + 1) * batch_size) % eval_steps == 0:
                     model.eval()
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
-                    for i in range(nb_error_bar_runs):
-                        total, correct = 0, 0
-                        for batch in val_loader:
-                            with torch.no_grad():
-                                input_ids = batch["input_ids"]
-                                labels = batch["labels"]
-                                attention_mask = batch["attention_mask"]
-                                outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-                                _, predicted = torch.max(outputs.logits, 1)
-                                total += labels.size(0)
-                                correct += (predicted == labels).sum().item()
+                    #for i in range(nb_error_bar_runs):
+                    total, correct = 0, 0
 
-                        eval_acc = correct / total
-                        log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {nb_samples_seen} samples: {eval_acc:.4f}')
-                        eval_acc_logs.append({"samples": nb_samples_seen, "accuracy": eval_acc})
+                    # correct_list is a list of 0s and 1s of size len(val_loader) * batch_size
+                    correct_list = []
+                    for batch in val_loader:
+                        with torch.no_grad():
+                            input_ids = batch["input_ids"]
+                            labels = batch["labels"]
+                            attention_mask = batch["attention_mask"]
+                            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                            _, predicted = torch.max(outputs.logits, 1)
+                            total += labels.size(0)
+                            correct += (predicted == labels).sum().item()
+
+                            correct_list.extend((predicted == labels).cpu().numpy().tolist())
+
+                    # compute error bars with bootstrapping
+                    nb_bootstraps = 1000
+                    mean_acc, std_acc, lower_bound, upper_bound = compute_bootstrap_acc(correct_list, n_bootstrap=nb_bootstraps)
+                    log.info(f"Mean accuracy: {mean_acc:.4f}, std: {std_acc:.4f}, lower bound: {lower_bound:.4f}, upper bound: {upper_bound:.4f} for {nb_bootstraps} bootstraps")
+                    eval_acc = correct / total
+                    log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {nb_samples_seen} samples: {eval_acc:.4f}')
+                    eval_acc_logs.append({"samples": nb_samples_seen, "accuracy": mean_acc, "std": std_acc, "lower_bound": lower_bound, "upper_bound": upper_bound})
                     run.log({"eval/accuracy": eval_acc}, step=nb_samples_seen)
 
                     if best_model is None or eval_acc > best_model["eval_acc"]:
@@ -457,9 +504,16 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                                
                 if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
+
+                    degradation_losses = []
                     for i in range(nb_error_bar_runs):
+                        degradation_check_batches = prepare_dataset_for_checking_degradation(args.detector, fact_completion_dataset, args.batch_size, nb_samples=1000)
                         degradation_loss = check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
-                        loss_degradation_logs.append({"samples": nb_samples_seen, "loss": degradation_loss})
+                        degradation_losses.append(degradation_loss)
+
+                    mean_degradation_loss = sum(degradation_losses) / len(degradation_losses)
+                    std_degradation_loss = np.std(degradation_losses)
+                    loss_degradation_logs.append({"samples": nb_samples_seen, "loss": mean_degradation_loss, "std": std_degradation_loss})
 
         else:
             log.info("Training signal is False, stopping training")
@@ -663,19 +717,12 @@ if __name__ == "__main__":
         degradation_check_batches = None   
         mlm_model = None
         log = create_logger(__name__, silent=False, to_disk=True,
-                                    log_file=f"{experiment_path}/log.txt")
-        
-        # test model loss on mlm eval before training
-        if args.check_degradation > 0:
-            degradation_check_batches = prepare_dataset_for_checking_degradation(args.detector, bert_tokenizer, args.batch_size, seed=42)
-            mlm_model = create_mlm_model(args.detector, args.device)
-            ref_degredation_loss = check_model_degradation(detector_model, bert_tokenizer, degradation_check_batches, args.check_degradation, log, mlm_model, args.detector)
-            
+                                    log_file=f"{experiment_path}/log.txt")        
 
         # run the training loop
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
-                           args.fp16, log, args.check_degradation, degradation_check_batches, mlm_model, args.log_loss_steps, args.eval_steps, args.freeze_base,
+                           args.fp16, log, args.check_degradation, args.log_loss_steps, args.eval_steps, args.freeze_base,
                            args.nb_error_bar_runs)
         
         # evaluate model on the test set after training by loading the best model

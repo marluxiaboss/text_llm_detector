@@ -2,6 +2,8 @@ import logging
 from time import strftime, gmtime
 import sys
 
+import numpy as np
+
 def create_logger(name, silent=False, to_disk=False, log_file=None):
     """Create a new logger"""
     # setup logger
@@ -30,6 +32,20 @@ def create_logger(name, silent=False, to_disk=False, log_file=None):
     return log
 
 
+def compute_bootstrap_acc(data, n_bootstrap=1000):
+
+    accs = np.zeros(n_bootstrap)
+
+    for i in range(n_bootstrap):
+        bootstrap_sample = np.random.choice(data, len(data), replace=True)
+        accs[i] = np.mean(bootstrap_sample)
+
+    lower_bound = np.percentile(accs, 2.5)
+    upper_bound = np.percentile(accs, 97.5)
+
+    return (np.mean(accs), np.std(accs), lower_bound, upper_bound)
+
+
 
 class Signal:
     """Running signal to control training process"""
@@ -47,3 +63,5 @@ class Signal:
     def read_signal(self):
         with open(self.signal_file, 'r') as fin:
             return eval(fin.read())
+        
+    
