@@ -244,10 +244,10 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     fake_responses_train, instructions = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache)
 
     print("len fake_responses_train: ", len(fake_responses_train))
-    if instructions is not []:
-        print("LEN BEFORE: ", len(train_subset))
+    if instructions:
+        print("len before: ", len(train_subset))
         train_subset = train_subset.filter(lambda x: x["instruction"] in instructions)
-        print("LEN AFTER: ", len(train_subset))
+        print("len after: ", len(train_subset))
 
     
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
