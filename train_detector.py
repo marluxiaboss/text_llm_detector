@@ -40,9 +40,11 @@ from utils import create_logger, Signal, compute_bootstrap_acc, compute_bootstra
 def tokenize_text(x, tokenizer):
     return tokenizer(x["text"], truncation=True, padding="max_length", return_tensors="pt")
 
-
-
 def prepare_fact_checking_dataset(tokenizer):
+    """
+    Process the fact completion dataset to filter out samples where the size of the question with the answer
+    is not equal to the size of the question + mask size
+    """
 
     fact_completion_dataset = load_dataset('Polyglot-or-Not/Fact-Completion')["English"]
 
@@ -110,6 +112,9 @@ def prepare_dataset_for_checking_degradation(detector_name, fact_completion_data
     return batches
 
 def create_mlm_model(model_name, device):
+    """
+    Create a MaskedLM model from the given model_name
+    """
     if model_name == "roberta":
         model = AutoModelForMaskedLM.from_pretrained("roberta-base").to(device)
     
@@ -126,6 +131,9 @@ def create_mlm_model(model_name, device):
 
 
 def adapt_model_to_mlm(classif_model, mlm_model, model_name):
+    """
+    Adapt the given classification model to the MaskedLM model by transferring the weights
+    """
 
     # transfer the roberta weights to the MaskedLM model
     if model_name == "bert":
@@ -145,6 +153,10 @@ def adapt_model_to_mlm(classif_model, mlm_model, model_name):
 
 
 def check_model_degradation(classif_model, tokenizer, batches, nb_samples, log, mlm_model, model_name):
+    """
+    Check the degradation of the model by tracking the loss on the MaskedLM task
+    """
+
 
     model = adapt_model_to_mlm(classif_model, mlm_model, model_name)
 
@@ -298,6 +310,10 @@ def process_tokenized_dataset(dataset):
     return dataset
 
 def create_experiment_folder(model_name, experiment_args):
+    """
+    Create a folder with the folowing elements:
+    log, description of training with all the args, model folder with all the saved models
+    """
 
     # create a folder with the folowing elements:
     # log, description of training with all the args, model folder with all the saved models
@@ -539,33 +555,27 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
             combined_logs_file.write(log)
 
 def plot_nb_samples_metrics(eval_acc_logs, save_path):
-    # transform to df
+
     eval_acc_logs_df = pd.DataFrame(eval_acc_logs)
     plt.figure()
-    # lineplot with nb_samples on x-axis and some metric on y-axis like accuracy
     sns.lineplot(x="samples", y="accuracy", data=eval_acc_logs_df)
 
-    # save the plot
     plt.savefig(f"{save_path}/accuracy_vs_nb_samples.png")
 
 def plot_nb_samples_loss(train_loss_logs, save_path):
-    # transform to df
+
     train_loss_logs_df = pd.DataFrame(train_loss_logs)
     plt.figure()
-    # lineplot with nb_samples on x-axis and loss on y-axis
     sns.lineplot(x="samples", y="loss", data=train_loss_logs_df)
 
-    # save the plot
     plt.savefig(f"{save_path}/loss_vs_nb_samples.png")
 
 def plot_degradation_loss(loss_degradation_logs, save_path):
-    # transform to df
+    
     loss_degradation_logs_df = pd.DataFrame(loss_degradation_logs)
     plt.figure()
-    # lineplot with nb_samples on x-axis and loss on y-axis
     sns.lineplot(x="samples", y="degrad_loss", data=loss_degradation_logs_df)
 
-    # save the plot
     plt.savefig(f"{save_path}/degradation_loss_vs_nb_samples.png")
 
 
