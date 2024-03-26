@@ -115,17 +115,34 @@ def create_mlm_model(model_name, device):
     """
     Create a MaskedLM model from the given model_name
     """
-    if model_name == "roberta_base" or model_name == "roberta_large":
+
+    # base version of the model
+    if model_name == "roberta_base":
         model = AutoModelForMaskedLM.from_pretrained("roberta-base").to(device)
     
-    if model_name == "bert_base" or model_name == "bert_large":
+    if model_name == "bert_base":
         model = AutoModelForMaskedLM.from_pretrained("bert-base-uncased").to(device)
     
-    if model_name == "electra_base" or model_name == "electra_large":
+    if model_name == "electra_base":
         model = AutoModelForMaskedLM.from_pretrained("google/electra-base-discriminator").to(device)
 
-    if model_name == "t5_base" or model_name == "t5_large":
+    if model_name == "t5_base":
         model = AutoModelForMaskedLM.from_pretrained("google-t5/t5-base").to(device)
+
+    # large version of the model
+    if model_name == "roberta_large":
+        model = AutoModelForMaskedLM.from_pretrained("roberta-large").to(device)
+    
+    if model_name == "bert_large":
+        model = AutoModelForMaskedLM.from_pretrained("bert-large-uncased").to(device)
+    
+    if model_name == "electra_large":
+        model = AutoModelForMaskedLM.from_pretrained("google/electra-large-discriminator").to(device)
+
+    if model_name == "t5_3b":
+        model = AutoModelForMaskedLM.from_pretrained("google-t5/t5-3b").to(device)
+
+    
     
     return model
 
