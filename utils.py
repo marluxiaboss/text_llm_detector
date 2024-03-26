@@ -63,7 +63,7 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
         nb_true_positives[i] = np.sum((data[bootstrap_sample] == 1) & (labels[bootstrap_sample] == 1))
         nb_true_negatives[i] = np.sum((data[bootstrap_sample] == 0) & (labels[bootstrap_sample] == 0))
     
-    metrics = ["accuracy", "precision", "recall", "f1_score"]
+    metrics = ["accuracy", "precision", "recall", "f1_score", "fp_rate"]
     avg_metrics = {}
     std_metrics = {}
     for metric in metrics:
@@ -82,6 +82,8 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
                 metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_negatives_i)
             elif metric == "f1_score":
                 metric_results[i] = 2 * nb_true_positives_i / (2 * nb_true_positives_i + nb_false_positives_i + nb_false_negatives_i)
+            elif metric == "fp_rate":
+                metric_results[i] = nb_false_positives_i / (nb_false_positives_i + nb_true_negatives_i)
 
         avg_metrics[metric] = np.mean(metric_results)
         std_metrics[metric] = np.std(metric_results)

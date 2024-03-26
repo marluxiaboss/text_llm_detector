@@ -423,7 +423,7 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
     else:
         tags.append("full_finetuning")
 
-    if args.adapter == "True":
+    if args.use_adapter == "True":
         tags.append("adapter")
 
     run = wandb.init(project=wandb_experiment_name, tags=tags, dir=experiment_path)
