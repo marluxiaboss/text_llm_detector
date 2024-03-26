@@ -91,13 +91,13 @@ def prepare_dataset_for_checking_degradation(detector_name, fact_completion_data
     # add [MASK] at the end of each question
     # we also add a ".", this is very important for bert models
 
-    if detector_name == "bert":
+    if detector_name == "bert_base" or detector_name == "bert_large":
         questions_masked = [q + " [MASK]." for q in questions]
 
-    elif detector_name == "roberta":
+    elif detector_name == "roberta_base" or detector_name == "roberta_large":
         questions_masked = [q + " <mask>." for q in questions]
 
-    elif detector_name == "electra":
+    elif detector_name == "electra_base" or detector_name == "electra_large":
         questions_masked = [q + " [MASK]." for q in questions]
 
     else:
@@ -115,16 +115,16 @@ def create_mlm_model(model_name, device):
     """
     Create a MaskedLM model from the given model_name
     """
-    if model_name == "roberta":
+    if model_name == "roberta_base" or model_name == "roberta_large":
         model = AutoModelForMaskedLM.from_pretrained("roberta-base").to(device)
     
-    if model_name == "bert":
+    if model_name == "bert_base" or model_name == "bert_large":
         model = AutoModelForMaskedLM.from_pretrained("bert-base-uncased").to(device)
     
-    if model_name == "electra":
+    if model_name == "electra_base" or model_name == "electra_large":
         model = AutoModelForMaskedLM.from_pretrained("google/electra-base-discriminator").to(device)
 
-    if model_name == "t5":
+    if model_name == "t5_base" or model_name == "t5_large":
         model = AutoModelForMaskedLM.from_pretrained("google-t5/t5-base").to(device)
     
     return model
@@ -136,13 +136,13 @@ def adapt_model_to_mlm(classif_model, mlm_model, model_name):
     """
 
     # transfer the roberta weights to the MaskedLM model
-    if model_name == "bert":
+    if model_name == "bert_base" or model_name == "bert_large":
         mlm_model.bert = classif_model.bert
 
-    elif model_name == "roberta":
+    elif model_name == "roberta_base" or model_name == "roberta_large":
         mlm_model.roberta = classif_model.roberta
 
-    elif model_name == "electra":
+    elif model_name == "electra_base" or model_name == "electra_large":
         mlm_model.electra = classif_model.electra
 
     else:
@@ -359,7 +359,8 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                         save_dir, detector_name, experiment_path, dataset_path,
                         fp16=True, log=None, check_degradation=0,
                         log_loss_steps=200, eval_steps=500, freeze_base=False,
-                        nb_error_bar_runs=5):
+                        nb_error_bar_runs=5, wandb_experiment_name="detector_training",
+                        training_args=None):
 
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     sig = Signal("run_signal.txt")
@@ -422,7 +423,10 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
     else:
         tags.append("full_finetuning")
 
-    run = wandb.init(project="detector_training", tags=tags, dir=experiment_path)
+    if args.adapter == "True":
+        tags.append("adapter")
+
+    run = wandb.init(project=wandb_experiment_name, tags=tags, dir=experiment_path)
 
     # test model loss on mlm eval before training
     mlm_model = None
@@ -571,7 +575,7 @@ def plot_nb_samples_loss(train_loss_logs, save_path):
     plt.savefig(f"{save_path}/loss_vs_nb_samples.png")
 
 def plot_degradation_loss(loss_degradation_logs, save_path):
-    
+
     loss_degradation_logs_df = pd.DataFrame(loss_degradation_logs)
     plt.figure()
     sns.lineplot(x="samples", y="degrad_loss", data=loss_degradation_logs_df)
@@ -645,6 +649,7 @@ if __name__ == "__main__":
     parser.add_argument("--use_adapter", type=str, help="Whether to use adapter layers. If set to True, will use adapter and freeze the rest.", default="False")
     parser.add_argument("--nb_error_bar_runs", type=int, help="Number of runs to calculate the error bars for the metrics", default=5)
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
+    parser.add_argument("--wandb_experiment_name", type=str, help="Name of the wandb experiment", default="detector_training")
     args = parser.parse_args()
 
 
@@ -669,7 +674,7 @@ if __name__ == "__main__":
         dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
 
     if args.evaluation == "False":
-        if args.detector == "roberta":
+        if args.detector == "roberta_base":
             #detector_path = "openai-community/roberta-base-openai-detector"
             #detector_path = "FacebookAI/roberta-large"
             detector_path = "FacebookAI/roberta-base"
@@ -677,19 +682,19 @@ if __name__ == "__main__":
             bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
 
-        elif args.detector == "bert":
+        elif args.detector == "bert_base":
             detector_path = "bert-base-uncased"
             detector_model = BertForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = BertTokenizer.from_pretrained(detector_path)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
 
-        elif args.detector == "electra":
+        elif args.detector == "electra_base":
             detector_path = "google/electra-base-discriminator"
             detector_model = ElectraForSequenceClassification.from_pretrained(detector_path).to(args.device)
             bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
             detector = LLMDetector(detector_model, bert_tokenizer, 2)
 
-        elif args.detector == "t5":
+        elif args.detector == "t5_base":
             #detector_path = "google-t5/t5-base"
             # the path above has issues when fp16 is set to True
             detector_path = "google-t5/t5-base"
@@ -699,6 +704,40 @@ if __name__ == "__main__":
 
             # set fp16 to False for T5 model, t5 has issues with fp16
             args.fp16 = False
+
+
+        if args.detector == "roberta_large":
+            #detector_path = "openai-community/roberta-base-openai-detector"
+            #detector_path = "FacebookAI/roberta-large"
+            detector_path = "FacebookAI/roberta-large"
+            detector_model = RobertaForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+        elif args.detector == "bert_large":
+            detector_path = "bert-large-uncased"
+            detector_model = BertForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = BertTokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+        elif args.detector == "electra_large":
+            detector_path = "google/electra-large-discriminator"
+            detector_model = ElectraForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+        elif args.detector == "t5_3b":
+            #detector_path = "google-t5/t5-base"
+            # the path above has issues when fp16 is set to True
+            detector_path = "google-t5/t5-3b"
+            detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
+
+            # set fp16 to False for T5 model, t5 has issues with fp16
+            args.fp16 = False
+
+
 
         else:
             raise ValueError("No other detector currently supported")
@@ -735,7 +774,7 @@ if __name__ == "__main__":
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
                            args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
                            args.fp16, log, args.check_degradation, args.log_loss_steps, args.eval_steps, args.freeze_base,
-                           args.nb_error_bar_runs)
+                           args.nb_error_bar_runs, args.wandb_experiment_name, args)
         
         # evaluate model on the test set after training by loading the best model
         test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
@@ -744,26 +783,50 @@ if __name__ == "__main__":
  
     elif args.evaluation == "True":
 
-        if args.detector == "roberta":
+        if args.detector == "roberta_base":
             detector_path = "FacebookAI/roberta-base"
             config = AutoConfig.from_pretrained(detector_path)
             model = RobertaForSequenceClassification(config)
             bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
 
-        elif args.detector == "bert":
+        elif args.detector == "bert_base":
             detector_path = "bert-base-uncased"
             config = AutoConfig.from_pretrained(detector_path)
             model = BertForSequenceClassification(config)
             bert_tokenizer = BertTokenizer.from_pretrained(detector_path)
 
-        elif args.detector == "electra":
+        elif args.detector == "electra_base":
             detector_path = "google/electra-base-discriminator"
             config = AutoConfig.from_pretrained(detector_path)
             detector_model = ElectraForSequenceClassification(config)
             bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
 
-        elif args.detector == "t5":
+        elif args.detector == "t5_base":
             detector_path = "google-t5/t5-base"
+            config = AutoConfig.from_pretrained(detector_path)
+            detector_model = T5ForSequenceClassification(config)
+            bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
+
+        if args.detector == "roberta_large":
+            detector_path = "FacebookAI/roberta-large"
+            config = AutoConfig.from_pretrained(detector_path)
+            model = RobertaForSequenceClassification(config)
+            bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+
+        elif args.detector == "bert_large":
+            detector_path = "bert-large-uncased"
+            config = AutoConfig.from_pretrained(detector_path)
+            model = BertForSequenceClassification(config)
+            bert_tokenizer = BertTokenizer.from_pretrained(detector_path)
+
+        elif args.detector == "electra_large":
+            detector_path = "google/electra-large-discriminator"
+            config = AutoConfig.from_pretrained(detector_path)
+            detector_model = ElectraForSequenceClassification(config)
+            bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
+
+        elif args.detector == "t5_3b":
+            detector_path = "google-t5/t5-3b"
             config = AutoConfig.from_pretrained(detector_path)
             detector_model = T5ForSequenceClassification(config)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
