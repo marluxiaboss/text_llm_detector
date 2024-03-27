@@ -14,12 +14,38 @@
 - `generator.py`: wrapper arround any LLM used to generate text from a prompt
 - `detector.py`: wrapper around any BERT type (bi-directional encoder) used to classify text as human or LLM generated
 
-### 1. Generating dataset of fake LLM responses and human reponses
+### 1. Python scripts
 - `generate_fake_true_dataset.py`: takes an LLM and generate responses using prompts from a given dataset
+- `train_detector.py`: train a chosen detector on a dataset created by `generate_fake_true_dataset.py`, can also be used to test an already trained model
+- `utils.py`
+- `create_experiment_plots.py`: creates the plots using the training logs created by `train_detector.py`
 
-### 2. Training an LLM to detect LLM generated responses
-- `train_detector.py`: finetune a pretrained detector on the dataset generated using `generate_fake_true_dataset.py` 
+### 2. Training logs file structure
 
+```
+saved_training_logs  
+│
+└───{detector_name} (e.g. roberta_large)
+    │
+    └───{training_method} (e.g. freeze_base)
+        │ 
+        └───{dataset_name} (e.g. fake_true_dataset_gpt2_10k)
+            │  
+            └───{experiment_time} (e.g. 12_12_1212)
+                │   args_logs.txt (training arguments)
+                │   log.txt (terminal logs of the training)
+                │ 
+                └───plots (training plots)
+                │
+                └───saved_models 
+                    best_model.pt (best model on eval set obtained during training)
+                │ 
+                └───test
+                    test_metrics_{dataset_name}.json (metrics on test set)
+                │ 
+                └───wandb
+
+```
 
 ## Experiments
 
@@ -29,6 +55,8 @@
 - Tested models: RoBERTa-large and DistilRoBERTa-base
 - Dataset used: `fake_true_dataset_mistral_10k` (see below to create this dataset)
 
+- Degradation is checked using Masked Language Model task on the following dataset: [Fact-Completion dataset](https://huggingface.co/datasets/Polyglot-or-Not/Fact-Completion?row=0)
+
 
 **Steps to reproduce:**
 - Generate the datasets of fake and true samples by launching ...sh script, the script creates `fake_true_dataset_{dataset_name}_10k` for each dataset
@@ -37,37 +65,44 @@
 
 
 ### Experiment 2
+**Goal:** Test a detector trained on a specific dataset with another unseen dataset
+- Tested models: RoBERTa-large, DistilRoBERTa-base, ELECTRA-large, T5-3b
+- Tested training method: finetuning classification head only, finetuning adapter (PEFT method) and full finetuning
+- Datasets used: `fake_true_dataset_gpt2_10k`, `fake_true_dataset_gemma_10k`, `fake_true_dataset_phi_10k`, `fake_true_dataset_mistral_10k`
 
-- Full finetuning of the detector
-- Detect degradation of MLM task using JudgeLLM (check each 1000 samples for example) and correct degradation
+- Models are trained on their respective dataset with the corresponding method until they reach a degradation threshold (see experiment 1 above).
+- Create 2 table per training method: 1 table reporting the f1-score and another reporting the false postive rate (6 tables in total)
 
-### Experiment 3
-
-- Test transferability + compare
-- Create a table for each detector with detector trained on specific geneartor on x-axis and generator on y axis 
-
-
-
+- Table 1: detectors trained with frozen base, f1 score
                                             
-|                                              | generator_1 | generator_2 | generator_3 | ... |   | generator_1_FT_chat | generator_not_seen | generator_not_seen_FT_chat |   |
-|----------------------------------------------|-------------|-------------|-------------|-----|---|---------------------|--------------------|----------------------------|---|
-| detector_1_trained_on_gen1                   |             |             |             |     |   |                     |                    |                            |   |
-| detector_1_trained_on_gen2                   |             |             |             |     |   |                     |                    |                            |   |
-| detector_1_trained_on_gen3                   |             |             |             |     |   |                     |                    |                            |   |
-| ...                                          |             |             |             |     |   |                     |                    |                            |   |
-| detector_1_trained_on_gen1,2,3 (Round Robin) |             |             |             |     |   |                     |                    |                            |   |
+|                                              | generator_1 | generator_2 | generator_3 | ... | generator_1_FT_chat | 
+|----------------------------------------------|-------------|-------------|-------------|-----|---------------------|
+| detector_1_trained_on_gen1                   |             |             |             |     |                     |  
+| detector_1_trained_on_gen2                   |             |             |             |     |                     |  
+| detector_1_trained_on_gen3                   |             |             |             |     |                     |  
+| ...                                          |             |             |             |     |                     |  
+| detector_1_trained_on_gen1,2,3 (Round Robin) |             |             |             |     |                     |  
+| detector_2_trained_on_gen1                   |             |             |             |     |                     | 
+| ...                                          |             |             |             |     |                     | 
+| detector_3_trained_on_gen1                   |             |             |             |     |                     | 
+| ...                                          |             |             |             |     |                     | 
 
 
 
 
+- Table 2: detectors trained with adapter method (PEFT), f1 score
+- Table 3: detectors trained with full finetuning, f1 score
+- repeat same with false positive rate...
+                                        
 
-- Train until degradation threshold (depending on experience 2)
 
-### Experience 4
-- Same but add evasive prompt
+### Experiment 3 
+TODO
+
+- Same but with prompting and paraphrasing to evade detectors 
 
 
-## Dataset used
+## Datasets used
 
-- EMNLP news
-- Instruction dataset (dolly), not sure
+- [CNN Dailymail Dataset](https://huggingface.co/datasets/cnn_dailymail?row=31) to create fake and true news samples
+- [Fact completion](https://huggingface.co/datasets/Polyglot-or-Not/Fact-Completion?row=0) to test detector degradation
