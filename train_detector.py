@@ -337,10 +337,10 @@ def create_experiment_folder(model_name, experiment_args):
 
     base_path = experiment_args.save_dir
     # check if there exists a subfolder already for the model_name
-    if not os.path.isdir(f"{base_path}/{model_name}"):
-        os.makedirs(f"{base_path}/{model_name}")
+    if not os.path.isdir(f"{base_path}/{model_name}/{args.dataset_path}"):
+        os.makedirs(f"{base_path}/{model_name}/{args.dataset_path}")
     
-    experiment_path = f"{base_path}/{model_name}/{datetime.now().strftime('%d_%m_%H%M')}"
+    experiment_path = f"{base_path}/{model_name}/{args.dataset_path}/{datetime.now().strftime('%d_%m_%H%M')}"
     os.makedirs(experiment_path)
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     os.makedirs(experiment_saved_model_path)
@@ -723,7 +723,7 @@ if __name__ == "__main__":
             args.fp16 = False
 
 
-        if args.detector == "roberta_large":
+        elif args.detector == "roberta_large":
             #detector_path = "openai-community/roberta-base-openai-detector"
             #detector_path = "FacebookAI/roberta-large"
             detector_path = "FacebookAI/roberta-large"
