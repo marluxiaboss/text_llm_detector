@@ -754,8 +754,6 @@ if __name__ == "__main__":
             # set fp16 to False for T5 model, t5 has issues with fp16
             args.fp16 = False
 
-
-
         else:
             raise ValueError("No other detector currently supported")
         

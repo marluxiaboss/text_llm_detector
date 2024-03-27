@@ -8,7 +8,7 @@
 
 
 ## File structure
-
+<a name="file_structure"></a>
 
 ### 0. Model classes
 - `generator.py`: wrapper arround any LLM used to generate text from a prompt
@@ -21,23 +21,27 @@
 - `train_detector.py`: finetune a pretrained detector on the dataset generated using `generate_fake_true_dataset.py` 
 
 
-## Experiences
+## Experiments
 
-### Experience 1
+### Experiment 1
+**Goal:** Test degradation of the base model using different training methods
+- Tested training methods: finetuning classification head only, finetuning adapter (PEFT method) and full finetuning
+- Tested models: RoBERTa-large and DistilRoBERTa-base
+- Dataset used: `fake_true_dataset_mistral_10k` (see below to create this dataset)
 
-- Finetune classification head only to detect LLM generated response
-- Compare performance of BERT, Roberta, Electra and T5
-- In this experience, check possible distribution shift between human and LLM responses to prevent shortcuts
 
-- Results saved in `save_dir/{model_name}/{current_time}`
-- Creates log files, `plots` dir and `saved_models` dir saving the model with the best eval accuracy
+**Steps to reproduce:**
+- Generate the datasets of fake and true samples by launching ...sh script, the script creates `fake_true_dataset_{dataset_name}_10k` for each dataset
+- launch `script_experiment1.sh` to launch the training with all the different models, the results are saved in `saved_training_logs` (see [file structure](#file-structure))
+- Use the json files `training_logs.json` to create the plots. (To update)
 
-### Experience 2
+
+### Experiment 2
 
 - Full finetuning of the detector
 - Detect degradation of MLM task using JudgeLLM (check each 1000 samples for example) and correct degradation
 
-### Experience 3
+### Experiment 3
 
 - Test transferability + compare
 - Create a table for each detector with detector trained on specific geneartor on x-axis and generator on y axis 
