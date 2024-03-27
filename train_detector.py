@@ -851,6 +851,10 @@ if __name__ == "__main__":
         else:
             raise ValueError("No other detector currently supported")
 
+        if args.use_adapter == "True":
+            adapters.init(model)
+            config = adapters.BnConfig(mh_adapter=True, output_adapter=True, reduction_factor=16, non_linearity="relu")
+            model.add_adapter("fake_true_detection", config=config)
 
         # load the trained weights
         model.load_state_dict(torch.load(args.model_path))
