@@ -340,12 +340,14 @@ def create_experiment_folder(model_name, experiment_args):
 
     training_method = None
 
-    if experiment_args.freeze_base == "True":
-        training_method = "freeze_base"
-    elif experiment_args.use_adapter == "True":
+    if experiment_args.use_adapter == "True":
         training_method = "adapter"
+    elif experiment_args.freeze_base == "True" and experiment_args.use_adapter == "False":
+        training_method = "freeze_base"
     elif experiment_args.freeze_base == "False":
         training_method = "full_finetuning"
+    else:
+        raise ValueError("Training method must be either 'freeze_base', 'adapter' or 'full_finetuning'")
     
     if training_method is None:
         raise ValueError("Training method must be either 'freeze_base', 'adapter' or 'full_finetuning'")
@@ -383,6 +385,8 @@ def create_experiment_folder(model_name, experiment_args):
         f.write(f"fp16: {experiment_args.fp16}\n")
         f.write(f"check_degradation: {experiment_args.check_degradation}\n")
         f.write(f"add_more_layers: {experiment_args.add_more_layers}\n")
+        f.write(f"use_adapter: {experiment_args.use_adapter}\n")
+
 
     return experiment_path
 
@@ -479,6 +483,8 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
         mean_degradation_loss = sum(degradation_losses) / len(degradation_losses)
         std_degradation_loss = np.std(degradation_losses)
         
+        orig_degradation_loss = mean_degradation_loss
+
         loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})
 
     for epoch in range(num_epochs):
@@ -568,7 +574,12 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                     std_degradation_loss = np.std(degradation_losses)
                     loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})
 
-        else:
+                    degradation_loss_threshold = args.degradation_threshold
+                    if mean_degradation_loss > 0:
+                        if orig_degradation_loss * (1 + degradation_loss_threshold) < mean_degradation_loss:
+                            log.info(f"Model has degraded, original loss: {orig_degradation_loss}, current loss: {mean_degradation_loss}")
+                            log.info(f"Stopping training")
+                            break
             log.info("Training signal is False, stopping training")
             break
     
@@ -676,6 +687,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_dir", type=str, help="Directory to save the model and logs", default="./training_logs/detector_freeze_base")
     parser.add_argument("--fp16", type=str, help="Whether to use fp16", default="True")
     parser.add_argument("--check_degradation", type=int, help="If set to > 0, then check for the degration of the model after each check_degradation steps", default=0)
+    parser.add_argument("--degradation_threshold", type=float, help="Threshold for the degradation of the model", default=-1.0)
     parser.add_argument("--log_loss_steps", type=int, help="How many samples seen before logging the loss", default=200)
     parser.add_argument("--eval_steps", type=int, help="How many samples seen before evaluating the model", default=500)
     parser.add_argument("--add_more_layers", type=str, help="Whether to add more layers to the classifier", default="False")
