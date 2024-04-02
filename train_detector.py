@@ -811,9 +811,10 @@ if __name__ == "__main__":
         log = create_logger(__name__, silent=False, to_disk=True,
                                     log_file=f"{experiment_path}/log.txt")        
 
+        dataset_name = args.dataset_path.split("/")[-1]
         # run the training loop
         run_training_loop(args.num_epochs, detector_model, bert_tokenizer, dataset["train"], dataset["valid"],
-                           args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, args.dataset_path,
+                           args.learning_rate, args.warmup_ratio, args.weight_decay, args.batch_size, args.save_dir, args.detector, experiment_path, dataset_name,
                            args.fp16, log, args.check_degradation, args.log_loss_steps, args.eval_steps, args.freeze_base,
                            args.nb_error_bar_runs, args.wandb_experiment_name, args)
         
@@ -894,13 +895,14 @@ if __name__ == "__main__":
         experiment_path = args.model_path.split("/saved_models")[0]
 
         # create log file
-        with open(f"{experiment_path}/test/log_{args.dataset_path}.txt", "w") as f:
+        dataset_name = args.dataset_path.split("/")[-1]
+        with open(f"{experiment_path}/test/log_{dataset_name}.txt", "w") as f:
             f.write("")
 
         log = create_logger(__name__, silent=False, to_disk=True,
-                                    log_file=f"{experiment_path}/test/log_{args.dataset_path}.txt")
+                                    log_file=f"{experiment_path}/test/log_{dataset_name}.txt")
 
-        test_model(model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
+        test_model(model, args.batch_size, dataset, experiment_path, log, dataset_name)
     else:
         raise ValueError("Evaluation mode must be either True or False")
 
