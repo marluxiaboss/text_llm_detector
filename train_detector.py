@@ -524,6 +524,29 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
 
                     running_loss = 0
 
+                
+                # check degradation of the model before evaluating the model, because is meaningless if the model has
+                # too much degradation
+                if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
+                    nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
+
+                    degradation_losses = []
+                    for i in range(nb_error_bar_runs):
+                        degradation_check_batches = prepare_dataset_for_checking_degradation(args.detector, fact_completion_dataset, args.batch_size, nb_samples=1000)
+                        degradation_loss = check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
+                        degradation_losses.append(degradation_loss)
+
+                    mean_degradation_loss = sum(degradation_losses) / len(degradation_losses)
+                    std_degradation_loss = np.std(degradation_losses)
+                    loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})
+
+                    degradation_loss_threshold = args.degradation_threshold
+                    if mean_degradation_loss > 0:
+                        if orig_degradation_loss * (1 + degradation_loss_threshold) < mean_degradation_loss:
+                            log.info(f"Model has degraded, original loss: {orig_degradation_loss}, current loss: {mean_degradation_loss}")
+                            log.info(f"Stopping training")
+                            break
+
                 if ((i + 1) * batch_size) % eval_steps == 0:
                     model.eval()
                     nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
@@ -560,26 +583,15 @@ def run_training_loop(num_epochs, model, tokenizer, train_dataset, val_dataset,
                         torch.save(model.state_dict(), f"{experiment_saved_model_path}/best_model.pt")
                         log.info(f"Best model with eval accuracy {eval_acc} with {nb_samples_seen} samples seen is saved")
                     model.train()
+
+                    if args.stop_on_perfect_acc == "True" and eval_acc >= 0.999:
+                        log.info("Accuracy is equal or above 99.9%")
+                        log.info("Stopping training")
+                        break
                                
-                if check_degradation > 0 and ((i + 1) * batch_size) % check_degradation == 0:
-                    nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
 
-                    degradation_losses = []
-                    for i in range(nb_error_bar_runs):
-                        degradation_check_batches = prepare_dataset_for_checking_degradation(args.detector, fact_completion_dataset, args.batch_size, nb_samples=1000)
-                        degradation_loss = check_model_degradation(model, tokenizer, degradation_check_batches, nb_samples_seen, log, mlm_model, detector_name)
-                        degradation_losses.append(degradation_loss)
 
-                    mean_degradation_loss = sum(degradation_losses) / len(degradation_losses)
-                    std_degradation_loss = np.std(degradation_losses)
-                    loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})
 
-                    degradation_loss_threshold = args.degradation_threshold
-                    if mean_degradation_loss > 0:
-                        if orig_degradation_loss * (1 + degradation_loss_threshold) < mean_degradation_loss:
-                            log.info(f"Model has degraded, original loss: {orig_degradation_loss}, current loss: {mean_degradation_loss}")
-                            log.info(f"Stopping training")
-                            break
             log.info("Training signal is False, stopping training")
             break
     
@@ -695,6 +707,7 @@ if __name__ == "__main__":
     parser.add_argument("--nb_error_bar_runs", type=int, help="Number of runs to calculate the error bars for the metrics", default=5)
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     parser.add_argument("--wandb_experiment_name", type=str, help="Name of the wandb experiment", default="detector_training")
+    parser.add_argument("--stop_on_perfect_acc", type=str, help="Whether to stop training when the model reaches 99.9% accuracy", default="False")
     args = parser.parse_args()
 
 
