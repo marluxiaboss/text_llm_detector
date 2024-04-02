@@ -352,10 +352,11 @@ def create_experiment_folder(model_name, experiment_args):
 
     base_path = experiment_args.save_dir
     # check if there exists a subfolder already for the model_name
-    if not os.path.isdir(f"{base_path}/{model_name}/{training_method}/{experiment_args.dataset_path}"):
-        os.makedirs(f"{base_path}/{model_name}/{training_method}/{experiment_args.dataset_path}")
+    dataset_name = experiment_args.dataset_path.split("/")[-1]
+    if not os.path.isdir(f"{base_path}/{model_name}/{training_method}/{dataset_name}"):
+        os.makedirs(f"{base_path}/{model_name}/{training_method}/{dataset_name}")
     
-    experiment_path = f"{base_path}/{model_name}/{training_method}/{experiment_args.dataset_path}/{datetime.now().strftime('%d_%m_%H%M')}"
+    experiment_path = f"{base_path}/{model_name}/{training_method}/{dataset_name}/{datetime.now().strftime('%d_%m_%H%M')}"
     os.makedirs(experiment_path)
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     os.makedirs(experiment_saved_model_path)
@@ -772,7 +773,7 @@ if __name__ == "__main__":
             args.fp16 = False
 
         # distil models
-        if args.detector == "distil_roberta-base":
+        elif args.detector == "distil_roberta-base":
             detector_path = "distilbert/distilroberta-base"
             #detector_model = DistilRobertaForSequenceClassification.from_pretrained(detector_path).to(args.device)
             detector_model = AutoModelForSequenceClassification.from_pretrained(detector_path).to(args.device)
@@ -819,8 +820,6 @@ if __name__ == "__main__":
         # evaluate model on the test set after training by loading the best model
         test_model(detector_model, args.batch_size, dataset, experiment_path, log, args.dataset_path)
 
-
- 
     elif args.evaluation == "True":
 
         if args.detector == "roberta_base":
