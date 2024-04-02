@@ -701,7 +701,12 @@ if __name__ == "__main__":
 
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
-    merged_dataset.save_to_disk(f"fake_true_dataset_{args.experiment_name}")
+
+    # check if folder "fake_true_datasets" exists
+    if not os.path.exists("fake_true_datasets"):
+        os.makedirs("fake_true_datasets")
+
+    merged_dataset.save_to_disk(f"./fake_true_datasets/fake_true_dataset_{args.experiment_name}")
 
     # load to pandas train split
     df_train = pd.DataFrame(merged_dataset['train'])
@@ -714,9 +719,9 @@ if __name__ == "__main__":
     df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
 
     # dump to json
-    df_train.to_json(f"fake_true_dataset_{args.experiment_name}_train.json", force_ascii=False, indent=4)
-    df_eval.to_json(f"fake_true_dataset_{args.experiment_name}_eval.json", force_ascii=False, indent=4)
-    df_test.to_json(f"fake_true_dataset_{args.experiment_name}_test.json", force_ascii=False, indent=4)
+    df_train.to_json(f"./fake_true_datasets/fake_true_dataset_{args.experiment_name}_train.json", force_ascii=False, indent=4)
+    df_eval.to_json(f"./fake_true_datasets/fake_true_dataset_{args.experiment_name}_eval.json", force_ascii=False, indent=4)
+    df_test.to_json(f"./fake_true_datasets/fake_true_dataset_{args.experiment_name}_test.json", force_ascii=False, indent=4)
 
 
 

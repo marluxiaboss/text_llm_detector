@@ -47,6 +47,9 @@ saved_training_logs
 
 ```
 
+### 3. Datasets
+- `fake_true_datasets` folder contains all the datasets 
+
 ## Experiments
 
 ### Experiment 1

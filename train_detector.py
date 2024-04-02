@@ -8,7 +8,7 @@ import numpy as np
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer, DataCollatorWithPadding,
     TrainerCallback, ElectraForSequenceClassification, ElectraTokenizer, T5ForSequenceClassification, T5Tokenizer, get_scheduler,
-    RobertaConfig, AutoConfig, AutoModelForMaskedLM)
+    RobertaConfig, AutoConfig, AutoModelForMaskedLM, AutoModelForSequenceClassification)
 from torch.optim import AdamW
 from copy import deepcopy
 from tqdm import tqdm
@@ -94,7 +94,7 @@ def prepare_dataset_for_checking_degradation(detector_name, fact_completion_data
     if detector_name == "bert_base" or detector_name == "bert_large":
         questions_masked = [q + " [MASK]." for q in questions]
 
-    elif detector_name == "roberta_base" or detector_name == "roberta_large":
+    elif detector_name == "roberta_base" or detector_name == "roberta_large" or detector_name == "distil_roberta-base":
         questions_masked = [q + " <mask>." for q in questions]
 
     elif detector_name == "electra_base" or detector_name == "electra_large":
@@ -142,6 +142,9 @@ def create_mlm_model(model_name, device):
     if model_name == "t5_3b":
         model = AutoModelForMaskedLM.from_pretrained("google-t5/t5-3b").to(device)
 
+    # distil version of the model
+    if model_name == "distil_roberta-base":
+        model = AutoModelForMaskedLM.from_pretrained("distilroberta-base").to(device)
     
     
     return model
@@ -156,7 +159,7 @@ def adapt_model_to_mlm(classif_model, mlm_model, model_name):
     if model_name == "bert_base" or model_name == "bert_large":
         mlm_model.bert = classif_model.bert
 
-    elif model_name == "roberta_base" or model_name == "roberta_large":
+    elif model_name == "roberta_base" or model_name == "roberta_large" or model_name == "distil_roberta-base":
         mlm_model.roberta = classif_model.roberta
 
     elif model_name == "electra_base" or model_name == "electra_large":
@@ -335,12 +338,24 @@ def create_experiment_folder(model_name, experiment_args):
     # create a folder with the folowing elements:
     # log, description of training with all the args, model folder with all the saved models
 
+    training_method = None
+
+    if experiment_args.freeze_base == "True":
+        training_method = "freeze_base"
+    elif experiment_args.use_adapter == "True":
+        training_method = "adapter"
+    elif experiment_args.freeze_base == "False":
+        training_method = "full_finetuning"
+    
+    if training_method is None:
+        raise ValueError("Training method must be either 'freeze_base', 'adapter' or 'full_finetuning'")
+
     base_path = experiment_args.save_dir
     # check if there exists a subfolder already for the model_name
-    if not os.path.isdir(f"{base_path}/{model_name}/{args.dataset_path}"):
-        os.makedirs(f"{base_path}/{model_name}/{args.dataset_path}")
+    if not os.path.isdir(f"{base_path}/{model_name}/{training_method}/{experiment_args.dataset_path}"):
+        os.makedirs(f"{base_path}/{model_name}/{training_method}/{experiment_args.dataset_path}")
     
-    experiment_path = f"{base_path}/{model_name}/{args.dataset_path}/{datetime.now().strftime('%d_%m_%H%M')}"
+    experiment_path = f"{base_path}/{model_name}/{training_method}/{experiment_args.dataset_path}/{datetime.now().strftime('%d_%m_%H%M')}"
     os.makedirs(experiment_path)
     experiment_saved_model_path = f"{experiment_path}/saved_models"
     os.makedirs(experiment_saved_model_path)
@@ -691,6 +706,8 @@ if __name__ == "__main__":
         dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
 
     if args.evaluation == "False":
+ 
+        # base models
         if args.detector == "roberta_base":
             #detector_path = "openai-community/roberta-base-openai-detector"
             #detector_path = "FacebookAI/roberta-large"
@@ -722,7 +739,7 @@ if __name__ == "__main__":
             # set fp16 to False for T5 model, t5 has issues with fp16
             args.fp16 = False
 
-
+        # large models
         elif args.detector == "roberta_large":
             #detector_path = "openai-community/roberta-base-openai-detector"
             #detector_path = "FacebookAI/roberta-large"
@@ -753,6 +770,14 @@ if __name__ == "__main__":
 
             # set fp16 to False for T5 model, t5 has issues with fp16
             args.fp16 = False
+
+        # distil models
+        if args.detector == "distil_roberta-base":
+            detector_path = "distilbert/distilroberta-base"
+            #detector_model = DistilRobertaForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            detector_model = AutoModelForSequenceClassification.from_pretrained(detector_path).to(args.device)
+            bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+            detector = LLMDetector(detector_model, bert_tokenizer, 2)
 
         else:
             raise ValueError("No other detector currently supported")
@@ -845,6 +870,12 @@ if __name__ == "__main__":
             config = AutoConfig.from_pretrained(detector_path)
             detector_model = T5ForSequenceClassification(config)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
+
+        elif args.detector == "distil_roberta-base":
+            detector_path = "distilbert/distilroberta-base"
+            config = AutoConfig.from_pretrained(detector_path)
+            model = AutoModelForSequenceClassification.from_pretrained(detector_path)
+            bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
 
         else:
             raise ValueError("No other detector currently supported")
