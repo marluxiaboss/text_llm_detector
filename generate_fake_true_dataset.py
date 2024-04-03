@@ -145,7 +145,11 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         def transform_chat_template(sample, use_chat_template=False):
 
             if use_chat_template:
-                text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
+                if sample["context"] != "":
+                    text_instruction = f"Context: {sample['context']} \n {prompt} {sample['instruction']}"
+                else:
+                    text_instruction = f"{prompt} {sample['instruction']}"
+                
                 match template_type:
                     case "system_user":
                         messages = [
@@ -172,10 +176,12 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
         true_dataset_list = true_dataset["text_template"]
         
+        print("trued_dataset_list: ", true_dataset_list)
         for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
             batch = true_dataset_list[i:i+batch_size]
             responses = generator(batch, max_new_tokens=max_new_tokens)
             fake_responses.extend(responses)
+        print("fake_responses: ", fake_responses)
     return fake_responses, instructions
 
 def filter_instruction(sample):
@@ -634,7 +640,7 @@ if __name__ == "__main__":
 
     elif args.generator == "mistral":
         gen_path = "mistralai/Mistral-7B-v0.1"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.float16).to(args.device)
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(args.device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
         generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
@@ -644,6 +650,20 @@ if __name__ == "__main__":
         #template for chat
         use_chat_template = False
         template_type = None  
+
+    elif args.generator == "zephyr":
+        gen_path = "HuggingFaceH4/zephyr-7b-beta"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(args.device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
+
+        # special for mistral
+        gen_tokenizer.pad_token = gen_tokenizer.eos_token
+
+        #template for chat
+        use_chat_template = True
+        template_type ="user"
+
 
     else:
         # no other generator is supported for now
