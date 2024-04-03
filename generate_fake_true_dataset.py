@@ -89,7 +89,7 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
 
 
 def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens, batch_size=2, use_chat_template=False,
-                             template_type=None, load_from_cache=False):
+                             template_type=None, load_from_cache=False, prompt=""):
     """
     Traverse dataset and generate responses for each instruction
     """
@@ -165,7 +165,7 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
                     add_generation_prompt=True
                 )
             else:
-                text_instruction = sample["instruction"]
+                text_instruction = f"{prompt} {sample["instruction"]}"
                 text_template = text_instruction
             return {"text_template": text_template}
         
@@ -221,7 +221,7 @@ def filter_instruction(sample):
     return {"generated_response": response_without_instruction}
 
 def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100,
-                           max_new_tokens=100, seed=42, batch_size=2, use_chat_template=False, template_type=None, load_from_cache=False):
+                           max_new_tokens=100, seed=42, batch_size=2, use_chat_template=False, template_type=None, load_from_cache=False, prompt=""):
     
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
@@ -241,7 +241,7 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
     #train_subset = true_dataset["train"].select(range(subset_size))
     train_subset = true_dataset["train"]
     
-    fake_responses_train, instructions = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache)
+    fake_responses_train, instructions = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache, prompt=prompt)
 
     print("len fake_responses_train: ", len(fake_responses_train))
     if instructions:
@@ -536,6 +536,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_response_length", type=int, help="Max length of the response in characters", default=500)
     parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=10)
     parser.add_argument("--load_from_cache", type=str, help="Load mutiple datasets chunk from cache", default="False")
+    parser.add_argument("--prompt", type=str, help="Prompt to use for generation, placed before the prefix", default="")
 
     args = parser.parse_args()
 
@@ -682,7 +683,7 @@ if __name__ == "__main__":
     # generate fake dataset
     #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
-                                          args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.load_from_cache)
+                                          args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.load_from_cache, prompt=args.prompt)
     
     #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
 
