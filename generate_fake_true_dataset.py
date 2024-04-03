@@ -168,6 +168,9 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
                     tokenize=False,
                     add_generation_prompt=True
                 )
+
+                # force prefix on the generated response
+                text_template = f"{text_template}\n{sample["instruction"]}"
             else:
                 text_instruction = f"{prompt} {sample["instruction"]}"
                 text_template = text_instruction
@@ -359,6 +362,9 @@ def regroup_pairs(merged_dataset, seed=42):
         dataset = concatenate_datasets([true_responses_dataset, fake_responses_dataset])
         dataset = create_train_from_dataset(dataset)
 
+        # shuffle the dataset again to mix the true and fake responses
+        dataset = dataset.shuffle(seed=seed)
+
         return dataset
     
     # shuffle the dataset
@@ -426,15 +432,22 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
     def format_text(sample):
 
         text = sample["text"]
-        if use_chat_template:
-            modified_text = f"Instruction: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
+        #if use_chat_template:
+        #    #modified_text = f"Instruction: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
+        #    if sample["label"] == 0:
+        #        modified_text = sample["context"] + "" + sample["instruction"] + " " + text
+        #    elif sample["label"] == 1:
+        #        modified_text = text
+        #    else:
+        #        raise ValueError("Label not supported")
+        #
+        #else:
+        if sample["label"] == 0:
+            modified_text = sample["context"] + "" + sample["instruction"] + " " + text
+        elif sample["label"] == 1:
+            modified_text = sample["context"] + "" + sample["instruction"] + " " + text
         else:
-            if sample["label"] == 0:
-                modified_text = sample["context"] + "" + sample["instruction"] + " " + text
-            elif sample["label"] == 1:
-                modified_text = sample["context"] + "" + sample["instruction"] + " " + text
-            else:
-                raise ValueError("Label not supported")
+            raise ValueError("Label not supported")
 
         return {"text": modified_text}
         
