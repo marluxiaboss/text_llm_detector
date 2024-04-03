@@ -179,12 +179,11 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
         true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
         true_dataset_list = true_dataset["text_template"]
         
-        print("trued_dataset_list: ", true_dataset_list)
         for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
             batch = true_dataset_list[i:i+batch_size]
             responses = generator(batch, max_new_tokens=max_new_tokens)
             fake_responses.extend(responses)
-        print("fake_responses: ", fake_responses)
+
     return fake_responses, instructions
 
 def filter_instruction(sample):
@@ -355,6 +354,9 @@ def regroup_pairs(merged_dataset, seed=42):
         # reorganize the fake responses according to the correct order
         fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering)
 
+        # remove true_responses without a corresponding fake response
+        true_responses_dataset = true_responses_dataset.select(correct_text_ordering)
+
         # sort both datasets by id to allign them, otherwise concat doesn't work
         true_responses_dataset = true_responses_dataset.sort("id")
         fake_responses_dataset = fake_responses_dataset.sort("id")
@@ -375,7 +377,7 @@ def regroup_pairs(merged_dataset, seed=42):
 
     # sort the dataset by id
     merged_dataset = merged_dataset.sort("id")
-    
+
     # remove id column
     merged_dataset = merged_dataset.remove_columns(["id"])
     #merged_dataset = create_train_from_dataset(merged_dataset)
@@ -422,6 +424,24 @@ def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
     print("Eval size:", len(merged_dataset['valid']))
     print("Test size:", len(merged_dataset['test']))
 
+    return merged_dataset
+
+def balance_dataset(dataset, create_train=True):
+    label_0 = dataset.filter(lambda x: x["label"] == 0)
+    label_1 = dataset.filter(lambda x: x["label"] == 1)
+    nb_label_0 = len(label_0["text"])
+    nb_label_1 = len(label_1["text"])
+
+    if nb_label_0 > nb_label_1:
+        label_0 = label_0.select(range(nb_label_1))
+
+    elif nb_label_1 > nb_label_0:
+        label_1 = label_1.select(range(nb_label_0))
+    
+    merged_dataset = concatenate_datasets([label_0, label_1])
+    if create_train:
+        merged_dataset = create_train_from_dataset(merged_dataset)
+    
     return merged_dataset
 
 def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_length_char=500):
@@ -471,21 +491,7 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
         print("Number of samples with label 0:", nb_label_0)
         print("Number of samples with label 1:", nb_label_1)
 
-        if nb_label_0 > nb_label_1:
-            label_0 = label_0.select(range(nb_label_1))
-            #print("label_0: ", label_0)
-            #print("label_1: ", label_1)
-            #print("label_0 after: ", create_train_from_dataset(label_0))
-            #print("label_1 after: ", create_train_from_dataset(label_1))
-            #merged_dataset = concatenate_datasets([create_train_from_dataset(label_0), create_train_from_dataset(label_1)])
-            merged_dataset = concatenate_datasets([label_0, label_1])
-            merged_dataset = create_train_from_dataset(merged_dataset)
-
-        elif nb_label_1 > nb_label_0:
-            label_1 = label_1.select(range(nb_label_0))
-            #merged_dataset = concatenate_datasets([create_train_from_dataset(label_0), create_train_from_dataset(label_1)])
-            merged_dataset = concatenate_datasets([label_0, label_1])
-            merged_dataset = create_train_from_dataset(merged_dataset)
+        merged_dataset = balance_dataset(merged_dataset["train"], create_train=True)
 
 
         nb_label_0 = len(merged_dataset.filter(lambda x: x["label"] == 0)["train"]["text"])
@@ -732,6 +738,15 @@ if __name__ == "__main__":
 
     # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
     merged_dataset = regroup_pairs(merged_dataset)
+
+    # balance the dataset again
+    #merged_dataset = balance_dataset(merged_dataset["train"], create_train=True)
+
+
+    nb_label_0 = len(merged_dataset["train"].filter(lambda x: x["label"] == 0)["text"])
+    nb_label_1 = len(merged_dataset["train"].filter(lambda x: x["label"] == 1)["text"])
+    print("Number of samples with label 0:", nb_label_0)
+    print("Number of samples with label 1:", nb_label_1)
 
     # split merged dataset into train, eval, test
     merged_dataset = split_merged_dataset(merged_dataset, eval_size=args.validation_size, test_size=args.test_size)
