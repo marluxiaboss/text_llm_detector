@@ -681,6 +681,19 @@ def test_model(model, batch_size, dataset, experiment_path, log, dataset_path):
         test_metrics_file.write(results)
 
 
+def create_round_robbin_dataset(datasets, take_samples=-1, seed=42):
+    """
+    Create a round robbin dataset from the given datasets
+    """
+
+    if take_samples > 0:
+        datasets = [dataset.select(range(take_samples)) for dataset in datasets]
+
+    dataset = concatenate_datasets(datasets)
+    dataset = dataset.shuffle(seed=seed)
+    
+    return dataset
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -708,6 +721,7 @@ if __name__ == "__main__":
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     parser.add_argument("--wandb_experiment_name", type=str, help="Name of the wandb experiment", default="detector_training")
     parser.add_argument("--stop_on_perfect_acc", type=str, help="Whether to stop training when the model reaches 99.9% accuracy", default="False")
+    parser.add_argument("--round_robin_training", type=str, help="Whether to train the model in a round robin fashion with multiple datasets", default="False")
     args = parser.parse_args()
 
 
@@ -722,8 +736,35 @@ if __name__ == "__main__":
     else:
         raise ValueError("Log mode must be either 'offline' or 'online'")
     
-    dataset = load_from_disk(args.dataset_path)
+    # train on multiple datasets in a round robin fashion
+    if args.round_robin_training == "True":
 
+        # check if the round_robin_datasets folder exists, otherwise create it
+        if not os.path.isdir("./fake_true_datasets/fake_true_dataset_round_robin"):
+            base_dataset_path = "./fake_true_datasets"
+            datasets_names = ["fake_true_dataset_gpt2_10k", "fake_true_dataset_phi_10k", "fake_true_dataset_gemma_10k", "fake_true_dataset_mistral_10k"]
+            datasets = [load_from_disk(f"{base_dataset_path}/{dataset_name}") for dataset_name in datasets_names]
+            
+            nb_samples_per_dataset = 2500
+            datasets_train = [dataset["train"] for dataset in datasets]
+            dataset_train = create_round_robbin_dataset(datasets_train, take_samples=nb_samples_per_dataset, seed=42)
+
+            nb_samples_per_dataset = 250
+            datasets_valid = [dataset["valid"] for dataset in datasets]
+            dataset_valid = create_round_robbin_dataset(datasets_valid, take_samples=nb_samples_per_dataset, seed=42)
+
+            nb_samples_per_dataset = 250
+            datasets_test = [dataset["test"] for dataset in datasets]
+            dataset_test = create_round_robbin_dataset(datasets_test, take_samples=nb_samples_per_dataset, seed=42)
+
+            dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
+            dataset.save_to_disk("./fake_true_datasets/fake_true_dataset_round_robin")
+        else:
+            dataset = load_from_disk("./fake_true_datasets/round_robin_dataset")
+    else:
+        dataset = load_from_disk(args.dataset_path)
+
+    # only take a subset of the dataset
     if args.take_samples > 0:
         print(f"Taking {args.take_samples} samples from the dataset")
         dataset_train = dataset["train"].select(range(int(args.take_samples)))
