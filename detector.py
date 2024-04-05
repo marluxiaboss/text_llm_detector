@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import numpy as np
+import adapters
 
 
 class AugmentedRobertaClassificationHead(nn.Module):
@@ -84,5 +85,15 @@ class LLMDetector(nn.Module):
     """
     bert_model.classifier = AugmentedRobertaClassificationHead(bert_model.config)
     return bert_model
+  
+  @staticmethod
+  def use_adapter(bert_model, device, train_adapter=False):
+    adapters.init(bert_model)
+    config = adapters.BnConfig(mh_adapter=True, output_adapter=True, reduction_factor=16, non_linearity="relu")
+    bert_model.add_adapter("fake_true_detection", config=config)
+
+    if train_adapter:
+      bert_model.train_adapter("fake_true_detection")
+    bert_model.to(device)
 
 

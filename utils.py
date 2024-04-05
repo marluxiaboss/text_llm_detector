@@ -3,8 +3,13 @@ from time import strftime, gmtime
 import sys
 
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
 
 def create_logger(name, silent=False, to_disk=False, log_file=None):
     """Create a new logger"""
@@ -117,4 +122,44 @@ class Signal:
         with open(self.signal_file, 'r') as fin:
             return eval(fin.read())
         
+
+
+### Dataset utils ###
+def create_round_robbin_dataset(datasets, take_samples=-1, seed=42):
+    """
+    Create a round robbin dataset from the given datasets
+    """
+
+    if take_samples > 0:
+        datasets = [dataset.select(range(take_samples)) for dataset in datasets]
+
+    dataset = concatenate_datasets(datasets)
+    dataset = dataset.shuffle(seed=seed)
     
+    return dataset
+    
+
+### Ploting utils ###
+def plot_nb_samples_metrics(eval_acc_logs, save_path):
+
+    eval_acc_logs_df = pd.DataFrame(eval_acc_logs)
+    plt.figure()
+    sns.lineplot(x="samples", y="accuracy", data=eval_acc_logs_df)
+
+    plt.savefig(f"{save_path}/accuracy_vs_nb_samples.png")
+
+def plot_nb_samples_loss(train_loss_logs, save_path):
+
+    train_loss_logs_df = pd.DataFrame(train_loss_logs)
+    plt.figure()
+    sns.lineplot(x="samples", y="loss", data=train_loss_logs_df)
+
+    plt.savefig(f"{save_path}/loss_vs_nb_samples.png")
+
+def plot_degradation_loss(loss_degradation_logs, save_path):
+
+    loss_degradation_logs_df = pd.DataFrame(loss_degradation_logs)
+    plt.figure()
+    sns.lineplot(x="samples", y="degrad_loss", data=loss_degradation_logs_df)
+
+    plt.savefig(f"{save_path}/degradation_loss_vs_nb_samples.png")
