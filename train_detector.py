@@ -65,6 +65,7 @@ if __name__ == "__main__":
     parser.add_argument("--wandb_experiment_name", type=str, help="Name of the wandb experiment", default="detector_training")
     parser.add_argument("--stop_on_perfect_acc", type=str, help="Whether to stop training when the model reaches 99.9% accuracy", default="False")
     parser.add_argument("--round_robin_training", type=str, help="Whether to train the model in a round robin fashion with multiple datasets", default="False")
+    parser.add_argument("--nb_samples_per_dataset", type=int, help="Number of samples to take from each dataset in round robin training", default=2500)
     args = parser.parse_args()
 
     # builder for training
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     
     # train on multiple datasets in a round robin fashion
     if args.round_robin_training == "True":
-        detector_trainer.set_round_robin_dataset()
+        detector_trainer.set_round_robin_dataset(nb_samples_per_dataset=args.nb_samples_per_dataset)
     else:
         detector_trainer.set_dataset(args.dataset_path, args.take_samples)
 

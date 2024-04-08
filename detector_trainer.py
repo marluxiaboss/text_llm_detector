@@ -50,15 +50,18 @@ class DetectorTrainer:
     
         dataset = load_from_disk(dataset_path)
 
-        dataset_train = dataset["train"].select(range(int(take_samples)))
-        dataset_valid = dataset["valid"].select(range(int(take_samples / 10)))
-        dataset_test = dataset["test"].select(range(int(take_samples / 10)))
+        dataset_train = dataset["train"]
+        dataset_valid = dataset["valid"]
+        dataset_test = dataset["test"]
 
         dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
 
         if take_samples > 0:
             print(f"Taking {take_samples} samples from the dataset")
-            dataset = dataset.select(range(take_samples))
+            dataset_train = dataset["train"].select(range(int(take_samples)))
+            dataset_valid = dataset["valid"].select(range(int(take_samples / 10)))
+            dataset_test = dataset["test"].select(range(int(take_samples / 10)))
+            dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
 
         self.dataset = dataset
         self.dataset_name = dataset_path.split("/")[-1]
@@ -75,21 +78,21 @@ class DetectorTrainer:
         self.dataset = self.dataset.map(lambda x: tokenize_text(x, self.tokenizer), batched=True)
 
 
-    def set_round_robin_dataset(self, take_samples=-1):
+    def set_round_robin_dataset(self, take_samples=-1, nb_samples_per_dataset=2500):
         if not os.path.isdir("./fake_true_datasets/fake_true_dataset_round_robin"):
             base_dataset_path = "./fake_true_datasets"
             datasets_names = ["fake_true_dataset_gpt2_10k", "fake_true_dataset_phi_10k", "fake_true_dataset_gemma_10k", "fake_true_dataset_mistral_10k"]
             datasets = [load_from_disk(f"{base_dataset_path}/{dataset_name}") for dataset_name in datasets_names]
             
-            nb_samples_per_dataset = 2500
+            nb_samples_per_dataset = nb_samples_per_dataset
             datasets_train = [dataset["train"] for dataset in datasets]
             dataset_train = create_round_robbin_dataset(datasets_train, take_samples=nb_samples_per_dataset, seed=42)
 
-            nb_samples_per_dataset = 250
+            nb_samples_per_dataset = nb_samples_per_dataset / 10
             datasets_valid = [dataset["valid"] for dataset in datasets]
             dataset_valid = create_round_robbin_dataset(datasets_valid, take_samples=nb_samples_per_dataset, seed=42)
 
-            nb_samples_per_dataset = 250
+            nb_samples_per_dataset = nb_samples_per_dataset / 10
             datasets_test = [dataset["test"] for dataset in datasets]
             dataset_test = create_round_robbin_dataset(datasets_test, take_samples=nb_samples_per_dataset, seed=42)
 
@@ -122,7 +125,7 @@ class DetectorTrainer:
         base_path = training_args.save_dir
 
         # check if there exists a subfolder already for the model_name
-        dataset_name = training_args.dataset_path.split("/")[-1]
+        dataset_name = self.dataset_path.split("/")[-1]
         if not os.path.isdir(f"{base_path}/{model_name}/{training_method}/{dataset_name}"):
             os.makedirs(f"{base_path}/{model_name}/{training_method}/{dataset_name}")
         
@@ -138,7 +141,7 @@ class DetectorTrainer:
         # create a file args_log.txt with all the args
         with open(f"{experiment_path}/args_log.txt", "w") as f:
             f.write(f"Model: {model_name}\n")
-            f.write(f"dataset_path: {training_args.dataset_path}\n")
+            f.write(f"dataset_path: {self.dataset_path}\n")
             f.write(f"num_epochs: {training_args.num_epochs}\n")
             f.write(f"batch_size: {training_args.batch_size}\n")
             f.write(f"learning_rate: {training_args.learning_rate}\n")
@@ -491,9 +494,10 @@ class DetectorTrainer:
         Check the degradation of the model by tracking the loss on the MaskedLM task
         """
 
-        model = self.adapt_model_to_mlm()
+        self.adapt_model_to_mlm()
         tokenizer = self.tokenizer
         log = self.log
+        model = self.mlm_model
 
         losses = []
         model.eval()
@@ -554,6 +558,7 @@ class DetectorTrainer:
             dataset.set_format("torch")
             return dataset
         
+        print(dataset["train"])
         # process both datasets
         train_dataset = process_tokenized_dataset(dataset["train"])
         val_dataset = process_tokenized_dataset(dataset["valid"])
@@ -615,6 +620,9 @@ class DetectorTrainer:
         if check_degradation > 0:
             nb_error_bar_runs = 5
             nb_samples_seen = 0
+
+            # load fact completion dataset for the first time
+            self.load_fact_checking_dataset()
             mean_degradation_loss, std_degradation_loss = self.check_degradation(nb_error_bar_runs, nb_samples_seen)
             orig_degradation_loss = mean_degradation_loss
             loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})

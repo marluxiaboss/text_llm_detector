@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from  matplotlib.colors import LinearSegmentedColormap
+import json
+import jsonlines
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
@@ -140,6 +143,8 @@ def create_round_robbin_dataset(datasets, take_samples=-1, seed=42):
     
 
 ### Ploting utils ###
+
+# plots just after training
 def plot_nb_samples_metrics(eval_acc_logs, save_path):
 
     eval_acc_logs_df = pd.DataFrame(eval_acc_logs)
@@ -163,3 +168,114 @@ def plot_degradation_loss(loss_degradation_logs, save_path):
     sns.lineplot(x="samples", y="degrad_loss", data=loss_degradation_logs_df)
 
     plt.savefig(f"{save_path}/degradation_loss_vs_nb_samples.png")
+
+# plots for experiment 1
+# distil-roberta trained on mistral with adapter
+
+def create_df_from_training_logs(detector, training_method, model_code):
+
+    detector_logs_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_mistral_10k/{model_code}/training_logs.json"
+
+    training_logs_data = []
+    for line in jsonlines.open(detector_logs_path):
+        training_logs_data.append(line)
+
+    # transform to pandas dataframe
+    df = pd.DataFrame(training_logs_data)
+
+    # 1) eval_acc data
+    eval_acc_df = df[df["accuracy"].notna()]
+    eval_acc_df = eval_acc_df[["accuracy", "samples", "std", "lower_bound", "upper_bound"]]
+
+
+    # 2) degrad_loss data
+    degrad_loss_df = df[df["degrad_loss"].notna()]
+    degrad_loss_df = degrad_loss_df[["degrad_loss", "samples", "std"]]
+
+
+    # 3) training loss data
+    training_loss_df = df[df["loss"].notna()]
+    training_loss_df = training_loss_df[["loss", "samples"]]
+
+    return eval_acc_df, degrad_loss_df, training_loss_df
+
+def plot_eval_acc_vs_nb_samples(eval_acc_df, save_path=None):
+    plt.fill_between(eval_acc_df["samples"], eval_acc_df["accuracy"] - eval_acc_df["std"],
+                  eval_acc_df["accuracy"] + eval_acc_df["std"], alpha = 0.5, color = 'gray')
+    plt.plot(eval_acc_df["samples"], eval_acc_df["accuracy"], color = 'black')
+    # 
+    plt.xlabel('Number of training samples seen')
+    plt.ylabel('Evaluation accuracy')
+
+    plt.title('Evaluation accuracy during training with standard deviation')
+
+def plot_degrad_loss_vs_nb_samples(degrad_loss_df, save_path=None):
+    plt.fill_between(degrad_loss_df["samples"], degrad_loss_df["degrad_loss"] - degrad_loss_df["std"],
+                  degrad_loss_df["degrad_loss"] + degrad_loss_df["std"], alpha = 0.5, color = 'gray')
+    plt.plot(degrad_loss_df["samples"], degrad_loss_df["degrad_loss"], color = 'black')
+
+    # add an horizontal line at 10.5, which is the baseline for a random model
+    plt.axhline(y=10.5, color='r', linestyle='--')
+
+    # name it "random model baseline"
+    plt.text(0, 10.55, "random model baseline", color = 'red')
+
+    plt.xlabel('Number of training samples seen')
+    plt.ylabel('Degradation loss')
+
+    plt.title('Degradation loss during training with standard deviation')
+
+def plot_training_loss_vs_nb_samples(training_loss_df, save_path=None):
+    plt.plot(training_loss_df["samples"], training_loss_df["loss"], color = 'black')
+    plt.xlabel('Number of training samples seen')
+    plt.ylabel('Training loss')
+
+    plt.title('Train loss during training')
+
+
+# plots for experiment 2
+def create_df_from_test_logs(training_method, trained_on_models, dataset_names):
+
+    results = []
+    for detector in trained_on_models.keys():
+        for model_code, base_model in trained_on_models[detector].items():
+            for dataset in dataset_names:
+                results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
+
+                with open(results_path, "r") as f:
+                    result_dict = json.load(f)
+                    result_dict["detector"] = f"{detector}_{base_model}"
+                    result_dict["dataset"] = dataset
+                    results.append(result_dict)
+
+    # transform to pandas dataframe
+    results_df = pd.DataFrame(results)
+
+    # order by detector and dataset
+    results_df = results_df.sort_values(by=["detector", "dataset"])
+
+    #display(results_df)
+
+    return results_df
+
+def heatmap_from_df(results_df, metric="accuracy"):
+    
+    cmap_g_r =LinearSegmentedColormap.from_list('rg',["r", "w", "g"], N=256) 
+
+    # 4x4 heatmap with the results where columns are the detectors trained on datasets and values are the accuracy
+    heatmap = sns.heatmap(results_df.pivot(index="detector", columns="dataset", values=metric), annot=True, cmap=cmap_g_r)
+    #heatmap = sns.heatmap(results_df.pivot(index="detector", columns="dataset", values="accuracy"), annot=True)
+    nb_detectors = len(results_df["detector"].unique())
+    """
+    # Set the text on the heatmap to add uncertainty
+    for i, detector in enumerate(results_df["detector"].unique()):
+        for j, dataset in enumerate(results_df["dataset"].unique()):
+
+            # get the correct postion
+            pos = nb_detectors * i + j
+            heatmap.texts[pos].set_text(f"{results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)]['accuracy'].values[0]:.2f} +/- {results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)]['std_accuracy'].values[0]:.2f}")
+    """
+    plt.xlabel("Tested on")
+    plt.ylabel("Trained on")
+
+    plt.title(f"{metric} of RoBERTa detectors on the different datasets")
