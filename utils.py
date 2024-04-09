@@ -174,7 +174,7 @@ def plot_degradation_loss(loss_degradation_logs, save_path):
 
 def create_df_from_training_logs(detector, training_method, model_code):
 
-    detector_logs_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_mistral_10k/{model_code}/training_logs.json"
+    detector_logs_path = f"./saved_training_logs_experiment_1/{detector}/{training_method}/fake_true_dataset_mistral_10k/{model_code}/training_logs.json"
 
     training_logs_data = []
     for line in jsonlines.open(detector_logs_path):

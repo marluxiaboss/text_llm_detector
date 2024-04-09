@@ -674,7 +674,7 @@ class DetectorTrainer:
                         loss_degradation_logs.append({"samples": nb_samples_seen, "degrad_loss": mean_degradation_loss, "std": std_degradation_loss})
 
                         degradation_loss_threshold = degradation_threshold
-                        if mean_degradation_loss > 0:
+                        if degradation_loss_threshold > 0:
                             if orig_degradation_loss * (1 + degradation_loss_threshold) < mean_degradation_loss:
                                 log.info(f"Model has degraded, original loss: {orig_degradation_loss}, current loss: {mean_degradation_loss}")
                                 log.info(f"Stopping training")
@@ -717,7 +717,7 @@ class DetectorTrainer:
                             log.info(f"Best model with eval accuracy {eval_acc} with {nb_samples_seen} samples seen is saved")
                         model.train()
 
-                        if stop_on_perfect_acc == "True" and eval_acc >= 0.999:
+                        if stop_on_perfect_acc == "True" and eval_acc >= 0.99:
                             log.info("Accuracy is equal or above 99.9%")
                             log.info("Stopping training")
                             break
