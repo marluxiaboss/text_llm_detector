@@ -591,10 +591,12 @@ class DetectorTrainer:
         # round both up to the nearest multiple of batch_size
         log_loss_steps = (log_loss_steps + self.batch_size - 1) // self.batch_size * self.batch_size
         eval_steps = (eval_steps + self.batch_size - 1) // self.batch_size * self.batch_size
+        check_degradation = (check_degradation + self.batch_size - 1) // self.batch_size * self.batch_size
 
         log = self.log
         log.info(f"log_loss_steps: {log_loss_steps}")
         log.info(f"eval_steps: {eval_steps}")
+        log.info(f"check_degradation: {check_degradation}")
 
         eval_acc_logs = []
         train_loss_logs = []

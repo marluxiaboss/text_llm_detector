@@ -260,6 +260,42 @@ def plot_training_loss_vs_nb_samples(training_loss_df, save_path=None):
 
     plt.title('Train loss during training')
 
+def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, degrad_loss_df_distil_full, degrad_loss_df_large_adapter, degrad_loss_df_large_full, save_path=None):
+    fig, ax = plt.subplots(1,2,figsize= (12,6), sharey = True, sharex = True)
+
+    ### Adapter method ###
+    ax[0].errorbar(degrad_loss_df_distil_adapter["samples"], degrad_loss_df_distil_adapter["degrad_loss"], yerr=degrad_loss_df_distil_adapter["std"], color = 'black', capsize=3)
+    ax[0].set_title('Adapter method')
+    ax[0].set_xlabel('Number of training samples seen')
+    ax[0].set_ylabel('Degradation loss')
+
+    # distil full
+    ax[0].errorbar(degrad_loss_df_large_adapter["samples"], degrad_loss_df_large_adapter["degrad_loss"], yerr=degrad_loss_df_large_adapter["std"], color = 'yellow', capsize=3)
+    ax[0].legend(["Distil-RoBERTa", "RoBERTa-Large"])
+
+    ax[0].axhline(y=10.5, color='r', linestyle='--')
+    ax[0].text(0, 10.55, "random model baseline", color = 'red')
+
+    ### Full finetuning method ###
+    ax[1].errorbar(degrad_loss_df_distil_full["samples"], degrad_loss_df_distil_full["degrad_loss"], yerr=degrad_loss_df_distil_full["std"], color = 'black', capsize=3)
+    ax[1].set_title('Full finetuning method')
+    ax[1].set_xlabel('Number of training samples seen')
+    ax[1].set_ylabel('Degradation loss')
+
+    # distil full
+    ax[1].errorbar(degrad_loss_df_large_full["samples"], degrad_loss_df_large_full["degrad_loss"], yerr=degrad_loss_df_large_full["std"], color = 'yellow', capsize=3)
+    ax[1].legend(["Distil-RoBERTa", "RoBERTa-Large"])
+
+    ax[1].axhline(y=10.5, color='r', linestyle='--')
+    ax[1].text(0, 10.55, "random model baseline", color = 'red')
+
+
+
+
+
+    if save_path:
+        plt.savefig(f"{save_path}/degrad_loss_vs_nb_samples_panel.png")
+    
 
 # plots for experiment 2
 def create_df_from_test_logs(training_method, trained_on_models, dataset_names):
@@ -289,7 +325,7 @@ def create_df_from_test_logs(training_method, trained_on_models, dataset_names):
 
     return results_df
 
-def heatmap_from_df(results_df, metric="accuracy"):
+def heatmap_from_df(results_df, metric="accuracy", with_std=False):
     fig, ax = plt.subplots(figsize=(10,10))  
 
     cmap_g_r = LinearSegmentedColormap.from_list('rg',["r", "w", "g"], N=256) 
@@ -307,15 +343,25 @@ def heatmap_from_df(results_df, metric="accuracy"):
     heatmap = sns.heatmap(pivoted_results_df, annot=True, cmap=cmap_g_r, ax=ax)
     #heatmap = sns.heatmap(results_df.pivot(index="detector", columns="dataset", values="accuracy"), annot=True)
     #nb_detectors = len(results_df["detector"].unique())
-    nb_datasets = len(results_df["dataset"].unique())
 
-    ## Set the text on the heatmap to add uncertainty
-    #for i, detector in enumerate(results_df["detector"].unique()):
-    #    for j, dataset in enumerate(results_df["dataset"].unique()):
-#
-    #        # get the correct postion
-    #        pos = nb_datasets * i + j
-    #        heatmap.texts[pos].set_text(f"{results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)][metric].values[0]:.2f} +/- {results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)][f"std_{metric}"].values[0]:.2f}")
+    if with_std:
+        nb_datasets = len(results_df["dataset"].unique())
+        pivoted_results_error_df = results_df.pivot(index="detector", columns="dataset", values=f"std_{metric}")
+
+        for i, detector in enumerate(results_df["detector"].unique()):
+            for j, dataset in enumerate(results_df["dataset"].unique()):
+
+                # get the correct postion
+                pos = nb_datasets * i + j
+                heatmap.texts[pos].set_text(f"{results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)][metric].values[0]:.2f} +/- {results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)][f"std_{metric}"].values[0]:.2f}")
+
+        ## Set the text on the heatmap to add uncertainty
+        #for i, detector in enumerate(results_df["detector"].unique()):
+        #    for j, dataset in enumerate(results_df["dataset"].unique()):
+    #
+        #        # get the correct postion
+        #        pos = nb_datasets * i + j
+        #        heatmap.texts[pos].set_text(f"{results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)][metric].values[0]:.2f} +/- {results_df[(results_df['detector'] == detector) & (results_df['dataset'] == dataset)][f"std_{metric}"].values[0]:.2f}")
 
     plt.xlabel("Tested on")
     plt.ylabel("Trained on")
