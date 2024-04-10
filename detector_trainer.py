@@ -764,6 +764,7 @@ class DetectorTrainer:
         experiment_path = self.experiment_path
         log = self.log
         dataset_path = self.dataset_path
+        dataset_name = self.dataset_name
 
         model.eval()
         metric = evaluate.combine(["accuracy", "f1", "precision", "recall"])
@@ -795,7 +796,7 @@ class DetectorTrainer:
             log.info(f"{key}: {value}")
             
         # save the results to a json file
-        with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_path}.json", "w") as test_metrics_file:
+        with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
             test_metrics_file.write(results)
 
  
