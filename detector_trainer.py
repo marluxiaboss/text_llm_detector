@@ -281,6 +281,9 @@ class DetectorTrainer:
     def set_stop_on_perfect_acc(self, stop_on_perfect_acc):
         self.stop_on_perfect_acc = stop_on_perfect_acc
 
+    def set_stop_after_n_samples(self, stop_after_n_samples):
+        self.stop_after_n_samples = stop_after_n_samples
+
     def set_log_loss_steps(self, log_loss_steps):
         self.log_loss_steps = log_loss_steps
     
@@ -680,6 +683,13 @@ class DetectorTrainer:
                                 log.info(f"Stopping training")
                                 break
 
+                    nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
+                    if (self.stop_after_n_samples > 0 and
+                        nb_samples_seen > self.stop_after_n_samples):
+                        log.info(f"Number of samples seen is above {self.stop_after_n_samples}")
+                        log.info("Stopping training")
+                        break
+                    
                     if ((i + 1) * batch_size) % eval_steps == 0:
                         model.eval()
                         nb_samples_seen = i*batch_size + epoch*len(train_loader)*batch_size
@@ -721,6 +731,8 @@ class DetectorTrainer:
                             log.info("Accuracy is equal or above 99.9%")
                             log.info("Stopping training")
                             break
+
+
 
                 log.info("Training signal is False, stopping training")
                 break

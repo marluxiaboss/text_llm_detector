@@ -66,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("--stop_on_perfect_acc", type=str, help="Whether to stop training when the model reaches 99.9% accuracy", default="False")
     parser.add_argument("--round_robin_training", type=str, help="Whether to train the model in a round robin fashion with multiple datasets", default="False")
     parser.add_argument("--nb_samples_per_dataset", type=int, help="Number of samples to take from each dataset in round robin training", default=2500)
+    parser.add_argument("--stop_after_n_samples", type=int, help="Stop training after n samples", default=-1)
     args = parser.parse_args()
 
     # builder for training
@@ -107,6 +108,7 @@ if __name__ == "__main__":
         detector_trainer.set_check_degradation_steps(args.check_degradation)
         detector_trainer.set_degradation_threshold(args.degradation_threshold)
         detector_trainer.set_stop_on_perfect_acc(args.stop_on_perfect_acc)
+        detector_trainer.set_stop_after_n_samples(args.stop_after_n_samples)
         detector_trainer.set_log_loss_steps(args.log_loss_steps)
         detector_trainer.set_eval_steps(args.eval_steps)
 
