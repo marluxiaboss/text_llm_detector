@@ -44,5 +44,5 @@ if __name__ == "__main__":
     dataset_test = create_round_robbin_dataset(datasets_test, take_samples=nb_samples_per_dataset, seed=42)
 
     dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
-    dataset.save_to_disk("./fake_true_datasets/fake_true_dataset_round_robin")
+    dataset.save_to_disk("./fake_true_datasets/fake_true_dataset_round_robin_10k")
 

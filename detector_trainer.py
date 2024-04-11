@@ -246,6 +246,9 @@ class DetectorTrainer:
             detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(device)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
 
+            self.bf16 = True
+            self.fp16 = True
+
         # distil models
         elif detector_name == "distil_roberta-base":
             detector_path = "distilbert/distilroberta-base"
@@ -576,6 +579,8 @@ class DetectorTrainer:
         
         if self.fp16:
             accelerator = Accelerator(mixed_precision='fp16')
+        elif self.bf16:
+            accelerator = Accelerator(mixed_precision='bf16')
         else:
             accelerator = Accelerator()
         
