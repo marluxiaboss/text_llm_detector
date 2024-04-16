@@ -260,6 +260,48 @@ def plot_training_loss_vs_nb_samples(training_loss_df, save_path=None):
 
     plt.title('Train loss during training')
 
+def plot_compared_model_size_eval_acc(eval_acc_df_distil_freeze_base, eval_acc_df_large_freeze_base, save_path=None):
+    #fig, ax = plt.subplots(1,1,figsize= (8,6), sharey = True, sharex = True)
+
+    ### Freeze base method ###
+    plt.errorbar(eval_acc_df_distil_freeze_base["samples"], eval_acc_df_distil_freeze_base["accuracy"], yerr=eval_acc_df_distil_freeze_base["std"], color = 'black', capsize=3)
+
+    # distil full
+    plt.errorbar(eval_acc_df_large_freeze_base["samples"], eval_acc_df_large_freeze_base["accuracy"], yerr=eval_acc_df_large_freeze_base["std"], color = 'yellow', capsize=3)
+    
+    
+    plt.title('Freeze base method')
+    plt.xlabel('Number of training samples seen')
+    plt.ylabel('Eval Accuracy')
+    plt.legend(["Distil-RoBERTa", "RoBERTa-Large"])
+
+    plt.show()
+
+
+def plot_panel_model_and_training_method_eval_acc(eval_acc_df_distil_adapter, eval_acc_df_distil_full, eval_acc_df_large_adapter, eval_acc_df_large_full, save_path=None):
+    fig, ax = plt.subplots(1,2,figsize= (12,6), sharey = True, sharex = True)
+
+    ### Adapter method ###
+    ax[0].errorbar(eval_acc_df_distil_adapter["samples"], eval_acc_df_distil_adapter["accuracy"], yerr=eval_acc_df_distil_adapter["std"], color = 'black', capsize=3)
+    ax[0].set_title('Adapter method')
+    ax[0].set_xlabel('Number of training samples seen')
+    ax[0].set_ylabel('Eval Accuracy')
+
+    # distil full
+    ax[0].errorbar(eval_acc_df_large_adapter["samples"], eval_acc_df_large_adapter["accuracy"], yerr=eval_acc_df_large_adapter["std"], color = 'yellow', capsize=3)
+    ax[0].legend(["Distil-RoBERTa", "RoBERTa-Large"])
+
+    ### Full finetuning method ###
+    ax[1].errorbar(eval_acc_df_distil_full["samples"], eval_acc_df_distil_full["accuracy"], yerr=eval_acc_df_distil_full["std"], color = 'black', capsize=3)
+    ax[1].set_title('Full finetuning method')
+    ax[1].set_xlabel('Number of training samples seen')
+    ax[1].set_ylabel('Eval Accuracy')
+
+    # distil full
+    ax[1].errorbar(eval_acc_df_large_full["samples"], eval_acc_df_large_full["accuracy"], yerr=eval_acc_df_large_full["std"], color = 'yellow', capsize=3)
+    ax[1].legend(["Distil-RoBERTa", "RoBERTa-Large"])
+
+
 def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, degrad_loss_df_distil_full, degrad_loss_df_large_adapter, degrad_loss_df_large_full, save_path=None):
     fig, ax = plt.subplots(1,2,figsize= (12,6), sharey = True, sharex = True)
 
@@ -288,10 +330,6 @@ def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, d
 
     ax[1].axhline(y=10.5, color='r', linestyle='--')
     ax[1].text(0, 10.55, "random model baseline", color = 'red')
-
-
-
-
 
     if save_path:
         plt.savefig(f"{save_path}/degrad_loss_vs_nb_samples_panel.png")
@@ -368,4 +406,4 @@ def heatmap_from_df(results_df, metric="accuracy", with_std=False):
 
     ax.xaxis.tick_top()
 
-    plt.title(f"{metric} of RoBERTa detectors on the different datasets")
+    plt.title(f"{metric} of detectors on the different datasets")

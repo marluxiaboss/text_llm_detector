@@ -243,11 +243,11 @@ class DetectorTrainer:
             #detector_path = "google-t5/t5-base"
             # the path above has issues when fp16 is set to True
             detector_path = "google-t5/t5-3b"
-            detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(device)
+            detector_model = T5ForSequenceClassification.from_pretrained(detector_path, torch_dtype=torch.bfloat16).to(device)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
 
             self.bf16 = True
-            self.fp16 = True
+            self.fp16 = False
 
         # distil models
         elif detector_name == "distil_roberta-base":
@@ -335,13 +335,13 @@ class DetectorTrainer:
         elif detector_name == "electra_large":
             detector_path = "google/electra-large-discriminator"
             config = AutoConfig.from_pretrained(detector_path)
-            detector_model = ElectraForSequenceClassification(config)
+            model = ElectraForSequenceClassification(config)
             bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
 
         elif detector_name == "t5_3b":
             detector_path = "google-t5/t5-3b"
             config = AutoConfig.from_pretrained(detector_path)
-            detector_model = T5ForSequenceClassification(config)
+            model = T5ForSequenceClassification(config)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
 
         elif detector_name == "distil_roberta-base":

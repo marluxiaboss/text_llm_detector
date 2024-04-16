@@ -136,7 +136,11 @@ if __name__ == "__main__":
 
         detector_trainer.set_pretrained_detector(args.detector)
 
-        detector_trainer.use_adapter(train_adapter=False)
+        if args.freeze_base == "True":
+            detector_trainer.freeze_base()
+
+        if args.use_adapter == "True":
+            detector_trainer.use_adapter(train_adapter=False)
 
         # load the trained weights
         detector_trainer.set_pretrained_weights(args.model_path)
@@ -148,7 +152,7 @@ if __name__ == "__main__":
         detector_trainer.set_experiment_folder(experiment_path)
 
         # create log file
-        detector_trainer.create_test_logger()
+        detector_trainer.create_test_logger(log_path=experiment_path)
 
         detector_trainer.test()
     else:
