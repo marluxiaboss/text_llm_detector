@@ -94,6 +94,8 @@ class LLMDetector(nn.Module):
 
     if train_adapter:
       bert_model.train_adapter("fake_true_detection")
+    else:
+      bert_model.set_active_adapters("fake_true_detection")
     bert_model.to(device)
 
 
