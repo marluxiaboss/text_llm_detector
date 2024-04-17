@@ -7,16 +7,26 @@ import random
 import numpy as np
 import torch
 import os
+import sys
 import time
 import glob
 import argparse
 import json
+from datetime import datetime
+import jsonlines
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_from_disk
 from torch.utils.data import DataLoader
 
 from tqdm import tqdm
+
+SRC_PATH = ["src"]
+for module_path in SRC_PATH:
+    if module_path not in sys.path:
+        sys.path.append(module_path)
+from utils import *
+
 
 
 
@@ -178,6 +188,12 @@ def tokenize_dataset(tokenizer, dataset):
 
 ### MAIN FILE ###
 def run(args):
+
+    # create experiment folder
+    base_path = "src/zero_shot_detector/test_results/fast_detect_gpt"
+    experiment_path = f"{base_path}/{datetime.now().strftime('%d_%m_%H%M')}"
+    dataset_name = args.dataset_path.split("/")[-1]
+
     # load model
     scoring_tokenizer = load_tokenizer(args.scoring_model_name, args.dataset, args.cache_dir)
     scoring_model = load_model(args.scoring_model_name, args.device, args.cache_dir)
@@ -186,6 +202,7 @@ def run(args):
         reference_tokenizer = load_tokenizer(args.reference_model_name, args.dataset, args.cache_dir)
         reference_model = load_model(args.reference_model_name, args.device, args.cache_dir)
         reference_model.eval()
+
     # evaluate criterion
     name = "sampling_discrepancy_analytic"
     criterion_fn = get_sampling_discrepancy_analytic
@@ -235,6 +252,14 @@ def run(args):
     acc = np.mean(preds == labels)
     print(f'Accuracy: {acc * 100:.2f}%')
 
+
+    results = compute_bootstrap_metrics(preds, labels)
+
+    # create folder for the experiment
+    os.makedirs(f"{experiment_path}/test", exist_ok=True)
+    with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
+        test_metrics_file.write(results)
+
     # results for random prediction
     random_preds = np.random.randint(0, 2, len(labels))
     random_acc = np.mean(random_preds == labels)
@@ -246,7 +271,7 @@ if __name__ == '__main__':
     parser.add_argument('--scoring_model_name', type=str, default="gpt-neo-2.7B")
     parser.add_argument('--dataset_path', type=str, default="xsum")
     parser.add_argument('--dataset', type=str, default="xsum")
-    parser.add_argument('--ref_path', type=str, default="./local_infer_ref")
+    parser.add_argument('--ref_path', type=str, default="src/zero_shot_detector/local_infer_ref")
     parser.add_argument('--device', type=str, default="cuda")
     parser.add_argument('--cache_dir', type=str, default="../cache")
     args = parser.parse_args()
