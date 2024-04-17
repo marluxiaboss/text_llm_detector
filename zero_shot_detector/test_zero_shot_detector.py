@@ -198,27 +198,6 @@ def run(args):
         pass
     else:
         tokenized_dataset = tokenize_dataset(scoring_tokenizer, dataset)
-    """
-    # input text
-    print('Local demo for Fast-DetectGPT, where the longer text has more reliable result.')
-    print('')
-    while True:
-        print("Please enter your text: (Press Enter twice to start processing)")
-        lines = []
-        while True:
-            line = input()
-            if len(line) == 0:
-                break
-            lines.append(line)
-        text = "\n".join(lines)
-        if len(text) == 0:
-            break
-        # evaluate text
-        tokenized = scoring_tokenizer(text, return_tensors="pt", padding=True, return_token_type_ids=False).to(args.device)
-        labels = tokenized.input_ids[:, 1:]
-        decoded_labels = scoring_tokenizer.decode(labels[0])
-        print(f'Labeled text: {decoded_labels}')
-    """
 
     # iterate over the dataset and do detection on each sample
 
@@ -229,11 +208,8 @@ def run(args):
     preds = []
     with torch.no_grad():
         for batch in tqdm(test_loader, desc="Performing detection on dataset..."):
-            #text = tokenized_dataset[i]["text"]
-            #labels = tokenized_dataset[i]["input_ids"][:, 1:]
-            #tokenized = tokenized_dataset[i].to(args.device)
             text = batch["text"]
-            #labels = batch["input_ids"][:, 1:]
+
             tokenized = scoring_tokenizer(text, return_tensors="pt", padding=True, return_token_type_ids=False).to(args.device)
             labels = tokenized.input_ids[:, 1:]
 
@@ -248,27 +224,21 @@ def run(args):
 
             for i in range(batch_size):
                 crit = criterion_fn(logits_ref[i:i+1], logits_score[i:i+1], labels[i:i+1])
-                # estimate the probability of machine generated text
-
-                #print("crit: ", crit)
                 prob = prob_estimator.crit_to_prob(crit)
-                #print(f'Fast-DetectGPT criterion is {crit:.4f}, suggesting that the text has a probability of {prob * 100:.0f}% to be fake.')
-                #print()
+
                 pred = 1 if prob > 0.5 else 0
                 preds.append(pred)
-
-            
-            #crit = criterion_fn(logits_ref, logits_score, labels)
-            ## estimate the probability of machine generated text
-            #prob = prob_estimator.crit_to_prob(crit)
-            #print(f'Fast-DetectGPT criterion is {crit:.4f}, suggesting that the text has a probability of {prob * 100:.0f}% to be fake.')
-            #print()
 
     # calculate accuracy
     preds = np.array(preds)
     labels = np.array(dataset["label"])
     acc = np.mean(preds == labels)
     print(f'Accuracy: {acc * 100:.2f}%')
+
+    # results for random prediction
+    random_preds = np.random.randint(0, 2, len(labels))
+    random_acc = np.mean(random_preds == labels)
+    print(f'Random prediction accuracy: {random_acc * 100:.2f}%')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
