@@ -219,7 +219,7 @@ def run(args):
     # iterate over the dataset and do detection on each sample
 
     # create dataloader
-    batch_size = 2
+    batch_size = 1
 
     test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
     preds = []

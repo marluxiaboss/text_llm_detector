@@ -562,7 +562,8 @@ if __name__ == "__main__":
     parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=10)
     parser.add_argument("--load_from_cache", type=str, help="Load mutiple datasets chunk from cache", default="False")
     parser.add_argument("--prompt", type=str, help="Prompt to use for generation, placed before the prefix", default="")
-
+    parser.add_argument("--repetition_penalty", type=float, help="Controls repetition penalty parameter of generation")
+    parser.add_argument("--temperature", type=float, help="Controls temperature parameter of generation")
     args = parser.parse_args()
 
     # check if the dataset already exists for the given experiment name
@@ -576,7 +577,7 @@ if __name__ == "__main__":
 
     # set default parameters for generation
     default_gen_params = {
-        "max_length": 200,
+        "max_length": 150,
         "max_new_tokens": None,
         "temperature": 0.8,
         "top_p": 0.8,
@@ -688,6 +689,9 @@ if __name__ == "__main__":
         # no other generator is supported for now
         raise ValueError("Generator not supported")
     
+    gen_params = default_gen_params
+    gen_params["repetition_penalty"] = args.repetition_penalty
+    gen_params["temperature"] = args.temperature
 
     if args.true_dataset_path == "databricks/databricks-dolly-15k":
         # load true dataset
