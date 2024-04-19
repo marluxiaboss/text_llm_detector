@@ -363,16 +363,75 @@ def create_df_from_test_logs(training_method, trained_on_models, dataset_names):
 
     return results_df
 
+def create_df_from_test_logs_modified(training_method, trained_on_models, dataset_names, suffix):
+
+    results = []
+    for detector in trained_on_models.keys():
+        for model_code, base_model in trained_on_models[detector].items():
+            for dataset in dataset_names:
+                results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/test/test_metrics_fake_true_dataset_{dataset}_10k_{suffix}.json"
+
+                with open(results_path, "r") as f:
+                    result_dict = json.load(f)
+                    result_dict["base_detector"] = detector
+                    result_dict["trained_on_dataset"] = base_model
+                    result_dict["detector"] = f"{detector}_{base_model}"
+                    result_dict["dataset"] = dataset
+                    results.append(result_dict)
+
+    # transform to pandas dataframe
+    results_df = pd.DataFrame(results)
+
+    # order by detector and dataset
+    results_df = results_df.sort_values(by=["trained_on_dataset", "detector", "dataset"])
+    #results_df = results_df.sort_values(by=["detector", "dataset"])
+
+    #display(results_df)
+
+    return results_df
+
+def add_test_logs_to_results_df(results_df, test_logs_dict):
+    results = []
+    detector = list(test_logs_dict.keys())[0]
+    results_dict = test_logs_dict[detector]
+    for timestamp, dataset in results_dict.items():
+        results_path = f"./saved_training_logs_experiment_2/{detector}/{timestamp}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
+
+        with open(results_path, "r") as f:
+            result_dict = json.load(f)
+            result_dict["base_detector"] = detector
+            result_dict["trained_on_dataset"] = "z"
+            result_dict["detector"] = f"{detector}"
+            result_dict["dataset"] = dataset
+            results.append(result_dict)
+
+    # transform to pandas dataframe
+    results_additionnal_df = pd.DataFrame(results)
+
+    # merge with the passed results_df
+    results_df = pd.concat([results_df, results_additionnal_df])
+
+    return results_df
+
+
 def heatmap_from_df(results_df, metric="accuracy", with_std=False):
     fig, ax = plt.subplots(figsize=(10,10))  
 
-    cmap_g_r = LinearSegmentedColormap.from_list('rg',["r", "w", "g"], N=256) 
+    cmap_g_r = LinearSegmentedColormap.from_list('rg',["r", "y", "g"], N=256) 
+
+    # if metric is the false positive rate, we want the colormap to be green for low values and red for high values
+    if metric == "fp_rate":
+        cmap_g_r = LinearSegmentedColormap.from_list('rg',["g", "y", "r"], N=256)
+
     pivoted_results_df = results_df.pivot(index="detector", columns="dataset", values=metric)
     pivoted_results_df["base_model"] = pivoted_results_df.index.map(lambda x: "_".join(x.split("_")[:2]))
     pivoted_results_df["trained_on_dataset"] = pivoted_results_df.index.map(lambda x: x.split("_")[2])
 
     # sort by trained_on_dataset
-    pivoted_results_df = pivoted_results_df.sort_values("trained_on_dataset")
+    pivoted_results_df = pivoted_results_df.sort_values("trained_on_dataset", na_position="last")
+
+    # put rows with trained_on_dataset = "" at the end
+    #pivoted_results_df = pivoted_results_df.sort_values("trained_on_dataset", na_position="last")
 
     # remove the base_model and trained_on_dataset columns
     pivoted_results_df = pivoted_results_df.drop(columns=["base_model", "trained_on_dataset"])

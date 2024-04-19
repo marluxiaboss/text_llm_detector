@@ -32,6 +32,11 @@ import jsonlines
 
 from datetime import datetime
 
+SRC_PATH = ["src"]
+for module_path in SRC_PATH:
+    if module_path not in sys.path:
+        sys.path.append(module_path)
+
 from detector import LLMDetector
 from detector_trainer import DetectorTrainer
 from utils import create_logger, Signal, compute_bootstrap_acc, compute_bootstrap_metrics
@@ -67,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("--round_robin_training", type=str, help="Whether to train the model in a round robin fashion with multiple datasets", default="False")
     parser.add_argument("--nb_samples_per_dataset", type=int, help="Number of samples to take from each dataset in round robin training", default=2500)
     parser.add_argument("--stop_after_n_samples", type=int, help="Stop training after n samples", default=-1)
+    parser.add_argument("--experiment_path", type=str, help="Path to the experiment folder", default="")
     args = parser.parse_args()
 
     # builder for training
@@ -143,12 +149,17 @@ if __name__ == "__main__":
             detector_trainer.use_adapter(train_adapter=False)
 
         # load the trained weights
-        detector_trainer.set_pretrained_weights(args.model_path)
+        if detector_trainer.set_weights:
+            detector_trainer.set_pretrained_weights(args.model_path)
 
         detector_trainer.tokenize_dataset()
 
         # if args.model_path is experiment_path/saved_models/best_model.pt, then the experiment_path is experiment_path
-        experiment_path = args.model_path.split("/saved_models")[0]
+        if args.experiment_path == "":
+            experiment_path = args.model_path.split("/saved_models")[0]
+        else:
+            experiment_path = detector_trainer.create_text_experiment_folder(args.experiment_path, args.detector)
+
         detector_trainer.set_experiment_folder(experiment_path)
 
         # create log file

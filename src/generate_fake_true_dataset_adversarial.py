@@ -33,7 +33,6 @@ class CharacterFilter(ABC):
     def filter(self, text: str) -> str:
         pass
 
-
 class SingleCharacterFilter(CharacterFilter):
     
     def __init__(self, char, replacement_char=""):

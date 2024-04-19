@@ -160,6 +160,13 @@ class DetectorTrainer:
 
         self.experiment_path = experiment_path
 
+    def create_text_experiment_folder(self, base_path, detector_name):
+
+        experiment_path = f"{base_path}/{detector_name}/{datetime.now().strftime('%d_%m_%H%M')}"
+        os.makedirs(experiment_path + "/test")
+
+        return experiment_path
+
     def set_experiment_folder(self, experiment_path):
         self.experiment_path = experiment_path
 
@@ -295,7 +302,9 @@ class DetectorTrainer:
 
     ### METHODS FOR SETTING TESTING PARAMTERS ###
     def set_pretrained_detector(self, detector_name):
-
+        
+        # Flag to set the weights of the model using a local .pt file or not (use weights from huggingface)
+        self.set_weights = True
         if detector_name == "roberta_base":
             detector_path = "FacebookAI/roberta-base"
             config = AutoConfig.from_pretrained(detector_path)
@@ -311,13 +320,13 @@ class DetectorTrainer:
         elif detector_name == "electra_base":
             detector_path = "google/electra-base-discriminator"
             config = AutoConfig.from_pretrained(detector_path)
-            detector_model = ElectraForSequenceClassification(config)
+            model = ElectraForSequenceClassification(config)
             bert_tokenizer = ElectraTokenizer.from_pretrained(detector_path)
 
         elif detector_name == "t5_base":
             detector_path = "google-t5/t5-base"
             config = AutoConfig.from_pretrained(detector_path)
-            detector_model = T5ForSequenceClassification(config)
+            model = T5ForSequenceClassification(config)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
 
         if detector_name == "roberta_large":
@@ -349,6 +358,12 @@ class DetectorTrainer:
             config = AutoConfig.from_pretrained(detector_path)
             model = AutoModelForSequenceClassification.from_pretrained(detector_path)
             bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+
+        elif detector_name == "roberta_base_open_ai":
+            detector_path = "openai-community/roberta-base-openai-detector"
+            model = RobertaForSequenceClassification.from_pretrained(detector_path)
+            bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
+            self.set_weights = False
 
         else:
             raise ValueError("No other detector currently supported")

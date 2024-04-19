@@ -190,7 +190,7 @@ def tokenize_dataset(tokenizer, dataset):
 def run(args):
 
     # create experiment folder
-    base_path = "src/zero_shot_detector/test_results/fast_detect_gpt"
+    base_path = "saved_training_logs_experiment_2"
     experiment_path = f"{base_path}/{datetime.now().strftime('%d_%m_%H%M')}"
     dataset_name = args.dataset_path.split("/")[-1]
 
@@ -229,9 +229,8 @@ def run(args):
 
             tokenized = scoring_tokenizer(text, return_tensors="pt", padding=True, return_token_type_ids=False).to(args.device)
             labels = tokenized.input_ids[:, 1:]
-
-            
             logits_score = scoring_model(**tokenized).logits[:, :-1]
+
             if args.reference_model_name == args.scoring_model_name:
                 logits_ref = logits_score
             else:
