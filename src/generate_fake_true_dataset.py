@@ -564,6 +564,7 @@ if __name__ == "__main__":
     parser.add_argument("--prompt", type=str, help="Prompt to use for generation, placed before the prefix", default="")
     parser.add_argument("--repetition_penalty", type=float, help="Controls repetition penalty parameter of generation", default=1.0)
     parser.add_argument("--temperature", type=float, help="Controls temperature parameter of generation", default=0.8)
+    parser.add_argument("--top_p", type=float, help="Controls top_p parameter of generation", default=0.8)
     args = parser.parse_args()
 
     # check if the dataset already exists for the given experiment name
@@ -693,6 +694,7 @@ if __name__ == "__main__":
 
     gen_params["repetition_penalty"] = args.repetition_penalty
     gen_params["temperature"] = args.temperature
+    gen_params["top_p"] = args.top_p
 
     if args.true_dataset_path == "databricks/databricks-dolly-15k":
         # load true dataset
