@@ -4,6 +4,8 @@ import os
 import pandas as pd
 
 import torch
+import nltk.data
+nltk.download('punkt')
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 from abc import ABC, abstractmethod
@@ -37,34 +39,42 @@ class HumarinpParaphraser(LLMParaphraser):
 
     def __init__(self, tokenizer, model, device, n_paraphrasing=1):
         super().__init__(tokenizer, model, device, n_paraphrasing)
+        self.nltk_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
     def paraphrase(
         self,
         text,
         num_beams=5,
         num_beam_groups=5,
-        num_return_sequences=5,
+        num_return_sequences=1,
         repetition_penalty=10.0,
         diversity_penalty=3.0,
         no_repeat_ngram_size=2,
         temperature=0.7,
         max_length=128
     ):
-        input_ids = self.tokenizer(
-            f'paraphrase: {text}',
-            return_tensors="pt", padding="longest",
-            max_length=max_length,
-            truncation=True,
-        ).input_ids.to(self.device)
-        
-        outputs = self.model.generate(
-            input_ids, temperature=temperature, repetition_penalty=repetition_penalty,
-            num_return_sequences=num_return_sequences, no_repeat_ngram_size=no_repeat_ngram_size,
-            num_beams=num_beams, num_beam_groups=num_beam_groups,
-            max_length=max_length, diversity_penalty=diversity_penalty
-        )
+        sentences = self.nltk_tokenizer.tokenize(text)
+        results_text = []
+        for i, sentence in enumerate(sentences):
 
-        res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+            text = sentence.strip()
+            input_ids = self.tokenizer(
+                f'paraphrase: {text}',
+                return_tensors="pt", padding="longest",
+                max_length=max_length,
+                truncation=True,
+            ).input_ids.to(self.device)
+            
+            outputs = self.model.generate(
+                input_ids, temperature=temperature, repetition_penalty=repetition_penalty,
+                num_return_sequences=num_return_sequences, no_repeat_ngram_size=no_repeat_ngram_size,
+                num_beams=num_beams, num_beam_groups=num_beam_groups,
+                max_length=max_length, diversity_penalty=diversity_penalty
+            )
+
+            res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+            results_text.append(res[0])
+        res = " ".join(results_text)
 
         return res
 
@@ -122,11 +132,13 @@ if __name__ == "__main__":
     # load the dataset, we only take the test split
     dataset_full = load_from_disk(dataset_path)
 
-    if args.take_samples > 0:
-        dataset_full = dataset_full.select(range(args.take_samples))
+
 
     if args.test_only:
         dataset = dataset_full["test"]
+
+        if args.take_samples > 0:
+            dataset = dataset.select(range(args.take_samples))
     else:
         dataset = dataset_full
 
@@ -153,7 +165,7 @@ if __name__ == "__main__":
         paraphraser = HumarinpParaphraser(tokenizer, model, device, n_paraphrasing=args.nb_paraphrasing)
 
         # apply the paraphraser
-        for i in range(len(paraphraser.n_paraphrasing)):
+        for i in range(paraphraser.n_paraphrasing):
             dataset = dataset.map(lambda x: {"text": paraphraser.paraphrase(x["text"])})
         
     # save the results to a subfolder of the original dataset
@@ -161,20 +173,28 @@ if __name__ == "__main__":
     dataset_name = dataset_path.split("/")[-1]
     dataset.save_to_disk(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}")
 
+    if args.test_only:
+        df_test = pd.DataFrame(dataset)
+        #df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
+        df_test.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_test.json", force_ascii=False, indent=4)
     # load to pandas train split
-    df_train = pd.DataFrame(dataset['train'])
-    df_eval = pd.DataFrame(dataset['valid'])
-    df_test = pd.DataFrame(dataset['test'])
+    else:
+        df_train = pd.DataFrame(dataset['train'])
+        df_eval = pd.DataFrame(dataset['valid'])
 
-    # transform text to list by splitting on \n
-    df_train["text"] = df_train["text"].apply(lambda x: x.split("\n"))
-    df_eval["text"] = df_eval["text"].apply(lambda x: x.split("\n"))
-    df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
+        # transform text to list by splitting on \n
+        df_train["text"] = df_train["text"].apply(lambda x: x.split("\n"))
+        df_eval["text"] = df_eval["text"].apply(lambda x: x.split("\n"))
 
-    # dump to json
-    df_train.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_train.json", force_ascii=False, indent=4)
-    df_eval.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_eval.json", force_ascii=False, indent=4)
-    df_test.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_test.json", force_ascii=False, indent=4)
+        # dump to json
+        df_train.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_train.json", force_ascii=False, indent=4)
+        df_eval.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_eval.json", force_ascii=False, indent=4)
+
+        df_test = pd.DataFrame(dataset['test'])
+        df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
+        df_test.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_test.json", force_ascii=False, indent=4)
+
+
 
     
 
