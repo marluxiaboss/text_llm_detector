@@ -365,6 +365,11 @@ class DetectorTrainer:
             bert_tokenizer = RobertaTokenizer.from_pretrained(detector_path)
             self.set_weights = False
 
+            # if we use this detector, we need to flip the labels
+            # ie. 0 -> 1 and 1 -> 0
+            self.flip_labels = True
+
+
         else:
             raise ValueError("No other detector currently supported")
         
@@ -787,6 +792,10 @@ class DetectorTrainer:
         log = self.log
         dataset_path = self.dataset_path
         dataset_name = self.dataset_name
+
+        if self.flip_labels:
+            log.info("Flipping labels for the dataset")
+            dataset["test"] = dataset["test"].map(lambda x: {"label": 1 - x["label"]})
 
         model.eval()
         metric = evaluate.combine(["accuracy", "f1", "precision", "recall"])
