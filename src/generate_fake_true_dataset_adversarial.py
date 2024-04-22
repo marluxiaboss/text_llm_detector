@@ -8,6 +8,8 @@ import nltk.data
 nltk.download('punkt')
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
+from tqdm import tqdm
+
 from abc import ABC, abstractmethod
 
 
@@ -18,7 +20,7 @@ class Parphraser(ABC):
         pass
 
     @abstractmethod
-    def batch_paraphrase(self, texts: list) -> list:
+    def batch_paraphrase(self, texts: list, batch_size: int) -> list:
         pass
 
 
@@ -33,7 +35,7 @@ class LLMParaphraser(Parphraser):
     def paraphrase(self, text: str) -> str:
         pass
 
-    def batch_paraphrase(self, texts: list) -> list:
+    def batch_paraphrase(self, texts: list, batch_size: int) -> list:
         pass
 class HumarinpParaphraser(LLMParaphraser):
 
@@ -77,6 +79,55 @@ class HumarinpParaphraser(LLMParaphraser):
         res = " ".join(results_text)
 
         return res
+    
+    def batch_paraphrase(
+        self,
+        texts: list,
+        batch_size=4,
+        num_beams=5,
+        num_beam_groups=5,
+        num_return_sequences=1,
+        repetition_penalty=10.0,
+        diversity_penalty=3.0,
+        no_repeat_ngram_size=2,
+        temperature=0.7,
+        max_length=128                  
+    ) -> list:
+        # same as paraphrase, but with a list of text
+
+        sentences_list = [self.nltk_tokenizer.tokenize(text) for text in texts]
+        results_text = []
+
+        #for i in tqdm(range(0, len(sentences_list), batch_size), desc="Paraphrasing..."):
+        for i in range(0, len(sentences_list), batch_size):
+            
+            # if we are at the end of the list, we take the remaining elements
+            if i + batch_size > len(sentences_list):
+                batch = sentences_list[i:]
+            else:
+                batch = sentences_list[i:i+batch_size]
+
+            input_ids = self.tokenizer.batch_encode_plus(
+                [f'paraphrase: {sentence.strip()}' for sentences in batch for sentence in sentences],
+                return_tensors="pt", padding="longest",
+                max_length=max_length,
+                truncation=True,
+            ).input_ids.to(self.device)
+
+            outputs = self.model.generate(
+                input_ids, temperature=temperature, repetition_penalty=repetition_penalty,
+                num_return_sequences=num_return_sequences, no_repeat_ngram_size=no_repeat_ngram_size,
+                num_beams=num_beams, num_beam_groups=num_beam_groups,
+                max_length=max_length, diversity_penalty=diversity_penalty
+            )
+
+            res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+            results_text.extend(res)
+
+        # join the results
+        results_text = [" ".join(results_text[i:i+len(sentences)]) for i, sentences in enumerate(sentences_list)]
+
+        return results_text
 
 class CharacterFilter(ABC):
     
@@ -125,6 +176,7 @@ if __name__ == "__main__":
     parser.add_argument("--use_humarin_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--nb_paraphrasing", type=int, help="Number of paraphrasing to do", default=1)
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
+    parser.add_argument("--batch_size", type=int, help="Batch size for the paraphrasing", default=4)
     args = parser.parse_args()
 
     dataset_path = args.dataset_path
@@ -166,7 +218,9 @@ if __name__ == "__main__":
 
         # apply the paraphraser
         for i in range(paraphraser.n_paraphrasing):
-            dataset = dataset.map(lambda x: {"text": paraphraser.paraphrase(x["text"])})
+
+            #dataset = dataset.map(lambda x: {"text": paraphraser.paraphrase(x["text"])}, batched=True, batch_size=16)
+            dataset = dataset.map(lambda x: {"text": paraphraser.batch_paraphrase(x["text"], args.batch_size)}, batched=True, batch_size=args.batch_size)
         
     # save the results to a subfolder of the original dataset
     modified_dataset_folder_base = dataset_path.split("/")[0] + "/modified_datasets"
