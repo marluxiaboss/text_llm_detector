@@ -2,15 +2,17 @@ from datasets import concatenate_datasets, load_from_disk, DatasetDict
 import argparse
 import os
 import pandas as pd
+import copy
 
 import torch
 import nltk.data
 nltk.download('punkt')
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-
-from tqdm import tqdm
+from datasets import load_from_disk, concatenate_datasets, Dataset
 
 from abc import ABC, abstractmethod
+
+from model_loader import load_generator
 
 
 class Parphraser(ABC):
@@ -190,6 +192,116 @@ class ArticleGenerator:
             articles.extend(res)
 
         return articles
+    
+
+def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_template=False, template_type=None):
+
+    if prefix != "":
+        text_instruction = f"{prompt} {prefix}"
+    else:
+        text_instruction = prompt
+        
+    if use_chat_template:
+        match template_type:
+            case "system_user":
+                messages = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": f"{text_instruction}"},
+                ]
+            case "user":
+                messages = [
+                {"role": "user", "content": f"{text_instruction}"},
+                ]
+            case _:
+                raise ValueError("Template type not supported")
+
+        text_template = tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+
+        # force prefix on the generated response
+        text_template = f"{text_template}\n{prefix}"
+
+    return text_template
+
+
+def regroup_pairs(merged_dataset, seed=42):
+    """
+    Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split
+    """
+
+    def fix_ids(dataset):
+        """
+        Fix the ids of the dataset
+        """
+        fake_responses_dataset = dataset.filter(lambda x: x["label"] == 1)
+        true_responses_dataset = dataset.filter(lambda x: x["label"] == 0)
+
+        fake_responses_text = fake_responses_dataset["text"]
+        true_responses_text = true_responses_dataset["text"]
+
+        correct_text_ordering_fake = []
+        correct_text_ordering_true = []
+
+        for i, _ in enumerate(fake_responses_text):
+
+            fake_response = fake_responses_text[i]
+
+            # find the prefix in true_dataset
+            prefix = " ".join(fake_response.split()[:10])
+
+            for j, _ in enumerate(true_responses_text):
+                if " ".join(true_responses_text[j].split()[:10]) == prefix:
+                    #correct_ids_fake_dataset.append(true_reponses_labels[i])
+                    correct_text_ordering_true.append(j)
+                    correct_text_ordering_fake.append(i)
+                    break   
+
+        print("merge_dataset_0", merged_dataset)
+        # reorganize the fake responses according to the correct order
+        fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering_fake)
+
+        # remove true_responses without a corresponding fake response
+        true_responses_dataset = true_responses_dataset.select(correct_text_ordering_true)
+
+        print("merge_dataset_1 fake", fake_responses_dataset)
+        print("merge_dataset_1 true", true_responses_dataset)
+
+        # sort both datasets by id to allign them, otherwise concat doesn't work
+        #true_responses_dataset = true_responses_dataset.sort("id")
+        #fake_responses_dataset = fake_responses_dataset.sort("id")
+
+        print("merge_dataset_2", fake_responses_dataset)
+
+        dataset = concatenate_datasets([true_responses_dataset, fake_responses_dataset])
+
+        print("merge_dataset_3", dataset)
+        #dataset = create_train_from_dataset(dataset)
+
+        # shuffle the dataset again to mix the true and fake responses
+        #dataset = dataset.shuffle(seed=seed)
+
+        return dataset
+    
+    # shuffle the dataset
+    merged_dataset = merged_dataset.shuffle(seed=seed)
+
+    # ids may be incorrect for label 1, we need to fix them
+    merged_dataset = fix_ids(merged_dataset)
+
+    print(merged_dataset)
+
+    # sort the dataset by id
+    #merged_dataset = merged_dataset.sort("id")
+
+    print(merged_dataset)
+
+    # remove id column
+    #merged_dataset = merged_dataset.remove_columns(["id"])
+
+    return merged_dataset
 
 
 
@@ -218,8 +330,6 @@ if __name__ == "__main__":
 
     # load the dataset, we only take the test split
     dataset_full = load_from_disk(dataset_path)
-
-
 
     if args.test_only:
         dataset = dataset_full["test"]
@@ -254,72 +364,51 @@ if __name__ == "__main__":
         model = AutoModelForSeq2SeqLM.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base", torch_dtype=torch.bfloat16).to(device)
         paraphraser = HumarinpParaphraser(tokenizer, model, device, n_paraphrasing=args.nb_paraphrasing)
 
+        # copy the original dataset
+        fake_dataset_orig = copy.deepcopy(fake_dataset)
+
         # apply the paraphraser
         for i in range(paraphraser.n_paraphrasing):
 
             #dataset = dataset.map(lambda x: {"text": paraphraser.paraphrase(x["text"])}, batched=True, batch_size=16)
             fake_dataset = fake_dataset.map(lambda x: {"text": paraphraser.batch_paraphrase(x["text"], args.batch_size)}, batched=True, batch_size=args.batch_size)
+
+        
+        fake_dataset = Dataset.from_dict(({"text": fake_dataset_orig["text"], "fake_paraphrased": fake_dataset["text"], "label": [1]*len(fake_dataset)}))
+        true_dataset = Dataset.from_dict({"text": dataset.filter(lambda x: x["label"] == 0)["text"], "fake_paraphrased": dataset.filter(lambda x: x["label"] == 0)["text"], "label": [0]*len(dataset.filter(lambda x: x["label"] == 0))})
+
+        print("fake_dataset", fake_dataset)
+        print("true_dataset", true_dataset)
+        dataset = concatenate_datasets([true_dataset, fake_dataset])
+        print("dataset", list(dataset))
+        dataset = regroup_pairs(dataset)
+        dataset = dataset.map(lambda x: {"text": x["fake_paraphrased"], "label": x["label"]})
+
     
     if args.use_article_generator:
         print("Using article generator")
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
         # load model
-        model = ...
-        tokenizer = ...
-
+        model, tokenizer, use_chat_template, template_type = load_generator(args.generator, args.device, args.access_token)
         article_generator = ArticleGenerator(model, tokenizer, device)
 
         # take the prefixes from the dataset
-        dataset_list = dataset["text"]
+        dataset_list = fake_dataset["text"]
         prefixes = [text[:10] for text in dataset_list]
 
-        if use_chat_template:
-            if sample["context"] != "":
-                text_instruction = f"Context: {sample['context']} \n {prompt} {sample['instruction']}"
-            else:
-                text_instruction = f"{prompt} {sample['instruction']}"
-            
-            match template_type:
-                case "system_user":
-                    messages = [
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": f"{text_instruction}"},
-                    ]
-                case "user":
-                    messages = [
-                    {"role": "user", "content": f"{text_instruction}"},
-                    ]
-                case _:
-                    raise ValueError("Template type not supported")
-
-            text_template = gen_tokenizer.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True
-            )
-
-            # force prefix on the generated response
-            text_template = f"{text_template}\n{sample["instruction"]}"
-            else:
-                text_instruction = f"{prompt} {sample["instruction"]}"
-                text_template = text_instruction
-            return {"text_template": text_template}
-        
-        true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
-        true_dataset_list = true_dataset["text_template"]
-
-        if args.prompt != "":
-            # add prompt to prefix
-
-        # apply chat template if needed
+        # apply the chat template with the prompt
+        prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, args.prompt, tokenizer, use_chat_template, template_type) for prefix in prefixes]
 
         # generate articles
-        articles = article_generator.generate_articles(dataset_list)
+        fake_articles = article_generator.generate_articles(prefixes_with_prompt)
 
+        # combine with true article to re-create the fake_true_dataset
+        fake_dataset = fake_dataset.map(lambda x: {"text": fake_articles[x["id"]], "label": 1})
 
-
-
+        # regroup the pairs to re-create the dataset as it was before
+        dataset = concatenate_datasets([dataset.filter(lambda x: x["label"] == 0), fake_dataset])
+        dataset = regroup_pairs(dataset)
         
     # save the results to a subfolder of the original dataset
     modified_dataset_folder_base = dataset_path.split("/")[0] + "/modified_datasets"

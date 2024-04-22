@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from src.generator import LLMGenerator
+from generator import LLMGenerator
 
 
 

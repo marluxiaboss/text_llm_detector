@@ -11,8 +11,8 @@ import json
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
 
-from src.generator import LLMGenerator
-from src.model_loader import load_generator
+from generator import LLMGenerator
+from model_loader import load_generator
 
 
 def create_train_from_dataset(dataset):
@@ -348,10 +348,10 @@ def regroup_pairs(merged_dataset, seed=42):
             # find the prefix in true_dataset
             prefix = " ".join(fake_response.split()[:10])
 
-            for i in range(len(true_responses_text)):
-                if " ".join(true_responses_text[i].split()[:10]) == prefix:
+            for j in range(len(true_responses_text)):
+                if " ".join(true_responses_text[j].split()[:10]) == prefix:
                     #correct_ids_fake_dataset.append(true_reponses_labels[i])
-                    correct_text_ordering.append(i)
+                    correct_text_ordering.append(j)
                     break
         
         # reorganize the fake responses according to the correct order
