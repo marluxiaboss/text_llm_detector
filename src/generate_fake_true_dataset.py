@@ -11,7 +11,8 @@ import json
 from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceClassification, BertTokenizer, BertModel,
  RobertaForSequenceClassification, RobertaTokenizer, RobertaModel, TrainingArguments, Trainer)
 
-from generator import LLMGenerator
+from src.generator import LLMGenerator
+from src.model_loader import load_generator
 
 
 def create_train_from_dataset(dataset):
@@ -183,6 +184,8 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
             batch = true_dataset_list[i:i+batch_size]
             responses = generator(batch, max_new_tokens=max_new_tokens)
             fake_responses.extend(responses)
+
+    print("fake_responses: ", fake_responses)
 
     return fake_responses, instructions
 
@@ -578,7 +581,7 @@ if __name__ == "__main__":
 
     # set default parameters for generation
     default_gen_params = {
-        "max_length": 150,
+        "max_length": 200,
         "max_new_tokens": None,
         "temperature": 0.8,
         "top_p": 0.8,
@@ -588,107 +591,7 @@ if __name__ == "__main__":
     # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 
     # load generator
-    if args.generator == "qwen_chat":
-        gen_path = "Qwen/Qwen1.5-0.5B-Chat"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
-        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
-
-        #template for chat
-        use_chat_template = True
-        template_type ="system_user"
-
-    elif args.generator == "qwen_0.5b":
-        gen_path = "Qwen/Qwen1.5-0.5B"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
-        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
-
-        #template for chat
-        use_chat_template = False
-        template_type = None        
-
-    elif args.generator == "gpt2":
-        gen_path = "openai-community/gpt2"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype="auto").to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
-
-        gen_params = default_gen_params
-        gen_params["repetition_penalty"] = 2.0
-        
-        # special for gpt2
-        gen_tokenizer.pad_token = gen_tokenizer.eos_token
-        gen_tokenizer.padding_side = 'left'
-
-        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
-
-        #template for chat
-        use_chat_template = False
-        template_type = None
-    elif args.generator == "gemma_2b_chat":
-        gen_path = "google/gemma-2b-it"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token, torch_dtype=torch.bfloat16).to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=args.access_token)
-        generator = LLMGenerator(gen_model, gen_tokenizer, args.device, gen_params=default_gen_params)
-
-        #template for chat
-        use_chat_template = True
-        template_type ="user"
-
-    elif args.generator == "gemma_2b":
-        gen_path = "google/gemma-2b"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=args.access_token, torch_dtype=torch.bfloat16).to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=args.access_token)
-        generator = LLMGenerator(gen_model, gen_tokenizer, args.device, gen_params=default_gen_params)
-
-        #template for chat
-        use_chat_template = False
-        template_type = None  
-
-    elif args.generator == "phi":
-        gen_path = "microsoft/phi-2"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.float16).to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path)
-        generator = LLMGenerator(gen_model, gen_tokenizer, args.device, gen_params=default_gen_params)
-
-        # special for phi
-        gen_tokenizer.pad_token = gen_tokenizer.eos_token
-        gen_tokenizer.padding_side = 'left'
-
-        #template for chat
-        use_chat_template = False
-        template_type = None  
-
-    elif args.generator == "mistral":
-        gen_path = "mistralai/Mistral-7B-v0.1"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
-        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
-
-        # special for mistral
-        gen_tokenizer.pad_token = gen_tokenizer.eos_token
-
-        #template for chat
-        use_chat_template = False
-        template_type = None  
-
-    elif args.generator == "zephyr":
-        gen_path = "HuggingFaceH4/zephyr-7b-beta"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(args.device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
-        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
-
-        # special for mistral
-        gen_tokenizer.pad_token = gen_tokenizer.eos_token
-
-        #template for chat
-        use_chat_template = True
-        template_type ="user"
-
-
-    else:
-        # no other generator is supported for now
-        raise ValueError("Generator not supported")
+    generator, gen_tokenizer, use_chat_template, template_type = load_generator(args.generator, args.device, args.access_token)
     
     gen_params = default_gen_params
 
@@ -721,7 +624,6 @@ if __name__ == "__main__":
 
     else:
         raise ValueError("Dataset not supported")
-
 
     # process true dataset
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)

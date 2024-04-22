@@ -159,6 +159,39 @@ class InBetweenCharacterFilter(CharacterFilter):
         return text.replace(self.char, f"{self.char}{self.replacement_char}{self.char}")
 """
 
+class ArticleGenerator:
+
+    """
+    Generates news article given a prefix, a model and an optional prompt
+    """
+
+    def __init__(self, model, tokenizer, device):
+        self.model = model
+        self.tokenizer = tokenizer
+        self.device = device
+
+    def generate_articles(self, prefixes: list, prompt: str = "", max_length=1024, batch_size=4) -> list:
+
+        articles = []
+
+        for prefix in prefixes:
+            input_ids = self.tokenizer(
+                f"{prompt} {prefix}",
+                return_tensors="pt", padding="longest",
+                max_length=max_length,
+                truncation=True,
+            ).input_ids.to(self.device)
+
+            outputs = self.model.generate(
+                input_ids, max_length=max_length
+            )
+
+            res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+            articles.extend(res)
+
+        return articles
+
+
 
 def apply_character_filters(text: str, character_filters: list) -> str:
     for character_filter in character_filters:
@@ -174,6 +207,8 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_name_suffix", type=str, help="Suffix to add to the dataset name", default="new")
     parser.add_argument("--test_only", help="Whether to only keep the test split", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_humarin_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument("--use_article_generator", help="Whether to use the article generator", default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument("--prompt", type=str, help="Prompt to use for the article generator", default="")
     parser.add_argument("--nb_paraphrasing", type=int, help="Number of paraphrasing to do", default=1)
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     parser.add_argument("--batch_size", type=int, help="Batch size for the paraphrasing", default=4)
@@ -209,18 +244,82 @@ if __name__ == "__main__":
         # apply the character filters
         dataset = dataset.map(lambda x: {"text": apply_character_filters(x["text"], character_filters)})
 
+    # only keep fake samples
+    fake_dataset = dataset.filter(lambda x: x["label"] == 1)
 
     if args.use_humarin_paraphraser:
+        print("Using HumarinP paraphraser")
         device = "cuda" if torch.cuda.is_available() else "cpu"
         tokenizer = AutoTokenizer.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base")
-        model = AutoModelForSeq2SeqLM.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base").to(device)
+        model = AutoModelForSeq2SeqLM.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base", torch_dtype=torch.bfloat16).to(device)
         paraphraser = HumarinpParaphraser(tokenizer, model, device, n_paraphrasing=args.nb_paraphrasing)
 
         # apply the paraphraser
         for i in range(paraphraser.n_paraphrasing):
 
             #dataset = dataset.map(lambda x: {"text": paraphraser.paraphrase(x["text"])}, batched=True, batch_size=16)
-            dataset = dataset.map(lambda x: {"text": paraphraser.batch_paraphrase(x["text"], args.batch_size)}, batched=True, batch_size=args.batch_size)
+            fake_dataset = fake_dataset.map(lambda x: {"text": paraphraser.batch_paraphrase(x["text"], args.batch_size)}, batched=True, batch_size=args.batch_size)
+    
+    if args.use_article_generator:
+        print("Using article generator")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        # load model
+        model = ...
+        tokenizer = ...
+
+        article_generator = ArticleGenerator(model, tokenizer, device)
+
+        # take the prefixes from the dataset
+        dataset_list = dataset["text"]
+        prefixes = [text[:10] for text in dataset_list]
+
+        if use_chat_template:
+            if sample["context"] != "":
+                text_instruction = f"Context: {sample['context']} \n {prompt} {sample['instruction']}"
+            else:
+                text_instruction = f"{prompt} {sample['instruction']}"
+            
+            match template_type:
+                case "system_user":
+                    messages = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": f"{text_instruction}"},
+                    ]
+                case "user":
+                    messages = [
+                    {"role": "user", "content": f"{text_instruction}"},
+                    ]
+                case _:
+                    raise ValueError("Template type not supported")
+
+            text_template = gen_tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+
+            # force prefix on the generated response
+            text_template = f"{text_template}\n{sample["instruction"]}"
+            else:
+                text_instruction = f"{prompt} {sample["instruction"]}"
+                text_template = text_instruction
+            return {"text_template": text_template}
+        
+        true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
+        true_dataset_list = true_dataset["text_template"]
+
+        if args.prompt != "":
+            # add prompt to prefix
+
+        # apply chat template if needed
+
+        # generate articles
+        articles = article_generator.generate_articles(dataset_list)
+
+
+
+
         
     # save the results to a subfolder of the original dataset
     modified_dataset_folder_base = dataset_path.split("/")[0] + "/modified_datasets"
