@@ -177,24 +177,21 @@ class ArticleGenerator:
         self.tokenizer = tokenizer
         self.device = device
 
-    def generate_articles(self, prefixes: list, prompt: str = "", max_length=1024, batch_size=4) -> list:
+    def generate_articles(self, prefixes_with_prompt: list, prefixes: list, prompt: str = "", max_length=1024, batch_size=4) -> list:
 
         articles = []
 
-        for prefix in prefixes:
-            input_ids = self.tokenizer(
-                f"{prompt} {prefix}",
-                return_tensors="pt", padding="longest",
-                max_length=max_length,
-                truncation=True,
-            ).input_ids.to(self.device)
-
-            outputs = self.model.generate(
-                input_ids, max_length=max_length
+        for i, prefix_with_prompt in enumerate(prefixes_with_prompt):
+            samples = [prefix_with_prompt]
+            outputs = self.model(
+                samples, max_new_tokens=1024
             )
+            res = outputs[0]
+            res = res.replace("\n", "")
 
-            res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
-            articles.extend(res)
+            # put the instruction again
+            res = f"{prefixes[i]}{res}"
+            articles.append(res)
 
         return articles
     
@@ -228,6 +225,9 @@ def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_temp
 
         # force prefix on the generated response
         text_template = f"{text_template}\n{prefix}"
+
+    else:
+        text_template = text_instruction
 
     return text_template
 
@@ -371,29 +371,39 @@ if __name__ == "__main__":
 
     
     if args.use_article_generator:
-        print("Using article generator")
+        generator = "zephyr"
+        print(f"Using article generator with {generator}")
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
         # load model
-        model, tokenizer, use_chat_template, template_type = load_generator(args.generator, args.device, args.access_token)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model, tokenizer, use_chat_template, template_type = load_generator(generator, device)
         article_generator = ArticleGenerator(model, tokenizer, device)
 
         # take the prefixes from the dataset
         dataset_list = fake_dataset["text"]
-        prefixes = [text[:10] for text in dataset_list]
+        prefixes = [" ".join(text.split()[:10]) for text in dataset_list]
 
         # apply the chat template with the prompt
         prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, args.prompt, tokenizer, use_chat_template, template_type) for prefix in prefixes]
 
+        print(prefixes_with_prompt)
+
         # generate articles
-        fake_articles = article_generator.generate_articles(prefixes_with_prompt)
+        fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes)
 
         # combine with true article to re-create the fake_true_dataset
-        fake_dataset = fake_dataset.map(lambda x: {"text": fake_articles[x["id"]], "label": 1})
+        #fake_dataset = fake_dataset.map(lambda x: {"text": fake_articles[x["id"]], "label": 1})
+        #fake_dataset_orig = copy.deepcopy(fake_dataset)
+
+        true_dataset = dataset.filter(lambda x: x["label"] == 0)
+        fake_dataset = Dataset.from_dict({"text": fake_dataset["text"], "label": [1] * len(fake_articles)})
+        true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(fake_articles)})
 
         # regroup the pairs to re-create the dataset as it was before
-        dataset = concatenate_datasets([dataset.filter(lambda x: x["label"] == 0), fake_dataset])
+        dataset = concatenate_datasets([true_dataset, fake_dataset])
         dataset = regroup_pairs(dataset)
+
         
     # save the results to a subfolder of the original dataset
     modified_dataset_folder_base = dataset_path.split("/")[0] + "/modified_datasets"

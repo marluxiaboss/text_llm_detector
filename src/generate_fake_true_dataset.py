@@ -586,7 +586,8 @@ if __name__ == "__main__":
         "temperature": 0.8,
         "top_p": 0.8,
         "repetition_penalty": 1,
-        "do_sample": True
+        "do_sample": True,
+        "min_new_tokens": 150
     }
     # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 
@@ -620,7 +621,6 @@ if __name__ == "__main__":
         true_dataset = true_dataset.select(range(args.fake_dataset_size))
 
         true_dataset = create_train_from_dataset(true_dataset)
-        print("true_dataset: ", true_dataset)
 
     else:
         raise ValueError("Dataset not supported")

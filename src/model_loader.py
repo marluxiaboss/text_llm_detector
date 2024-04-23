@@ -10,7 +10,8 @@ default_gen_params = {
     "temperature": 0.8,
     "top_p": 0.8,
     "repetition_penalty": 1,
-    "do_sample": True
+    "do_sample": True,
+    "min_new_tokens": 150
 }
 
 def load_generator(model_name, device, access_token=None):
@@ -44,7 +45,7 @@ def load_generator(model_name, device, access_token=None):
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True, padding_side="left")
 
         gen_params = default_gen_params
-        gen_params["repetition_penalty"] = 2.0
+        #gen_params["repetition_penalty"] = 2.0
         
         # special for gpt2
         gen_tokenizer.pad_token = gen_tokenizer.eos_token
