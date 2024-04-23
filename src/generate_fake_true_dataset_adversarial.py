@@ -126,10 +126,15 @@ class HumarinpParaphraser(LLMParaphraser):
             res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
             results_text.extend(res)
 
-        # join the results
-        results_text = [" ".join(results_text[i:i+len(sentences)]) for i, sentences in enumerate(sentences_list)]
+        results_joined = []
+        i = 0
+        for sentence in sentences_list:
+            len_sent = len(sentence)
+            results_joined.append(" ".join(results_text[i:i+len_sent]))
+            i += len_sent
 
-        return results_text
+
+        return results_joined
 
 class CharacterFilter(ABC):
     
@@ -259,29 +264,22 @@ def regroup_pairs(merged_dataset, seed=42):
                     correct_text_ordering_fake.append(i)
                     break   
 
-        print("merge_dataset_0", merged_dataset)
         # reorganize the fake responses according to the correct order
         fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering_fake)
 
         # remove true_responses without a corresponding fake response
         true_responses_dataset = true_responses_dataset.select(correct_text_ordering_true)
 
-        print("merge_dataset_1 fake", fake_responses_dataset)
-        print("merge_dataset_1 true", true_responses_dataset)
-
-        # sort both datasets by id to allign them, otherwise concat doesn't work
-        #true_responses_dataset = true_responses_dataset.sort("id")
-        #fake_responses_dataset = fake_responses_dataset.sort("id")
-
-        print("merge_dataset_2", fake_responses_dataset)
-
+        # add an id column to fake and true responses datasets
+        fake_responses_dataset = fake_responses_dataset.add_column("id", list(range(len(fake_responses_dataset))))
+        true_responses_dataset = true_responses_dataset.add_column("id", list(range(len(true_responses_dataset))))
+                                                                   
         dataset = concatenate_datasets([true_responses_dataset, fake_responses_dataset])
 
-        print("merge_dataset_3", dataset)
-        #dataset = create_train_from_dataset(dataset)
-
-        # shuffle the dataset again to mix the true and fake responses
-        #dataset = dataset.shuffle(seed=seed)
+        # shuffle the dataset to mix between true and fake responses within pairs and sort by id to have the correct order again
+        dataset = dataset.shuffle(seed=seed)
+        dataset = dataset.sort("id")
+        dataset = dataset.remove_columns("id")
 
         return dataset
     
@@ -290,16 +288,6 @@ def regroup_pairs(merged_dataset, seed=42):
 
     # ids may be incorrect for label 1, we need to fix them
     merged_dataset = fix_ids(merged_dataset)
-
-    print(merged_dataset)
-
-    # sort the dataset by id
-    #merged_dataset = merged_dataset.sort("id")
-
-    print(merged_dataset)
-
-    # remove id column
-    #merged_dataset = merged_dataset.remove_columns(["id"])
 
     return merged_dataset
 
@@ -373,16 +361,13 @@ if __name__ == "__main__":
             #dataset = dataset.map(lambda x: {"text": paraphraser.paraphrase(x["text"])}, batched=True, batch_size=16)
             fake_dataset = fake_dataset.map(lambda x: {"text": paraphraser.batch_paraphrase(x["text"], args.batch_size)}, batched=True, batch_size=args.batch_size)
 
-        
-        fake_dataset = Dataset.from_dict(({"text": fake_dataset_orig["text"], "fake_paraphrased": fake_dataset["text"], "label": [1]*len(fake_dataset)}))
+        fake_dataset = Dataset.from_dict(({"text": fake_dataset_orig["text"], "fake_paraphrased":  [text[:500] for text in fake_dataset["text"]], "label": [1]*len(fake_dataset)}))
         true_dataset = Dataset.from_dict({"text": dataset.filter(lambda x: x["label"] == 0)["text"], "fake_paraphrased": dataset.filter(lambda x: x["label"] == 0)["text"], "label": [0]*len(dataset.filter(lambda x: x["label"] == 0))})
 
-        print("fake_dataset", fake_dataset)
-        print("true_dataset", true_dataset)
         dataset = concatenate_datasets([true_dataset, fake_dataset])
-        print("dataset", list(dataset))
         dataset = regroup_pairs(dataset)
         dataset = dataset.map(lambda x: {"text": x["fake_paraphrased"], "label": x["label"]})
+        dataset = dataset.remove_columns(["fake_paraphrased"])
 
     
     if args.use_article_generator:
@@ -417,7 +402,7 @@ if __name__ == "__main__":
 
     if args.test_only:
         df_test = pd.DataFrame(dataset)
-        #df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
+        df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
         df_test.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_test.json", force_ascii=False, indent=4)
     # load to pandas train split
     else:
