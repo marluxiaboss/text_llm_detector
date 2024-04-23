@@ -16,6 +16,9 @@ from model_loader import load_generator
 
 
 class Parphraser(ABC):
+    """
+    Abstract class for a paraphraser
+    """
 
     @abstractmethod
     def paraphrase(self, text: str) -> str:
@@ -154,18 +157,6 @@ class SingleCharacterFilter(CharacterFilter):
         return text.replace(self.char, self.replacement_char)
     
 
-"""
-TODO: figure out how to correctly remove what's in between parenthesis without shortening the text
-class InBetweenCharacterFilter(CharacterFilter):
-    
-    def __init__(self, char, replacement_char=""):
-        self.char = char
-        self.replacement_char = replacement_char
-
-    def filter(self, text: str) -> str:
-        return text.replace(self.char, f"{self.char}{self.replacement_char}{self.char}")
-"""
-
 class ArticleGenerator:
 
     """
@@ -177,25 +168,23 @@ class ArticleGenerator:
         self.tokenizer = tokenizer
         self.device = device
 
-    def generate_articles(self, prefixes_with_prompt: list, prefixes: list, prompt: str = "", max_length=1024, batch_size=4) -> list:
+    def generate_articles(self, prefixes_with_prompt: list, prefixes: list, batch_size=4) -> list:
 
         articles = []
 
-        for i, prefix_with_prompt in enumerate(prefixes_with_prompt):
-            samples = [prefix_with_prompt]
-            outputs = self.model(
-                samples, max_new_tokens=1024
-            )
-            res = outputs[0]
-            res = res.replace("\n", "")
+        for i in range(0, len(prefixes_with_prompt), batch_size):
+            if i + batch_size > len(prefixes_with_prompt):
+                samples = prefixes_with_prompt[i:]
+            else:
+                samples = prefixes_with_prompt[i:i+batch_size]
+            outputs = self.model(samples)
+            res = [text.replace("\n", "") for text in outputs]
+            res = [f"{prefixes[j + i]}{res[j]}" for j in range(len(res))]
 
-            # put the instruction again
-            res = f"{prefixes[i]}{res}"
-            articles.append(res)
+            articles.extend(res)
 
         return articles
     
-
 def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_template=False, template_type=None):
 
     if prefix != "":
@@ -308,10 +297,12 @@ if __name__ == "__main__":
     parser.add_argument("--test_only", help="Whether to only keep the test split", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_humarin_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_article_generator", help="Whether to use the article generator", default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument("--article_generator", type=str, help="Generator used to generate the articles, it should be a chat model", default="zephyr")
     parser.add_argument("--prompt", type=str, help="Prompt to use for the article generator", default="")
     parser.add_argument("--nb_paraphrasing", type=int, help="Number of paraphrasing to do", default=1)
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     parser.add_argument("--batch_size", type=int, help="Batch size for the paraphrasing", default=4)
+    parser.add_argument("--temperature", type=float, help="Temperature for the generation, default one if not set", default=-1.0)
     args = parser.parse_args()
 
     dataset_path = args.dataset_path
@@ -371,13 +362,13 @@ if __name__ == "__main__":
 
     
     if args.use_article_generator:
-        generator = "zephyr"
+        generator = args.article_generator
         print(f"Using article generator with {generator}")
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
         # load model
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        model, tokenizer, use_chat_template, template_type = load_generator(generator, device)
+        model, tokenizer, use_chat_template, template_type = load_generator(generator, device, temperature=args.temperature)
         article_generator = ArticleGenerator(model, tokenizer, device)
 
         # take the prefixes from the dataset
@@ -387,17 +378,15 @@ if __name__ == "__main__":
         # apply the chat template with the prompt
         prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, args.prompt, tokenizer, use_chat_template, template_type) for prefix in prefixes]
 
-        print(prefixes_with_prompt)
-
         # generate articles
-        fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes)
+        fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
 
         # combine with true article to re-create the fake_true_dataset
         #fake_dataset = fake_dataset.map(lambda x: {"text": fake_articles[x["id"]], "label": 1})
         #fake_dataset_orig = copy.deepcopy(fake_dataset)
 
         true_dataset = dataset.filter(lambda x: x["label"] == 0)
-        fake_dataset = Dataset.from_dict({"text": fake_dataset["text"], "label": [1] * len(fake_articles)})
+        fake_dataset = Dataset.from_dict({"text": [text[:500] for text in fake_articles], "label": [1] * len(fake_articles)})
         true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(fake_articles)})
 
         # regroup the pairs to re-create the dataset as it was before

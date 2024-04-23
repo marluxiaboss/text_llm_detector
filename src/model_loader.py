@@ -4,7 +4,14 @@ from generator import LLMGenerator
 
 
 
-default_gen_params = {
+
+def load_generator(model_name, device, access_token=None, temperature=-1.0):
+    """
+    Load the generator model and tokenizer
+    """
+    
+    # set generation parameters
+    default_gen_params = {
     "max_length": 200,
     "max_new_tokens": None,
     "temperature": 0.8,
@@ -12,12 +19,11 @@ default_gen_params = {
     "repetition_penalty": 1,
     "do_sample": True,
     "min_new_tokens": 150
-}
+    }
 
-def load_generator(model_name, device, access_token=None):
-    """
-    Load the generator model and tokenizer
-    """
+    if temperature != -1.0:
+        default_gen_params["temperature"] = temperature
+        
     # load generator
     if model_name == "qwen_chat":
         gen_path = "Qwen/Qwen1.5-0.5B-Chat"
