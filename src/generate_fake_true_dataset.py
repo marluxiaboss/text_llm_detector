@@ -185,8 +185,6 @@ def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_toke
             responses = generator(batch, max_new_tokens=max_new_tokens)
             fake_responses.extend(responses)
 
-    print("fake_responses: ", fake_responses)
-
     return fake_responses, instructions
 
 def filter_instruction(sample):
@@ -339,26 +337,28 @@ def regroup_pairs(merged_dataset, seed=42):
         fake_responses_text = fake_responses_dataset["text"]
         true_responses_text = true_responses_dataset["text"]
 
-        correct_text_ordering = []
+        correct_text_ordering_fake = []
+        correct_text_ordering_true = []
 
-        for i in tqdm(range(len(fake_responses_text)), desc="Correcting ids..."):
+        for i, _ in enumerate(fake_responses_text):
 
             fake_response = fake_responses_text[i]
 
             # find the prefix in true_dataset
             prefix = " ".join(fake_response.split()[:10])
 
-            for j in range(len(true_responses_text)):
+            for j, _ in enumerate(true_responses_text):
                 if " ".join(true_responses_text[j].split()[:10]) == prefix:
                     #correct_ids_fake_dataset.append(true_reponses_labels[i])
-                    correct_text_ordering.append(j)
-                    break
-        
+                    correct_text_ordering_true.append(j)
+                    correct_text_ordering_fake.append(i)
+                    break   
+
         # reorganize the fake responses according to the correct order
-        fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering)
+        fake_responses_dataset = fake_responses_dataset.select(correct_text_ordering_fake)
 
         # remove true_responses without a corresponding fake response
-        true_responses_dataset = true_responses_dataset.select(correct_text_ordering)
+        true_responses_dataset = true_responses_dataset.select(correct_text_ordering_true)
 
         # sort both datasets by id to allign them, otherwise concat doesn't work
         true_responses_dataset = true_responses_dataset.sort("id")
