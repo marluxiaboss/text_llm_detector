@@ -28,8 +28,10 @@ class Parphraser(ABC):
     def batch_paraphrase(self, texts: list, batch_size: int) -> list:
         pass
 
-
 class LLMParaphraser(Parphraser):
+    """
+    Paraphraser using a language model
+    """
 
     def __init__(self, tokenizer, model, device, n_paraphrasing=1):
         self.tokenizer = tokenizer
@@ -42,7 +44,10 @@ class LLMParaphraser(Parphraser):
 
     def batch_paraphrase(self, texts: list, batch_size: int) -> list:
         pass
-class HumarinpParaphraser(LLMParaphraser):
+class HumarinParaphraser(LLMParaphraser):
+    """
+    Paraphraser using the Humarin model(see: humarin/chatgpt_paraphraser_on_T5_base)
+    """
 
     def __init__(self, tokenizer, model, device, n_paraphrasing=1):
         super().__init__(tokenizer, model, device, n_paraphrasing)
@@ -140,6 +145,9 @@ class HumarinpParaphraser(LLMParaphraser):
         return results_joined
 
 class CharacterFilter(ABC):
+    """
+    Abstract class for a character filter
+    """
     
     def __init__(self):
         pass
@@ -148,6 +156,9 @@ class CharacterFilter(ABC):
         pass
 
 class SingleCharacterFilter(CharacterFilter):
+    """
+    Filter a single character in a text
+    """
     
     def __init__(self, char, replacement_char=""):
         self.char = char
@@ -179,9 +190,15 @@ class ArticleGenerator:
                 samples = prefixes_with_prompt[i:i+batch_size]
             outputs = self.model(samples)
             res = [text.replace("\n", "") for text in outputs]
-            res = [f"{prefixes[j + i]}{res[j]}" for j in range(len(res))]
-
-            articles.extend(res)
+            final_res = []
+            for j, _ in enumerate(res):
+                # some models add already a space at the beginning of the text
+                if res[j][0] == " ":
+                    final_res.append(f"{prefixes[j + i]}{res[j]}")
+                else:
+                    final_res.append(f"{prefixes[j + i]} {res[j]}")
+            articles.extend(final_res)
+            #res = [f"{prefixes[j + i]} {res[j]}" for j in range(len(res))]
 
         return articles
     
@@ -260,6 +277,8 @@ def regroup_pairs(merged_dataset, seed=42):
         true_responses_dataset = true_responses_dataset.select(correct_text_ordering_true)
 
         # add an id column to fake and true responses datasets
+        print("fake response len just before", len(fake_responses_dataset))
+        print("fake_responses_dataset just before", fake_responses_dataset)
         fake_responses_dataset = fake_responses_dataset.add_column("id", list(range(len(fake_responses_dataset))))
         true_responses_dataset = true_responses_dataset.add_column("id", list(range(len(true_responses_dataset))))
                                                                    
@@ -279,8 +298,6 @@ def regroup_pairs(merged_dataset, seed=42):
     merged_dataset = fix_ids(merged_dataset)
 
     return merged_dataset
-
-
 
 def apply_character_filters(text: str, character_filters: list) -> str:
     for character_filter in character_filters:
@@ -341,7 +358,7 @@ if __name__ == "__main__":
         device = "cuda" if torch.cuda.is_available() else "cpu"
         tokenizer = AutoTokenizer.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base")
         model = AutoModelForSeq2SeqLM.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base", torch_dtype=torch.bfloat16).to(device)
-        paraphraser = HumarinpParaphraser(tokenizer, model, device, n_paraphrasing=args.nb_paraphrasing)
+        paraphraser = HumarinParaphraser(tokenizer, model, device, n_paraphrasing=args.nb_paraphrasing)
 
         # copy the original dataset
         fake_dataset_orig = copy.deepcopy(fake_dataset)
@@ -373,21 +390,22 @@ if __name__ == "__main__":
 
         # take the prefixes from the dataset
         dataset_list = fake_dataset["text"]
-        prefixes = [" ".join(text.split()[:10]) for text in dataset_list]
+        prefix_len = 10
+        prefixes = [" ".join(text.split()[:prefix_len]) for text in dataset_list]
 
         # apply the chat template with the prompt
         prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, args.prompt, tokenizer, use_chat_template, template_type) for prefix in prefixes]
 
         # generate articles
         fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
-
-        # combine with true article to re-create the fake_true_dataset
-        #fake_dataset = fake_dataset.map(lambda x: {"text": fake_articles[x["id"]], "label": 1})
-        #fake_dataset_orig = copy.deepcopy(fake_dataset)
+        print("prefixes", prefixes)
+        print("fake_articles", fake_articles)
 
         true_dataset = dataset.filter(lambda x: x["label"] == 0)
-        fake_dataset = Dataset.from_dict({"text": [text[:500] for text in fake_articles], "label": [1] * len(fake_articles)})
-        true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(fake_articles)})
+        print("true_dataset", list(true_dataset))
+        article_len = 500
+        fake_dataset = Dataset.from_dict({"text": [text[:article_len] for text in fake_articles], "label": [1] * len(fake_articles)})
+        true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(true_dataset["text"])})
 
         # regroup the pairs to re-create the dataset as it was before
         dataset = concatenate_datasets([true_dataset, fake_dataset])

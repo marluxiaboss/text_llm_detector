@@ -587,7 +587,7 @@ if __name__ == "__main__":
         "top_p": 0.8,
         "repetition_penalty": 1,
         "do_sample": True,
-        "min_new_tokens": 150
+        "min_new_tokens": 100
     }
     # TODO: add checks for test_size and validation_size, max_length and max_nb_tokens_input
 

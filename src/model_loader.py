@@ -18,7 +18,7 @@ def load_generator(model_name, device, access_token=None, temperature=-1.0):
     "top_p": 0.8,
     "repetition_penalty": 1,
     "do_sample": True,
-    "min_new_tokens": 150
+    "min_new_tokens": 100
     }
 
     if temperature != -1.0:
