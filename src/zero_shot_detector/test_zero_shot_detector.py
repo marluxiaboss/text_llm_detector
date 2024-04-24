@@ -170,7 +170,10 @@ class ProbEstimator:
 def load_test_dataset(dataset_path):
 
     dataset = load_from_disk(dataset_path)
-    dataset_test = dataset["test"]
+    try:
+        dataset_test = dataset["test"]
+    except KeyError:
+        dataset_test = dataset
 
     return dataset_test
 

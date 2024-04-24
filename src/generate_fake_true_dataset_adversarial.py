@@ -3,6 +3,7 @@ import argparse
 import os
 import pandas as pd
 import copy
+from tqdm import tqdm
 
 import torch
 import nltk.data
@@ -183,7 +184,7 @@ class ArticleGenerator:
 
         articles = []
 
-        for i in range(0, len(prefixes_with_prompt), batch_size):
+        for i in tqdm(range(0, len(prefixes_with_prompt), batch_size)):
             if i + batch_size > len(prefixes_with_prompt):
                 samples = prefixes_with_prompt[i:]
             else:
