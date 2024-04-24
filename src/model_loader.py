@@ -5,7 +5,7 @@ from generator import LLMGenerator
 
 
 
-def load_generator(model_name, device, access_token=None, temperature=-1.0):
+def load_generator(model_name, device, access_token=None, temperature=-1.0, repetition_penalty=1.0):
     """
     Load the generator model and tokenizer
     """
@@ -23,6 +23,8 @@ def load_generator(model_name, device, access_token=None, temperature=-1.0):
 
     if temperature != -1.0:
         default_gen_params["temperature"] = temperature
+
+    default_gen_params["repetition_penalty"] = repetition_penalty
         
     # load generator
     if model_name == "qwen_chat":

@@ -277,8 +277,6 @@ def regroup_pairs(merged_dataset, seed=42):
         true_responses_dataset = true_responses_dataset.select(correct_text_ordering_true)
 
         # add an id column to fake and true responses datasets
-        print("fake response len just before", len(fake_responses_dataset))
-        print("fake_responses_dataset just before", fake_responses_dataset)
         fake_responses_dataset = fake_responses_dataset.add_column("id", list(range(len(fake_responses_dataset))))
         true_responses_dataset = true_responses_dataset.add_column("id", list(range(len(true_responses_dataset))))
                                                                    
@@ -320,6 +318,7 @@ if __name__ == "__main__":
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     parser.add_argument("--batch_size", type=int, help="Batch size for the paraphrasing", default=4)
     parser.add_argument("--temperature", type=float, help="Temperature for the generation, default one if not set", default=-1.0)
+    parser.add_argument("--repetition_penalty", type=float, help="Repetition penalty for the generation", default=1.0)
     args = parser.parse_args()
 
     dataset_path = args.dataset_path
@@ -385,7 +384,7 @@ if __name__ == "__main__":
 
         # load model
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        model, tokenizer, use_chat_template, template_type = load_generator(generator, device, temperature=args.temperature)
+        model, tokenizer, use_chat_template, template_type = load_generator(generator, device, temperature=args.temperature, repetition_penalty=args.repetition_penalty)
         article_generator = ArticleGenerator(model, tokenizer, device)
 
         # take the prefixes from the dataset
@@ -398,11 +397,9 @@ if __name__ == "__main__":
 
         # generate articles
         fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
-        print("prefixes", prefixes)
-        print("fake_articles", fake_articles)
 
         true_dataset = dataset.filter(lambda x: x["label"] == 0)
-        print("true_dataset", list(true_dataset))
+
         article_len = 500
         fake_dataset = Dataset.from_dict({"text": [text[:article_len] for text in fake_articles], "label": [1] * len(fake_articles)})
         true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(true_dataset["text"])})
