@@ -20,10 +20,25 @@ if __name__ == "__main__":
         fake_true_samples.append({"text": row["original"], "label": 0})
         fake_true_samples.append({"text": row["sampled"], "label": 1})
 
+
+    """
+    # add spaces to the texts until we reach 500 characters
+    for sample in fake_true_samples:
+        text = sample["text"]
+        while len(text) < 500:
+            text += " "
+        sample["text"] = text
     
+
+    # truncate all samples to 500 characters
+    for sample in fake_true_samples:
+        sample["text"] = sample["text"][:500]
+
+    """
+
     #fake_true_dataset = DatasetDict({"test": fake_true_dataset_df})
     fake_true_dataset_df = pd.DataFrame(fake_true_samples)
-    fake_true_dataset_df["text"] = fake_true_dataset_df["text"].apply(lambda x: x.split("\n"))
+    #fake_true_dataset_df["text"] = fake_true_dataset_df["text"].apply(lambda x: x.split("\n"))
     print(fake_true_dataset_df.head())
     #fake_true_dataset = Dataset.from_pandas(fake_true_dataset_df)
     fake_true_dataset = DatasetDict({"test": Dataset.from_pandas(fake_true_dataset_df)})

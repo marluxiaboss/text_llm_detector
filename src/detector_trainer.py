@@ -65,7 +65,7 @@ class DetectorTrainer:
         else:
             dataset_test = dataset["test"]
             dataset = DatasetDict({"test": dataset_test})
-            
+
         self.dataset = dataset
         self.dataset_name = dataset_path.split("/")[-1]
         self.dataset_path = dataset_path
@@ -76,10 +76,9 @@ class DetectorTrainer:
             raise ValueError("Tokenizer not set")
         
         def tokenize_text(x, tokenizer):
-            return tokenizer(x["text"], truncation=True, padding="max_length", return_tensors="pt")
+            return tokenizer(x["text"], padding="max_length", truncation=True, return_tensors="pt")
         
         self.dataset = self.dataset.map(lambda x: tokenize_text(x, self.tokenizer), batched=True)
-
 
     def set_round_robin_dataset(self, take_samples=-1, nb_samples_per_dataset=2500):
         if not os.path.isdir("./fake_true_datasets/fake_true_dataset_round_robin"):
@@ -305,9 +304,11 @@ class DetectorTrainer:
 
     ### METHODS FOR SETTING TESTING PARAMTERS ###
     def set_pretrained_detector(self, detector_name):
-        
+
         # Flag to set the weights of the model using a local .pt file or not (use weights from huggingface)
         self.set_weights = True
+
+        self.flip_labels = False
         if detector_name == "roberta_base":
             detector_path = "FacebookAI/roberta-base"
             config = AutoConfig.from_pretrained(detector_path)
