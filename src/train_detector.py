@@ -96,7 +96,7 @@ if __name__ == "__main__":
     if args.round_robin_training == "True":
         detector_trainer.set_round_robin_dataset(nb_samples_per_dataset=args.nb_samples_per_dataset)
     else:
-        detector_trainer.set_dataset(args.dataset_path, args.take_samples)
+        detector_trainer.set_dataset(args.dataset_path, args.take_samples, args.evaluation)
 
     # general hyperparameters
     detector_trainer.set_batch_size(args.batch_size)

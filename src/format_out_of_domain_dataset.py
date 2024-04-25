@@ -25,7 +25,8 @@ if __name__ == "__main__":
     fake_true_dataset_df = pd.DataFrame(fake_true_samples)
     fake_true_dataset_df["text"] = fake_true_dataset_df["text"].apply(lambda x: x.split("\n"))
     print(fake_true_dataset_df.head())
-    fake_true_dataset = Dataset.from_pandas(fake_true_dataset_df)
+    #fake_true_dataset = Dataset.from_pandas(fake_true_dataset_df)
+    fake_true_dataset = DatasetDict({"test": Dataset.from_pandas(fake_true_dataset_df)})
     fake_true_dataset.save_to_disk(f"{args.save_path}")
 
     # save the json version of the dataset

@@ -46,23 +46,26 @@ class DetectorTrainer:
     ### GENERAL METHODS ###
 
 
-    def set_dataset(self, dataset_path, take_samples=-1):
+    def set_dataset(self, dataset_path, take_samples=-1, evaluation_mode=False):
     
         dataset = load_from_disk(dataset_path)
+        if evaluation_mode == "False":
+            dataset_train = dataset["train"]
+            dataset_valid = dataset["valid"]
+            dataset_test = dataset["test"]
 
-        dataset_train = dataset["train"]
-        dataset_valid = dataset["valid"]
-        dataset_test = dataset["test"]
-
-        dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
-
-        if take_samples > 0:
-            print(f"Taking {take_samples} samples from the dataset")
-            dataset_train = dataset["train"].select(range(int(take_samples)))
-            dataset_valid = dataset["valid"].select(range(int(take_samples / 10)))
-            dataset_test = dataset["test"].select(range(int(take_samples / 10)))
             dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
 
+            if take_samples > 0:
+                print(f"Taking {take_samples} samples from the dataset")
+                dataset_train = dataset["train"].select(range(int(take_samples)))
+                dataset_valid = dataset["valid"].select(range(int(take_samples / 10)))
+                dataset_test = dataset["test"].select(range(int(take_samples / 10)))
+                dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
+        else:
+            dataset_test = dataset["test"]
+            dataset = DatasetDict({"test": dataset_test})
+            
         self.dataset = dataset
         self.dataset_name = dataset_path.split("/")[-1]
         self.dataset_path = dataset_path
