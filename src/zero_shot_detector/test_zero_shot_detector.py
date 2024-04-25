@@ -193,7 +193,7 @@ def tokenize_dataset(tokenizer, dataset):
 def run(args):
 
     # create experiment folder
-    base_path = "saved_training_logs_experiment_2"
+    base_path = "saved_training_logs_experiment_2/fast_detect_gpt"
     experiment_path = f"{base_path}/{datetime.now().strftime('%d_%m_%H%M')}"
     dataset_name = args.dataset_path.split("/")[-1]
 
