@@ -9,9 +9,12 @@ from transformers import (
     pipeline,
     Trainer,
     DataCollatorWithPadding,
-    DataCollatorForLanguageModeling
+    DataCollatorForLanguageModeling,
+    BitsAndBytesConfig
 )
 
+from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
+from trl import SFTTrainer
 import argparse
 
 
@@ -22,6 +25,23 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, help="Batch size", default=1)
     parser.add_argument("--learning_rate", type=float, help="Learning rate", default=2e-4)
     args = parser.parse_args()
+
+    bnb_config = BitsAndBytesConfig(
+        load_in_8bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_use_double_quant=True,
+    )
+
+    peft_config = LoraConfig(
+        r= 64,          
+        lora_alpha= 16,
+        lora_dropout=0.05, #0.1
+        bias="none",
+        task_type="CAUSAL_LM",
+    #target_modules= ["Wqkv", "out_proj"] #["Wqkv", "fc1", "fc2" ] # ["Wqkv", "out_proj", "fc1", "fc2" ]
+    )
+
 
     # Model
     base_model = "microsoft/phi-2"
@@ -55,14 +75,15 @@ if __name__ == "__main__":
     model = AutoModelForCausalLM.from_pretrained(
         base_model,
         trust_remote_code=True,
-        torch_dtype=torch.bfloat16,
-    ).to(device)
+    #    quantization_config=bnb_config,
+        device_map={"": 0}
+    )
 
     training_arguments = TrainingArguments(
         output_dir = "./phi_finetuning_news_results",
         num_train_epochs = 1,
-        fp16 = False,
-        bf16 = True,
+        #fp16 = False,
+        #bf16 = True,
         per_device_train_batch_size = args.batch_size,
         per_device_eval_batch_size = args.batch_size,
         learning_rate = args.learning_rate,
@@ -70,21 +91,30 @@ if __name__ == "__main__":
         warmup_ratio = 0.1,
         #max_grad_norm = 0.3,
         save_steps = 0,
+        optim="paged_adamw_32bit",
         logging_steps = 5,
     )
 
 
     # Set supervised fine-tuning parameters
-    trainer = Trainer(
+    trainer = SFTTrainer(
         model=model,
-        train_dataset=tokenized_dataset,
+        train_dataset=raw_dataset,
         tokenizer=tokenizer,
         args=training_arguments,
         data_collator=data_collator,
+        peft_config=peft_config,
+        dataset_text_field="article",
     )
 
     # Train model
     trainer.train()
 
+    # save full model
+    model = trainer.model.merge_and_unload()
+
     # Save model
-    model.save_pretrained(f"trained_models/{new_model}")
+    model.save_pretrained(f"trained_models/{new_model}_peft")
+
+
+
