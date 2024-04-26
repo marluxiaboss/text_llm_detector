@@ -413,11 +413,15 @@ if __name__ == "__main__":
     # save the results to a subfolder of the original dataset
     modified_dataset_folder_base = dataset_path.split("/")[0] + "/modified_datasets"
     dataset_name = dataset_path.split("/")[-1]
+
+    if args.test_only:
+        dataset = DatasetDict({"test": dataset})
+        
     dataset.save_to_disk(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}")
 
     if args.test_only:
         df_test = pd.DataFrame(dataset)
-        df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
+        #df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
         df_test.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_test.json", force_ascii=False, indent=4)
     # load to pandas train split
     else:
@@ -425,8 +429,8 @@ if __name__ == "__main__":
         df_eval = pd.DataFrame(dataset['valid'])
 
         # transform text to list by splitting on \n
-        df_train["text"] = df_train["text"].apply(lambda x: x.split("\n"))
-        df_eval["text"] = df_eval["text"].apply(lambda x: x.split("\n"))
+        #df_train["text"] = df_train["text"].apply(lambda x: x.split("\n"))
+        #df_eval["text"] = df_eval["text"].apply(lambda x: x.split("\n"))
 
         # dump to json
         df_train.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_train.json", force_ascii=False, indent=4)
