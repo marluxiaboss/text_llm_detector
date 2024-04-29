@@ -96,9 +96,9 @@ if __name__ == "__main__":
         #max_grad_norm = 0.3,
         save_steps = 0,
         optim="paged_adamw_32bit",
-        logging_steps = 5,
+        logging_steps = 0.005,
         evaluation_strategy="steps",
-        eval_steps=50
+        eval_steps=0.05
     )
 
 
