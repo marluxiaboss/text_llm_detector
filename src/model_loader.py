@@ -136,6 +136,10 @@ def load_generator(model_name, device, access_token=None, temperature=-1.0, repe
         gen_tokenizer.pad_token = gen_tokenizer.eos_token
         gen_tokenizer.padding_side = 'left'
 
+        #template for chat
+        use_chat_template = False
+        template_type = None  
+
 
     else:
         # no other generator is supported for now
