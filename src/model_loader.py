@@ -5,7 +5,7 @@ from generator import LLMGenerator
 
 
 
-def load_generator(model_name, device, access_token=None, temperature=-1.0, repetition_penalty=1.0):
+def load_generator(model_name, device, access_token=None, temperature=0.8, repetition_penalty=1.0, top_p=0.95, top_k=50):
     """
     Load the generator model and tokenizer
     """
@@ -15,16 +15,17 @@ def load_generator(model_name, device, access_token=None, temperature=-1.0, repe
     "max_length": 200,
     "max_new_tokens": None,
     "temperature": 0.8,
-    "top_p": 0.8,
+    "top_p": 0.95,
     "repetition_penalty": 1,
     "do_sample": True,
-    "min_new_tokens": 100
+    "min_new_tokens": 100,
+    "top_k": 50
     }
 
-    if temperature != -1.0:
-        default_gen_params["temperature"] = temperature
-
+    default_gen_params["temperature"] = temperature
     default_gen_params["repetition_penalty"] = repetition_penalty
+    default_gen_params["top_p"] = top_p
+    default_gen_params["top_k"] = top_k
         
     # load generator
     if model_name == "qwen_chat":
