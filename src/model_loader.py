@@ -126,9 +126,10 @@ def load_generator(model_name, device, access_token=None, temperature=-1.0, repe
 
     elif model_name == "phi_news":
         gen_path = "trained_models/phi-2-cnn_news_peft"
+        base_path = "microsoft/phi-2"
 
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.float16, local_files_only=True).to(device)
-        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path)
+        gen_tokenizer = AutoTokenizer.from_pretrained(base_path)
         generator = LLMGenerator(gen_model, gen_tokenizer, device, gen_params=default_gen_params)
 
         # special for phi

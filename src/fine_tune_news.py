@@ -52,10 +52,14 @@ if __name__ == "__main__":
     # Dataset
     dataset_path = "cnn_dailymail"
     raw_dataset = load_dataset(dataset_path, "3.0.0")["train"]
+    raw_dataset_eval = load_dataset(dataset_path, "3.0.0")["validation"]
 
     # sample 1000 examples 
     raw_dataset = raw_dataset.shuffle(seed=42)
     raw_dataset = raw_dataset.select(range(args.nb_training_samples))
+
+    raw_dataset_eval = raw_dataset_eval.shuffle(seed=42)
+    raw_dataset_eval = raw_dataset_eval.select(range(args.nb_training_samples // 10))
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(base_model, use_fast=True)
@@ -93,6 +97,8 @@ if __name__ == "__main__":
         save_steps = 0,
         optim="paged_adamw_32bit",
         logging_steps = 5,
+        evaluation_strategy="steps",
+        eval_steps=50
     )
 
 
@@ -100,6 +106,7 @@ if __name__ == "__main__":
     trainer = SFTTrainer(
         model=model,
         train_dataset=raw_dataset,
+        eval_dataset=raw_dataset_eval,
         tokenizer=tokenizer,
         args=training_arguments,
         data_collator=data_collator,
@@ -114,7 +121,7 @@ if __name__ == "__main__":
     model = trainer.model.merge_and_unload()
 
     # Save model
-    model.save_pretrained(f"trained_models/{new_model}_peft")
+    model.save_pretrained(f"trained_models/{new_model}_peft", safe_serialization=False)
 
 
 
