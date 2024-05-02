@@ -28,7 +28,7 @@ if __name__ == "__main__":
     nb_samples_per_dataset = args.nb_samples_per_dataset
 
     base_dataset_path = args.save_dir
-    datasets_names = ["fake_true_dataset_gpt2_10k", "fake_true_dataset_phi_10k", "fake_true_dataset_gemma_10k", "fake_true_dataset_mistral_10k"]
+    datasets_names = ["fake_true_dataset_phi_10k", "fake_true_dataset_gemma_10k", "fake_true_dataset_mistral_10k"]
     datasets = [load_from_disk(f"{base_dataset_path}/{dataset_name}") for dataset_name in datasets_names]
     
     nb_samples_per_dataset = nb_samples_per_dataset

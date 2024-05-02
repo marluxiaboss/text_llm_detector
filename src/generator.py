@@ -2,9 +2,14 @@ import torch
 from torch import nn
 from datetime import datetime
 
+import nltk.data
+nltk.download('punkt')
+
+from tqdm import tqdm
+
 
 class LLMGenerator(nn.Module):
-    def __init__(self, gpt_model, tokenizer,  gen_params, device=None,):
+    def __init__(self, gpt_model, tokenizer, gen_params=None, device=None):
         super().__init__()
 
         # gpt should already be trained
@@ -18,43 +23,14 @@ class LLMGenerator(nn.Module):
 
         self.gen_params = gen_params 
 
-    def forward_old(self, text, max_length=512, max_new_tokens=100, temperature=1, top_k=50, top_p=0.9, repetition_penalty=1, skip_special_tokens=True):
-
-        # tokenize text using the tokenizer
-        input_ids = self.tokenizer.encode(
-            text, return_tensors="pt").to(self.device)
-        # generate text using the gpt model
-        # output_ids = self.gpt.generate(input_ids, max_length=max_length, max_new_tokens=max_new_tokens, temperature=temperature, top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
-        with torch.no_grad():
-            output_ids = self.gpt.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature,
-                                           top_k=top_k, top_p=top_p, repetition_penalty=repetition_penalty)
-
-        # optional, remove input_ids from output_ids
-        # output_ids = [output_id[len(input_ids):] for input_id, output_id in zip(input_ids, output_ids)]
-
-        # decode the generated text
-        decoded_output = self.tokenizer.batch_decode(
-            output_ids, skip_special_tokens=skip_special_tokens)[0]
-
-        # remove the input text from the generated text
-        decoded_output = decoded_output.replace(text, "").strip()
-
-        # remove special tokens from the generated text
-        special_tokens = self.tokenizer.additional_special_tokens
-
-        for special_token in special_tokens:
-            decoded_output = decoded_output.replace(special_token, "")
-
-        # decoded_output = decoded_output.replace(text, "")
-        return decoded_output
-
-    def forward(self, samples):
+    def forward(self, samples, max_new_tokens=None):
 
         max_length = self.gen_params["max_length"]
         encoding = self.tokenizer.batch_encode_plus(
             samples, return_tensors='pt', padding=True, truncation=True, max_length=max_length)
         input_ids = encoding['input_ids'].to(self.device)
 
+        print("self gen params: ", self.gen_params)
         # generate text using the gpt model
         with torch.no_grad():
             output_ids = self.gpt.generate(
@@ -76,7 +52,11 @@ class LLMGenerator(nn.Module):
 
         return decoded_outputs
 
-    def forward_with_distribution(self, samples):
+    def forward_with_distribution(self, sample):
+        
+        samples = [sample]
+        
+        # sample is only one text, this function does not support batch generation
         max_length = self.gen_params["max_length"]
         encoding = self.tokenizer.batch_encode_plus(
             samples, return_tensors='pt', padding=True, truncation=True, max_length=max_length)
@@ -84,14 +64,19 @@ class LLMGenerator(nn.Module):
 
         # generate text using the gpt model
         with torch.no_grad():
-            output_ids = self.gpt.generate(
-                input_ids, pad_token_id=self.tokenizer.pad_token_id, **self.gen_params)
+            #output_ids = self.gpt.generate(
+            #    input_ids, pad_token_id=self.tokenizer.pad_token_id, **self.gen_params)
+            output = self.gpt.generate(
+                input_ids, pad_token_id=self.tokenizer.pad_token_id, **self.gen_params, return_dict_in_generate=True,
+                output_logits=True)
+            
+        output_ids = output.sequences
 
         # decode the generated text
         # decoded_outputs = self.tokenizer.batch_decode(output_ids, skip_special_tokens=skip_special_tokens)
         decoded_outputs = self.tokenizer.batch_decode(
             output_ids[:, input_ids.shape[1]:])
-
+        
         # remove special tokens from the generated text
         special_tokens = self.tokenizer.additional_special_tokens + \
             [self.tokenizer.pad_token] + [self.tokenizer.eos_token]
@@ -103,14 +88,55 @@ class LLMGenerator(nn.Module):
 
         # get the distribution of the generated tokens with format list dict {token: probability}
         # i.e. the list should have the same length as the decoded_outputs
-        distribution = []
+        distributions = []
+        scores = output.logits
+        
+        new_scores = []
+    
+        # apply softmax to the scores
+        for i in range(len(scores)):
+            new_scores.append(torch.nn.functional.softmax(scores[i], dim=-1))
+            
+        # compute all the decoded tokens once
+        token_vocab = self.tokenizer.get_vocab()
+        
+        # reverse the dictionary
+        token_vocab = {v: k for k, v in token_vocab.items()}
+        
+        # sort the dictionary by key
+        token_vocab = dict(sorted(token_vocab.items(), key=lambda item: item[0]))
+        token_list_ordered = list(token_vocab.items())
 
-        model = self.gpt
+        for i in range(len(new_scores)):
+            
+            distribution = {}
+            
+            distribution_list = new_scores[i][0].tolist()
+            distribution = dict(zip(token_list_ordered, distribution_list))
+            distributions.append(distribution)
+        
+        # sort all the distributions by probability
+        top_p = self.gen_params["top_p"]
+        new_distributions = []
+        for i in range(len(distributions)):
+            distribution = dict(sorted(distributions[i].items(), key=lambda item: item[1], reverse=True))
+            
+            # only keep tokens until we get probability = top_p
+            top_p_sum = 0
+            new_distribution = {}
+            for key, value in distribution.items():
+                new_distribution[key] = value
+                top_p_sum += value
+                if top_p_sum >= top_p:
+                    break
+            new_distributions.append(new_distribution)
+            
+            
+        distributions = new_distributions
 
-        for i, output_id in enumerate(output_ids):
-            # get the distribution of the generated tokens
-            output_id = output_id[input_ids.shape[1]:]
-            distribution.append(model.get_output_embeddings()[
-                                output_id].softmax(dim=-1).cpu().numpy())
-
-            return decoded_outputs, distribution
+        #for i in range(50):
+        #    print("token: ", list(distribution_0.keys())[i], " prob: ", list(distribution_0.values())[i])
+        
+        
+        
+        return decoded_outputs, distributions

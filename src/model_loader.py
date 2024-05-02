@@ -2,9 +2,6 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from generator import LLMGenerator
 
-
-
-
 def load_generator(model_name, device, access_token=None, temperature=0.8, repetition_penalty=1.0, top_p=0.95, top_k=50):
     """
     Load the generator model and tokenizer
@@ -114,6 +111,19 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
 
     elif model_name == "zephyr":
         gen_path = "HuggingFaceH4/zephyr-7b-beta"
+        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(device)
+        gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
+
+        # special for mistral
+        gen_tokenizer.pad_token = gen_tokenizer.eos_token
+
+        #template for chat
+        use_chat_template = True
+        template_type ="user"
+        
+    elif model_name == "llama3":
+        gen_path = "meta-llama/Meta-Llama-3-8B-Instruct"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
         generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)

@@ -252,7 +252,7 @@ class DetectorTrainer:
             #detector_path = "google-t5/t5-base"
             # the path above has issues when fp16 is set to True
             detector_path = "google-t5/t5-3b"
-            detector_model = T5ForSequenceClassification.from_pretrained(detector_path, torch_dtype=torch.bfloat16).to(device)
+            detector_model = T5ForSequenceClassification.from_pretrained(detector_path).to(device)
             bert_tokenizer = T5Tokenizer.from_pretrained(detector_path)
 
             self.bf16 = True
@@ -552,7 +552,7 @@ class DetectorTrainer:
         return avg_loss
 
     def check_degradation(self, nb_error_bar_runs, nb_samples_seen):
-        mlm_model = self.create_mlm_model()
+        self.create_mlm_model()
         degradation_losses = []
 
         for i in range(nb_error_bar_runs):           
@@ -562,7 +562,12 @@ class DetectorTrainer:
 
         mean_degradation_loss = sum(degradation_losses) / len(degradation_losses)
         std_degradation_loss = np.std(degradation_losses)
-
+        
+        
+        # clear memory
+        del self.mlm_model
+        torch.cuda.empty_cache()
+        
         return mean_degradation_loss, std_degradation_loss
 
     ### METHODS FOR TRAINING AND EVALUATING ###
@@ -603,6 +608,7 @@ class DetectorTrainer:
         
         if self.fp16:
             accelerator = Accelerator(mixed_precision='fp16')
+            
         elif self.bf16:
             accelerator = Accelerator(mixed_precision='bf16')
         else:
@@ -673,12 +679,21 @@ class DetectorTrainer:
                     input_ids = batch["input_ids"]
                     attention_mask = batch["attention_mask"]
                     labels = batch["labels"]
+                    
                     outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
                     loss = outputs.loss
+                        
                     running_loss += loss.detach().item()
 
                     accelerator.backward(loss)
+
+                    # clip the norm of the gradient to 1.0 (default) and save the base grad_norm before clipping
+                    #grad_norm = accelerator.clip_grad_norm_(model.parameters(), 1.0)
+
                     optimizer.step()
+                    
+                    # this should not affect the training, but is used to log the gradient norm
+                    #grad_norm = accelerator.clip_grad_norm_(model.parameters(), 1.0)
                     optimizer.zero_grad()
                     scheduler.step()
                     progress_bar.update(1)
@@ -693,6 +708,7 @@ class DetectorTrainer:
                         metrics["train/loss"] = avg_loss
                         metrics["train/learning_rate"] = scheduler.get_last_lr()[0]
                         metrics["train/epoch"] = epoch
+                        #metrics["train/grad_norm"] = grad_norm
 
                         run.log(metrics, step=nb_samples_seen)
 

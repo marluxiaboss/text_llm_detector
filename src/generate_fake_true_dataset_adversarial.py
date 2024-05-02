@@ -183,23 +183,23 @@ class ArticleGenerator:
     def generate_articles(self, prefixes_with_prompt: list, prefixes: list, batch_size=4) -> list:
 
         articles = []
-
-        for i in tqdm(range(0, len(prefixes_with_prompt), batch_size)):
-            if i + batch_size > len(prefixes_with_prompt):
-                samples = prefixes_with_prompt[i:]
-            else:
-                samples = prefixes_with_prompt[i:i+batch_size]
-            outputs = self.model(samples)
-            res = [text.replace("\n", "") for text in outputs]
-            final_res = []
-            for j, _ in enumerate(res):
-                # some models add already a space at the beginning of the text
-                if res[j][0] == " ":
-                    final_res.append(f"{prefixes[j + i]}{res[j]}")
+        with torch.no_grad():
+            for i in tqdm(range(0, len(prefixes_with_prompt), batch_size)):
+                if i + batch_size > len(prefixes_with_prompt):
+                    samples = prefixes_with_prompt[i:]
                 else:
-                    final_res.append(f"{prefixes[j + i]} {res[j]}")
-            articles.extend(final_res)
-            #res = [f"{prefixes[j + i]} {res[j]}" for j in range(len(res))]
+                    samples = prefixes_with_prompt[i:i+batch_size]
+                outputs = self.model(samples)
+                res = [text.replace("\n", "") for text in outputs]
+                final_res = []
+                for j, _ in enumerate(res):
+                    # some models add already a space at the beginning of the text
+                    if res[j][0] == " ":
+                        final_res.append(f"{prefixes[j + i]}{res[j]}")
+                    else:
+                        final_res.append(f"{prefixes[j + i]} {res[j]}")
+                articles.extend(final_res)
+                #res = [f"{prefixes[j + i]} {res[j]}" for j in range(len(res))]
 
         return articles
     

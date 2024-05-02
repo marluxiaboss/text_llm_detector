@@ -106,6 +106,13 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
     
     avg_metrics.update(std_metrics)
     metrics_dict = avg_metrics
+    
+    # add TP, TN, FP, FN to the metrics_dict
+    metrics_dict["TP"] = np.mean(nb_true_positives)
+    metrics_dict["TN"] = np.mean(nb_true_negatives)
+    metrics_dict["FP"] = np.mean(nb_false_positives)
+    metrics_dict["FN"] = np.mean(nb_false_negatives)
+    
     return metrics_dict
 
 class Signal:
@@ -125,8 +132,6 @@ class Signal:
         with open(self.signal_file, 'r') as fin:
             return eval(fin.read())
         
-
-
 ### Dataset utils ###
 def create_round_robbin_dataset(datasets, take_samples=-1, seed=42):
     """
@@ -300,6 +305,10 @@ def plot_panel_model_and_training_method_eval_acc(eval_acc_df_distil_adapter, ev
     # distil full
     ax[1].errorbar(eval_acc_df_large_full["samples"], eval_acc_df_large_full["accuracy"], yerr=eval_acc_df_large_full["std"], color = 'yellow', capsize=3)
     ax[1].legend(["Distil-RoBERTa", "RoBERTa-Large"])
+    
+    # show y ticks each 0.05
+    ax[0].set_yticks(np.arange(0.5, 1, 0.05))
+    ax[1].set_yticks(np.arange(0.5, 1, 0.05))
 
 
 def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, degrad_loss_df_distil_full, degrad_loss_df_large_adapter, degrad_loss_df_large_full, save_path=None):
