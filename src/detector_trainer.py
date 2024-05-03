@@ -292,6 +292,9 @@ class DetectorTrainer:
 
     def set_stop_on_perfect_acc(self, stop_on_perfect_acc):
         self.stop_on_perfect_acc = stop_on_perfect_acc
+        
+    def set_stop_on_loss_plateau(self, stop_on_loss_plateau):
+        self.stop_on_loss_plateau = stop_on_loss_plateau
 
     def set_stop_after_n_samples(self, stop_after_n_samples):
         self.stop_after_n_samples = stop_after_n_samples
@@ -578,6 +581,7 @@ class DetectorTrainer:
         check_degradation = self.check_degradation_steps
         degradation_threshold = self.degradation_threshold
         stop_on_perfect_acc = self.stop_on_perfect_acc
+        stop_on_loss_plateau = self.stop_on_loss_plateau
         weight_decay = self.weight_decay
         dataset = self.dataset
         model = self.detector
@@ -634,6 +638,7 @@ class DetectorTrainer:
         log.info(f"check_degradation: {check_degradation}")
 
         eval_acc_logs = []
+        eval_loss_logs = []
         train_loss_logs = []
         loss_degradation_logs = []
 
@@ -745,17 +750,23 @@ class DetectorTrainer:
 
                         # correct_list is a list of 0s and 1s of size len(val_loader) * batch_size
                         correct_list = []
+                        eval_loss = 0
                         for batch in val_loader:
                             with torch.no_grad():
                                 input_ids = batch["input_ids"]
                                 labels = batch["labels"]
                                 attention_mask = batch["attention_mask"]
                                 outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                                loss = outputs.loss
+                                eval_loss += loss.item()
                                 _, predicted = torch.max(outputs.logits, 1)
                                 total += labels.size(0)
                                 correct += (predicted == labels).sum().item()
 
                                 correct_list.extend((predicted == labels).cpu().numpy().tolist())
+                                
+                        eval_loss /= len(val_loader)
+                        eval_loss_logs.append(eval_loss)
 
                         # compute error bars with bootstrapping
                         nb_bootstraps = 1000
@@ -778,8 +789,18 @@ class DetectorTrainer:
                             log.info("Accuracy is equal or above 99.9%")
                             log.info("Stopping training")
                             break
-
-
+                        
+                        # stop training if no improvement in the last 3 eval_loss
+                        if stop_on_loss_plateau:
+                            curr_loss = eval_loss_logs[-1]
+                            
+                            # compare loss against the last 3 losses
+                            if len(eval_loss_logs) > 3:
+                                last_losses = eval_loss_logs[-3:]
+                                if all(curr_loss >= loss for loss in last_losses):
+                                    log.info("No improvement in the last 3 eval_loss")
+                                    log.info("Stopping training")
+                                    break
 
                 log.info("Training signal is False, stopping training")
                 break
@@ -813,7 +834,7 @@ class DetectorTrainer:
         dataset_path = self.dataset_path
         dataset_name = self.dataset_name
 
-        if self.flip_labels:
+        if hasattr(self, "flip_labels") and self.flip_labels:
             log.info("Flipping labels for the dataset")
             dataset["test"] = dataset["test"].map(lambda x: {"label": 1 - x["label"]})
 
