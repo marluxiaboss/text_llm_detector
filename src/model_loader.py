@@ -102,7 +102,6 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
         generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
-        # special for mistral
         gen_tokenizer.pad_token = gen_tokenizer.eos_token
 
         #template for chat
@@ -115,25 +114,34 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
         generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
-        # special for mistral
         gen_tokenizer.pad_token = gen_tokenizer.eos_token
 
         #template for chat
         use_chat_template = True
         template_type ="user"
         
-    elif model_name == "llama3":
+    elif model_name == "llama3_instruct":
         gen_path = "meta-llama/Meta-Llama-3-8B-Instruct"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
-        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
-
-        # special for mistral
+        
+        
         gen_tokenizer.pad_token = gen_tokenizer.eos_token
 
         #template for chat
         use_chat_template = True
         template_type ="user"
+        
+        
+        # special for llama3
+        terminators = [
+            gen_tokenizer.eos_token_id,
+            gen_tokenizer.convert_tokens_to_ids("<|eot_id|>")
+        ]
+        gen_params = default_gen_params     
+        gen_params["eos_token_id"] = terminators
+        
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
     elif model_name == "phi_news":
         gen_path = "trained_models/phi-2-cnn_news_peft"

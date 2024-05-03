@@ -773,16 +773,17 @@ class DetectorTrainer:
                         mean_acc, std_acc, lower_bound, upper_bound = compute_bootstrap_acc(correct_list, n_bootstrap=nb_bootstraps)
                         log.info(f"Mean accuracy: {mean_acc:.4f}, std: {std_acc:.4f}, lower bound: {lower_bound:.4f}, upper bound: {upper_bound:.4f} for {nb_bootstraps} bootstraps")
                         eval_acc = correct / total
-                        log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {nb_samples_seen} samples: {eval_acc:.4f}')
+                        log.info(f'Epoch {epoch+1}/{num_epochs}, Validation accuracy after {nb_samples_seen} samples: {eval_acc:.4f} with eval loss: {eval_loss:.4f}')
                         eval_acc_logs.append({"samples": nb_samples_seen, "accuracy": mean_acc, "std": std_acc, "lower_bound": lower_bound, "upper_bound": upper_bound})
                         run.log({"eval/accuracy": eval_acc}, step=nb_samples_seen)
+                        run.log({"eval/loss": eval_loss}, step=nb_samples_seen)
 
-                        if best_model is None or eval_acc > best_model["eval_acc"]:
-                            best_model = {"eval_acc": eval_acc, "nb_samples": nb_samples_seen}
+                        if best_model is None or eval_loss < best_model["eval_loss"]:
+                            best_model = {"eval_acc": eval_acc, "nb_samples": nb_samples_seen, "eval_loss": eval_loss}
                             
                             # save the model
                             torch.save(model.state_dict(), f"{experiment_saved_model_path}/best_model.pt")
-                            log.info(f"Best model with eval accuracy {eval_acc} with {nb_samples_seen} samples seen is saved")
+                            log.info(f"Best model with eval loss {eval_loss} and eval accuracy {eval_acc} with {nb_samples_seen} samples seen is saved")
                         model.train()
 
                         if stop_on_perfect_acc == "True" and eval_acc >= 0.99:
@@ -791,14 +792,15 @@ class DetectorTrainer:
                             break
                         
                         # stop training if no improvement in the last 3 eval_loss
+                        n_plateau_loss = 5
                         if stop_on_loss_plateau:
                             curr_loss = eval_loss_logs[-1]
                             
                             # compare loss against the last 3 losses
-                            if len(eval_loss_logs) > 3:
-                                last_losses = eval_loss_logs[-3:]
+                            if len(eval_loss_logs) > n_plateau_loss:
+                                last_losses = eval_loss_logs[-n_plateau_loss:]
                                 if all(curr_loss >= loss for loss in last_losses):
-                                    log.info("No improvement in the last 3 eval_loss")
+                                    log.info(f"No improvement in the last {n_plateau_loss} eval_loss")
                                     log.info("Stopping training")
                                     break
 
