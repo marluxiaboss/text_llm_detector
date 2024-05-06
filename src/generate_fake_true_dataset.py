@@ -258,7 +258,6 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
         train_subset = train_subset.filter(lambda x: x["instruction"] in instructions)
         print("len after: ", len(train_subset))
 
-    print("fake_responses_train: ", fake_responses_train)
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
                     "context": train_subset["context"], "true_response": train_subset["text"], "id": train_subset["id"]})
     

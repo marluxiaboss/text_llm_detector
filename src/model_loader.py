@@ -70,7 +70,7 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
 
         #template for chat
         use_chat_template = True
-        template_type ="user"
+        template_type ="system_user"
 
     elif model_name == "gemma_2b":
         gen_path = "google/gemma-2b"
@@ -118,7 +118,7 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
 
         #template for chat
         use_chat_template = True
-        template_type ="user"
+        template_type ="system_user"
         
     elif model_name == "llama3_instruct":
         gen_path = "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -126,11 +126,14 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
         
         
-        gen_tokenizer.pad_token = gen_tokenizer.eos_token
+        #gen_tokenizer.eos_token ='<|eot_id|>'
+        #gen_tokenizer.pad_token = gen_tokenizer.eos_token
+        gen_tokenizer.pad_token = '<|eot_id|>'
+        gen_tokenizer.padding_side = "left"
 
         #template for chat
         use_chat_template = True
-        template_type ="user"
+        template_type ="system_user"
         
         
         # special for llama3
