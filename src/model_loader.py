@@ -66,17 +66,17 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
         gen_path = "google/gemma-2b-it"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=access_token, torch_dtype=torch.bfloat16).to(device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=access_token)
-        generator = LLMGenerator(gen_model, gen_tokenizer, device, gen_params=default_gen_params)
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
         #template for chat
         use_chat_template = True
-        template_type ="system_user"
+        template_type ="user"
 
     elif model_name == "gemma_2b":
         gen_path = "google/gemma-2b"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=access_token, torch_dtype=torch.bfloat16).to(device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path,  token=access_token)
-        generator = LLMGenerator(gen_model, gen_tokenizer, device, gen_params=default_gen_params)
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
         #template for chat
         use_chat_template = False
@@ -86,7 +86,7 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
         gen_path = "microsoft/phi-2"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.float16).to(device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path)
-        generator = LLMGenerator(gen_model, gen_tokenizer, device, gen_params=default_gen_params)
+        generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
         # special for phi
         gen_tokenizer.pad_token = gen_tokenizer.eos_token

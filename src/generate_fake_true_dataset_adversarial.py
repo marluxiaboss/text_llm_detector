@@ -203,7 +203,7 @@ class ArticleGenerator:
 
         return articles
     
-def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_template=False, template_type=None):
+def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_template=False, template_type=None, system_prompt=""):
 
     if prefix != "":
         text_instruction = f"{prompt} {prefix}"
@@ -213,8 +213,12 @@ def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_temp
     if use_chat_template:
         match template_type:
             case "system_user":
+                if system_prompt == "":
+                    sys_prompt = "You are a helpful assistant."
+                else:
+                    sys_prompt = system_prompt
                 messages = [
-                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "system", "content": f"{sys_prompt}"},
                 {"role": "user", "content": f"{text_instruction}"},
                 ]
             case "user":
@@ -314,11 +318,12 @@ if __name__ == "__main__":
     parser.add_argument("--use_humarin_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_article_generator", help="Whether to use the article generator", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--article_generator", type=str, help="Generator used to generate the articles, it should be a chat model", default="zephyr")
+    parser.add_argument("--system_prompt", type=str, help="Prompt to use for the system in the chat template", default="")
     parser.add_argument("--prompt", type=str, help="Prompt to use for the article generator", default="")
     parser.add_argument("--nb_paraphrasing", type=int, help="Number of paraphrasing to do", default=1)
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     parser.add_argument("--batch_size", type=int, help="Batch size for the paraphrasing", default=4)
-    parser.add_argument("--temperature", type=float, help="Temperature for the generation, default one if not set", default=-1.0)
+    parser.add_argument("--temperature", type=float, help="Temperature for the generation, default one if not set", default=0.8)
     parser.add_argument("--repetition_penalty", type=float, help="Repetition penalty for the generation", default=1.0)
     args = parser.parse_args()
 
@@ -394,7 +399,7 @@ if __name__ == "__main__":
         prefixes = [" ".join(text.split()[:prefix_len]) for text in dataset_list]
 
         # apply the chat template with the prompt
-        prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, args.prompt, tokenizer, use_chat_template, template_type) for prefix in prefixes]
+        prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, args.prompt, tokenizer, use_chat_template, template_type, args.system_prompt) for prefix in prefixes]
 
         # generate articles
         fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
