@@ -25,7 +25,8 @@ class LLMGenerator(nn.Module):
 
     def forward(self, samples, max_new_tokens=None):
 
-        max_length = self.gen_params["max_length"]
+        max_length = self.gen_params["max_length"] if max_new_tokens is None else max_new_tokens
+        self.gen_params["max_length"] = max_length
         encoding = self.tokenizer.batch_encode_plus(
             samples, return_tensors='pt', padding=True, truncation=True, max_length=max_length)
         input_ids = encoding['input_ids'].to(self.device)

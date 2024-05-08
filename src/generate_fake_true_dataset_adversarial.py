@@ -189,7 +189,13 @@ class ArticleGenerator:
                     samples = prefixes_with_prompt[i:]
                 else:
                     samples = prefixes_with_prompt[i:i+batch_size]
-                outputs = self.model(samples)
+                    
+                # increase max_length to take into account the length of the prompt,
+                # since we use the same type of prompt for all samples, it should be on average the same length
+                first_sample = samples[0]
+                first_sample_tokenized_length = len(self.tokenizer(first_sample)["input_ids"])
+                max_length = 200 + first_sample_tokenized_length 
+                outputs = self.model(samples, max_new_tokens=max_length)
                 res = [text.replace("\n", "") for text in outputs]
                 final_res = []
                 for j, _ in enumerate(res):
@@ -211,12 +217,12 @@ def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_temp
         text_instruction = prompt
         
     if use_chat_template:
+        if system_prompt == "":
+            sys_prompt = "You are a helpful assistant."
+        else:
+            sys_prompt = system_prompt
         match template_type:
             case "system_user":
-                if system_prompt == "":
-                    sys_prompt = "You are a helpful assistant."
-                else:
-                    sys_prompt = system_prompt
                 messages = [
                 {"role": "system", "content": f"{sys_prompt}"},
                 {"role": "user", "content": f"{text_instruction}"},
@@ -316,6 +322,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_name_suffix", type=str, help="Suffix to add to the dataset name", default="new")
     parser.add_argument("--test_only", help="Whether to only keep the test split", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_humarin_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument("--use_llm_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_article_generator", help="Whether to use the article generator", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--article_generator", type=str, help="Generator used to generate the articles, it should be a chat model", default="zephyr")
     parser.add_argument("--system_prompt", type=str, help="Prompt to use for the system in the chat template", default="")
@@ -381,6 +388,59 @@ if __name__ == "__main__":
         dataset = regroup_pairs(dataset)
         dataset = dataset.map(lambda x: {"text": x["fake_paraphrased"], "label": x["label"]})
         dataset = dataset.remove_columns(["fake_paraphrased"])
+        
+    if args.use_llm_paraphraser:
+        generator = args.article_generator
+        print(f"Using article generator with {generator}")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        # load model
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model, tokenizer, use_chat_template, template_type = load_generator(generator, device, temperature=args.temperature, repetition_penalty=args.repetition_penalty)
+        article_generator = ArticleGenerator(model, tokenizer, device)
+
+        # take the prefixes from the dataset
+        dataset_list = fake_dataset["text"]
+        prefix_len = 10
+        prefixes = [" ".join(text.split()[:prefix_len]) for text in dataset_list]
+        
+        system_paraphrasing_prompt = ("You are a paraphraser. You are given an input passage ‘INPUT’. You should paraphrase ‘INPUT’ to print ‘OUTPUT’."
+"‘OUTPUT’ shoud be diverse and different as much as possible from ‘INPUT’ and should not copy any part verbatim from ‘INPUT’."
+"‘OUTPUT’ should preserve the meaning and content of ’INPUT’ while maintaining text quality and grammar."
+"‘OUTPUT’ should not be much longer than ‘INPUT’. You should print ‘OUTPUT’ and nothing else so that its easy for me to parse.")
+        
+        user_paraphrasing_prompts = [f"INPUT: {fake_text}" for fake_text in dataset_list]
+        
+
+        # apply the chat template with the prompt
+        prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, paraphrase_prompt, tokenizer, use_chat_template, template_type, system_paraphrasing_prompt) for prefix, paraphrase_prompt in zip(prefixes, user_paraphrasing_prompts)]
+        
+        print("prefixes_with_prompt: ", prefixes_with_prompt)
+        # TODO: test that it works!
+
+
+        # generate articles
+        fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
+
+        true_dataset = dataset.filter(lambda x: x["label"] == 0)
+        
+        article_len = 500
+        # find indices of articles that are less than article_len characters
+        indices_short_articles = [i for i, article in enumerate(fake_articles) if len(article) < article_len]
+        print("Percentage of short articles: ", len(indices_short_articles) / len(fake_articles) * 100)
+        
+        # remove short articles from the fake dataset and the corresponding true articles
+        #fake_articles = [article for i, article in enumerate(fake_articles) if i not in indices_short_articles]
+        #true_dataset = true_dataset.select([i for i in range(len(true_dataset)) if i not in indices_short_articles])
+        
+        
+        fake_dataset = Dataset.from_dict({"text": [text[:article_len] for text in fake_articles], "label": [1] * len(fake_articles)})
+        true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(true_dataset["text"])})
+
+        # regroup the pairs to re-create the dataset as it was before
+        dataset = concatenate_datasets([true_dataset, fake_dataset])
+        dataset = regroup_pairs(dataset)
+        
 
     
     if args.use_article_generator:
@@ -405,8 +465,17 @@ if __name__ == "__main__":
         fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
 
         true_dataset = dataset.filter(lambda x: x["label"] == 0)
-
+        
         article_len = 500
+        # find indices of articles that are less than article_len characters
+        indices_short_articles = [i for i, article in enumerate(fake_articles) if len(article) < article_len]
+        print("Percentage of short articles: ", len(indices_short_articles) / len(fake_articles) * 100)
+        
+        # remove short articles from the fake dataset and the corresponding true articles
+        #fake_articles = [article for i, article in enumerate(fake_articles) if i not in indices_short_articles]
+        #true_dataset = true_dataset.select([i for i in range(len(true_dataset)) if i not in indices_short_articles])
+        
+        
         fake_dataset = Dataset.from_dict({"text": [text[:article_len] for text in fake_articles], "label": [1] * len(fake_articles)})
         true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(true_dataset["text"])})
 
