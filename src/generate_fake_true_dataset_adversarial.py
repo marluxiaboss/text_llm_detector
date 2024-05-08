@@ -411,16 +411,14 @@ if __name__ == "__main__":
         
         user_paraphrasing_prompts = [f"INPUT: {fake_text}" for fake_text in dataset_list]
         
-
         # apply the chat template with the prompt
         prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, paraphrase_prompt, tokenizer, use_chat_template, template_type, system_paraphrasing_prompt) for prefix, paraphrase_prompt in zip(prefixes, user_paraphrasing_prompts)]
         
-        print("prefixes_with_prompt: ", prefixes_with_prompt)
-        # TODO: test that it works!
-
-
         # generate articles
-        fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
+        for i in range(args.nb_paraphrasing):
+            fake_articles = article_generator.generate_articles(prefixes_with_prompt, prefixes, batch_size=args.batch_size)
+            prefixes = [" ".join(text.split()[:prefix_len]) for text in fake_articles]
+            prefixes_with_prompt = [transform_chat_template_with_prompt(prefix, paraphrase_prompt, tokenizer, use_chat_template, template_type, system_paraphrasing_prompt) for prefix, paraphrase_prompt in zip(prefixes, user_paraphrasing_prompts)]
 
         true_dataset = dataset.filter(lambda x: x["label"] == 0)
         
