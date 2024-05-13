@@ -42,6 +42,10 @@ if __name__ == "__main__":
             fake_true_samples.append({"text": row["original"], "label": 0})
             fake_true_samples.append({"text": row["sampled"], "label": 1})
             
+    if args.dataset_name == "pubmed_only_true":
+        for index, row in dataset_df.iterrows():
+            fake_true_samples.append({"text": row["original"], "label": 0})
+            
     # for https://huggingface.co/datasets/EdinburghNLP/xsum
     if args.dataset_name == "xsum_only_true":
         for index, row in dataset_df.iterrows():
