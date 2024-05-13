@@ -32,9 +32,14 @@ if __name__ == "__main__":
             raise ValueError("orig_dataset_type must be either huggingface or json")
     
     if args.take_samples is not None:
-        dataset_df = dataset_df.sample(args.take_samples, random_state=42)
+        
+        if not dataset_df.shape[0] < args.take_samples:
+            dataset_df = dataset_df.sample(args.take_samples, random_state=42)
+        else:
+            print("Warning: take_samples is larger than the dataset size. Taking the whole dataset.")
 
     fake_true_samples = []
+
     
     # for https://github.com/baoguangsheng/fast-detect-gpt/blob/main/exp_gpt3to4/data/pubmed_gpt-4.raw_data.json
     if args.dataset_name == "pubmed_fake_true":
@@ -50,6 +55,11 @@ if __name__ == "__main__":
     if args.dataset_name == "xsum_only_true":
         for index, row in dataset_df.iterrows():
             fake_true_samples.append({"text": row["document"], "label": 0})
+            
+    if args.dataset_name == "cnn_dailymail_only_true":
+        for index, row in dataset_df.iterrows():
+            if row["label"] == 0:
+                fake_true_samples.append({"text": row["text"][0], "label": 0})
 
     fake_true_dataset_df = pd.DataFrame(fake_true_samples)
     
