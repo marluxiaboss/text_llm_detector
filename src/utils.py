@@ -81,17 +81,37 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
             nb_false_negatives_i = nb_false_negatives[i]
             nb_true_positives_i = nb_true_positives[i]
             nb_true_negatives_i = nb_true_negatives[i]
+            
+            # we need to test cases where the denominator is 0 because there might dataset with only 0 labels or 1 labels
+            match metric:
+                case "accuracy":
+                    if len(data) == 0:
+                        metric_results[i] = 0
+                    else:
+                        metric_results[i] = (nb_true_positives_i + nb_true_negatives_i) / len(data)
+                    
+                case "precision":
+                    if (nb_true_positives_i + nb_false_positives_i == 0):
+                        metric_results[i] = 0
+                    else:
+                        metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_positives_i)
+                        
+                case "recall":
+                    if (nb_true_positives_i + nb_false_negatives_i == 0):
+                        metric_results[i] = 0
+                    else:
+                        metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_negatives_i)
+                case "f1_score":
+                    if (2 * nb_true_positives_i + nb_false_positives_i + nb_false_negatives_i) == 0:
+                        metric_results[i] = 0
+                    else:
+                        metric_results[i] = 2 * nb_true_positives_i / (2 * nb_true_positives_i + nb_false_positives_i + nb_false_negatives_i)
+                case "fp_rate":
+                    if  (nb_false_positives_i + nb_true_negatives_i) == 0:
+                        metric_results[i] = 0
+                    else:
+                        metric_results[i] = nb_false_positives_i / (nb_false_positives_i + nb_true_negatives_i)
 
-            if metric == "accuracy":
-                metric_results[i] = (nb_true_positives_i + nb_true_negatives_i) / len(data)
-            elif metric == "precision":
-                metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_positives_i)
-            elif metric == "recall":
-                metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_negatives_i)
-            elif metric == "f1_score":
-                metric_results[i] = 2 * nb_true_positives_i / (2 * nb_true_positives_i + nb_false_positives_i + nb_false_negatives_i)
-            elif metric == "fp_rate":
-                metric_results[i] = nb_false_positives_i / (nb_false_positives_i + nb_true_negatives_i)
 
         avg_metrics[metric] = np.mean(metric_results)
         std_metrics[metric] = np.std(metric_results)

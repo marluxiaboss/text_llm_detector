@@ -195,7 +195,8 @@ class ArticleGenerator:
                 first_sample = samples[0]
                 first_sample_tokenized_length = len(self.tokenizer(first_sample)["input_ids"])
                 max_length = 200 + first_sample_tokenized_length 
-                outputs = self.model(samples, max_new_tokens=max_length)
+                min_new_tokens = 200
+                outputs = self.model(samples, max_new_tokens=max_length, min_new_tokens=min_new_tokens)
                 res = [text.replace("\n", "") for text in outputs]
                 final_res = []
                 for j, _ in enumerate(res):
