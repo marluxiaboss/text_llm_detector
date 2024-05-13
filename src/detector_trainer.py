@@ -164,9 +164,16 @@ class DetectorTrainer:
 
     def create_text_experiment_folder(self, base_path, detector_name):
 
-        experiment_path = f"{base_path}/{detector_name}/{datetime.now().strftime('%d_%m_%H%M')}"
-        os.makedirs(experiment_path + "/test")
-
+        #experiment_path = f"{base_path}/{detector_name}/{datetime.now().strftime('%d_%m_%H%M')}"
+        
+        # it makes more sense to overwrite the last test than recreating a folder
+        experiment_path = f"{base_path}/{detector_name}"
+        
+        # check if test folder exists
+        test_folder = f"{experiment_path}/test"
+        if not os.path.isdir(test_folder):
+            os.makedirs(test_folder)
+            
         return experiment_path
 
     def set_experiment_folder(self, experiment_path):

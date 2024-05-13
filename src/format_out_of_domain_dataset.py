@@ -49,6 +49,7 @@ if __name__ == "__main__":
             
     if args.dataset_name == "pubmed_only_true":
         for index, row in dataset_df.iterrows():
+            print("row: original", row["original"])
             fake_true_samples.append({"text": row["original"], "label": 0})
             
     # for https://huggingface.co/datasets/EdinburghNLP/xsum
@@ -66,9 +67,12 @@ if __name__ == "__main__":
     # keep only the first 500 characters of the text
     fake_true_dataset_df["text"] = fake_true_dataset_df["text"].apply(lambda x: x[:500])
     
+    
+    size_before = len(fake_true_dataset_df)
     # fiter out samples with < 500 characters
     fake_true_dataset_df = fake_true_dataset_df[fake_true_dataset_df["text"].apply(lambda x: len(x) >= 500)]
     
+    print(f"Filtered out percentage of samples: {100*(size_before - len(fake_true_dataset_df))/size_before}%")
     print("Size of the dataset: ", len(fake_true_dataset_df))
     
     # print first rows of the dataset to verify the validity
