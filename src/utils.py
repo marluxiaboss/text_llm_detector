@@ -56,7 +56,7 @@ def compute_bootstrap_acc(data, n_bootstrap=1000):
     return (np.mean(accs), np.std(accs), lower_bound, upper_bound)
 
 
-def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
+def compute_bootstrap_metrics(data, labels, n_bootstrap=1000, flip_labels=False):
 
     # compute false postives, false negatives, true positives, true negatives using bootstrap
     nb_false_positives = np.zeros(n_bootstrap)
@@ -81,6 +81,12 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
             nb_false_negatives_i = nb_false_negatives[i]
             nb_true_positives_i = nb_true_positives[i]
             nb_true_negatives_i = nb_true_negatives[i]
+            
+            if flip_labels:
+                nb_false_positives_i = nb_true_negatives_i
+                nb_false_negatives_i = nb_true_positives_i
+                nb_true_positives_i = nb_false_positives_i
+                nb_true_negatives_i = nb_false_negatives_i
             
             # we need to test cases where the denominator is 0 because there might dataset with only 0 labels or 1 labels
             match metric:
@@ -111,8 +117,7 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000):
                         metric_results[i] = 0
                     else:
                         metric_results[i] = nb_false_positives_i / (nb_false_positives_i + nb_true_negatives_i)
-
-
+            
         avg_metrics[metric] = np.mean(metric_results)
         std_metrics[metric] = np.std(metric_results)
 

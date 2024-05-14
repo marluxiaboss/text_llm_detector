@@ -870,7 +870,11 @@ class DetectorTrainer:
         predictions = trainer.predict(dataset["test"])
         preds = np.argmax(predictions.predictions, axis=-1)
 
-        results = compute_bootstrap_metrics(preds, predictions.label_ids)
+        if not hasattr(self, "flip_labels"):
+            flip_labels = False
+        else:
+            flip_labels = self.flip_labels
+        results = compute_bootstrap_metrics(preds, predictions.label_ids, flip_labels=flip_labels)
         
         log.info("Test metrics:")
         for key, value in results.items():
