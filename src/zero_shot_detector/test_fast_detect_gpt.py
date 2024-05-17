@@ -269,6 +269,69 @@ def run(args):
     random_acc = np.mean(random_preds == labels)
     print(f'Random prediction accuracy: {random_acc * 100:.2f}%')
 
+
+    def predict_on_dataset(dataset):
+        
+        # create experiment folder
+
+        # load model
+        scoring_tokenizer = load_tokenizer(args.scoring_model_name, args.dataset, args.cache_dir)
+        scoring_model = load_model(args.scoring_model_name, args.device, args.cache_dir)
+        scoring_model.eval()
+        if args.reference_model_name != args.scoring_model_name:
+            reference_tokenizer = load_tokenizer(args.reference_model_name, args.dataset, args.cache_dir)
+            reference_model = load_model(args.reference_model_name, args.device, args.cache_dir)
+            reference_model.eval()
+
+        # evaluate criterion
+        name = "sampling_discrepancy_analytic"
+        criterion_fn = get_sampling_discrepancy_analytic
+        prob_estimator = ProbEstimator(args)
+
+        #dataset = load_test_dataset(args.dataset_path)
+
+        # maybe need to tokenize the dataset twice, once for each tokenizer
+        if args.reference_model_name != args.scoring_model_name:
+            pass
+        else:
+            tokenized_dataset = tokenize_dataset(scoring_tokenizer, dataset)
+
+        # iterate over the dataset and do detection on each sample
+
+        # create dataloader
+        batch_size = 1
+        
+        test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+        preds = []
+        with torch.no_grad():
+            for batch in tqdm(test_loader, desc="Performing detection on dataset..."):
+                text = batch["text"]
+
+                tokenized = scoring_tokenizer(text, return_tensors="pt", padding=True, return_token_type_ids=False).to(args.device)
+                labels = tokenized.input_ids[:, 1:]
+                logits_score = scoring_model(**tokenized).logits[:, :-1]
+
+                if args.reference_model_name == args.scoring_model_name:
+                    logits_ref = logits_score
+                else:
+                    tokenized = reference_tokenizer(text, return_tensors="pt", padding=True, return_token_type_ids=False).to(args.device)
+                    assert torch.all(tokenized.input_ids[:, 1:] == labels), "Tokenizer is mismatch."
+                    logits_ref = reference_model(**tokenized).logits[:, :-1]
+
+                for i in range(batch_size):
+                    crit = criterion_fn(logits_ref[i:i+1], logits_score[i:i+1], labels[i:i+1])
+                    prob = prob_estimator.crit_to_prob(crit)
+
+                    pred = 1 if prob > 0.5 else 0
+                    preds.append(pred)
+
+        # calculate accuracy
+        preds = np.array(preds)
+        labels = np.array(dataset["label"])
+
+        return preds, labels
+    
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--reference_model_name', type=str, default="gpt-neo-2.7B")  # use gpt-j-6B for more accurate detection
