@@ -49,9 +49,16 @@ def apply_chat_template_and_prepare_for_dpo(
         }
     ]
     
-    sample["prompt"] = tokenizer.apply_chat_template(prompt, tokenizer=False, add_generation_prompt=True)
-    sample["chosen"] = tokenizer.apply_chat_template(chosen, tokenizer=False)
-    sample["rejected"] = tokenizer.apply_chat_template(rejected, tokenizer=False)
+    sample["prompt"] = tokenizer.apply_chat_template(prompt, tokenize=False, add_generation_prompt=True)
+    sample["chosen"] = tokenizer.apply_chat_template(chosen, tokenize=False)
+    sample["rejected"] = tokenizer.apply_chat_template(rejected, tokenize=False)
+    
+    return {
+        "prompt": sample["prompt"],
+        "chosen": sample["chosen"],
+        "rejected": sample["rejected"],
+    }
+    
     
 if __name__ == "__main__":
     
@@ -171,6 +178,10 @@ if __name__ == "__main__":
 
     dpo_dataset_dict = DatasetDict({"train": Dataset.from_dict(dpo_dict_train), "valid": Dataset.from_dict(dpo_dict_valid), "test": Dataset.from_dict(dpo_dict_test)})
     dpo_dataset_dict_chat = dpo_dataset_dict.map(lambda x: apply_chat_template_and_prepare_for_dpo(x, tokenizer))
+    
+    # transform to "prompt": [...], "chosen": [...], "rejected": [...] format
+    
+    #dpo_dataset_dict_chat = dpo_dataset_dict_chat.map(lambda x: [{"prompt": x["prompt"], "chosen": x["chosen"], "rejected": x["rejected"]}])
     
     # save the dataset
     dpo_dataset_dict_chat.save_to_disk(args.save_path)
