@@ -46,12 +46,30 @@ if __name__ == "__main__":
     # load dataset
     dataset = load_from_disk(args.dataset_path)
     train_dataset = dataset["train"]
+    eval_dataset = dataset["valid"]
     print("train_dataset: ", train_dataset)
 
 
     training_args = DPOConfig(
         beta=0.1,
         output_dir="src/dpo_training/dpo_training_output",
+        learning_rate=5e-5,
+        bf16=True,
+        do_eval=True,
+        eval_steps=100,
+        evaluation_strategy="steps",
+        logging_steps=10,
+        lr_scheduler_type="linear",
+        max_length=1024,
+        max_prompt_length=512,
+        num_train_epochs=1,
+        per_device_train_batch_size=1,
+        per_device_eval_batch_size=1,
+        warmup_ratio=0.1,
+        save_total_limit=1,
+        save_strategy="steps",
+        max_grad_norm=1.0,
+        seed=42
     )
     
     dpo_trainer = DPOTrainer(
@@ -59,5 +77,9 @@ if __name__ == "__main__":
         model_ref,
         args=training_args,
         train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
         tokenizer=tokenizer,
     )
+    
+    
+    dpo_trainer.train()

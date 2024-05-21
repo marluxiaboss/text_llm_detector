@@ -99,11 +99,11 @@ if __name__ == "__main__":
         dataset = dataset.select(range(args.take_samples))
         
     # 2) Run FastDetectGPT to create labels for the datasetl. 0 = true -> accepted, 1 = fake -> rejected
-    #preds, labels = predict_on_dataset(dataset)
+    preds, labels = predict_on_dataset(dataset)
     
     # set labels to random 0 or 1 for testing purposes
-    preds = np.random.randint(0, 2, len(dataset))
-    labels = np.random.randint(0, 2, len(dataset))
+    #preds = np.random.randint(0, 2, len(dataset))
+    #labels = np.random.randint(0, 2, len(dataset))
     
     print("preds", preds)
     print("labels", labels)

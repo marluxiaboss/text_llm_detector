@@ -333,6 +333,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, help="Batch size for the paraphrasing", default=4)
     parser.add_argument("--temperature", type=float, help="Temperature for the generation, default one if not set", default=0.8)
     parser.add_argument("--repetition_penalty", type=float, help="Repetition penalty for the generation", default=1.0)
+    parser.add_argument("--checkpoint_path", type=str, help="Whether to load the model from a checkpoint (Only supported for Zephyr)", default=None)
+
     args = parser.parse_args()
 
     dataset_path = args.dataset_path
@@ -448,7 +450,7 @@ if __name__ == "__main__":
 
         # load model
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        model, tokenizer, use_chat_template, template_type = load_generator(generator, device, temperature=args.temperature, repetition_penalty=args.repetition_penalty)
+        model, tokenizer, use_chat_template, template_type = load_generator(generator, device, temperature=args.temperature, repetition_penalty=args.repetition_penalty, checkpoint_path=args.checkpoint_path)
         article_generator = ArticleGenerator(model, tokenizer, device)
 
         # take the prefixes from the dataset

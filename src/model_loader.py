@@ -2,7 +2,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from generator import LLMGenerator
 
-def load_generator(model_name, device, access_token=None, temperature=0.8, repetition_penalty=1.0, top_p=0.95, top_k=50):
+def load_generator(model_name, device, access_token=None, temperature=0.8, repetition_penalty=1.0, top_p=0.95, top_k=50, checkpoint_path=None):
     """
     Load the generator model and tokenizer
     """
@@ -110,7 +110,12 @@ def load_generator(model_name, device, access_token=None, temperature=0.8, repet
 
     elif model_name == "zephyr":
         gen_path = "HuggingFaceH4/zephyr-7b-beta"
-        gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(device)
+        
+        # For zephyr, we can load from a checkpoint
+        if checkpoint_path:
+            gen_model = AutoModelForCausalLM.from_pretrained(checkpoint_path, torch_dtype=torch.bfloat16).to(device)
+        else:
+            gen_model = AutoModelForCausalLM.from_pretrained(gen_path, torch_dtype=torch.bfloat16).to(device)
         gen_tokenizer = AutoTokenizer.from_pretrained(gen_path, trust_remote_code=True)
         generator = LLMGenerator(gen_model, gen_tokenizer, gen_params=default_gen_params)
 
