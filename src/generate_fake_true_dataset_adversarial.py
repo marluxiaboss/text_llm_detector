@@ -393,7 +393,6 @@ if __name__ == "__main__":
     if args.use_llm_paraphraser:
         generator = args.article_generator
         print(f"Using article generator with {generator}")
-        device = "cuda" if torch.cuda.is_available() else "cpu"
 
         # load model
         device = "cuda" if torch.cuda.is_available() else "cpu"
