@@ -18,6 +18,8 @@ import jsonlines
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_from_disk
 from torch.utils.data import DataLoader
+from sklearn.metrics import roc_auc_score
+
 
 from tqdm import tqdm
 
@@ -232,6 +234,8 @@ def run(args):
 
     test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
     preds = []
+    probs = []
+    
     with torch.no_grad():
         for batch in tqdm(test_loader, desc="Performing detection on dataset..."):
             text = batch["text"]
@@ -253,12 +257,18 @@ def run(args):
 
                 pred = 1 if prob > 0.5 else 0
                 preds.append(pred)
+                probs.append(prob)
 
     # calculate accuracy
     preds = np.array(preds)
     labels = np.array(dataset["label"])
     acc = np.mean(preds == labels)
     print(f'Accuracy: {acc * 100:.2f}%')
+    
+    # calculate roc auc score
+    probs = np.array(probs)
+    roc_auc = roc_auc_score(labels, probs)
+    print(f'ROC AUC: {roc_auc * 100:.2f}%')
 
 
     results = compute_bootstrap_metrics(preds, labels)
@@ -314,6 +324,7 @@ def predict_on_dataset(dataset):
     
     test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
     preds = []
+    probs = []
     with torch.no_grad():
         for batch in tqdm(test_loader, desc="Performing detection on dataset..."):
             text = batch["text"]
@@ -334,11 +345,17 @@ def predict_on_dataset(dataset):
                 prob = prob_estimator.crit_to_prob(crit)
 
                 pred = 1 if prob > 0.5 else 0
+                
+                probs.append(prob)
                 preds.append(pred)
 
     # calculate accuracy
     preds = np.array(preds)
     labels = np.array(dataset["label"])
+    
+    # calculate roc auc score
+    probs = np.array(probs)
+    
 
     return preds, labels
     

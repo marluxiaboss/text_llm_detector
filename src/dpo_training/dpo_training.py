@@ -31,6 +31,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_path", type=str, help="Path to the original dataset", required=True)
     parser.add_argument("--model_name", type=str, help="Name of the model that will be used for DPO, used for the tokenizer to have the chat template", required=True, default="zephyr")
+    parser.add_argument("--take_samples", type=int, help="Number of samples to take from the original dataset", required=True, default=1000)
     args = parser.parse_args()
 
     
@@ -45,20 +46,31 @@ if __name__ == "__main__":
     
     # load dataset
     dataset = load_from_disk(args.dataset_path)
+    
     train_dataset = dataset["train"]
     eval_dataset = dataset["valid"]
+    
+    if args.take_samples > 0:
+        fraction = args.take_samples / len(dataset["train"])
+        
+        print(f"Fraction of dataset taken: {fraction}")
+        
+        # take a fraction of the dataset for each split
+        train_dataset = train_dataset.select(range(int(len(train_dataset) * fraction)))
+        eval_dataset = eval_dataset.select(range(int(len(eval_dataset) * fraction)))
+    
     print("train_dataset: ", train_dataset)
 
 
     training_args = DPOConfig(
         beta=0.1,
         output_dir="src/dpo_training/dpo_training_output",
-        learning_rate=5e-5,
+        learning_rate=5e-7,
         bf16=True,
         do_eval=True,
         eval_steps=100,
         evaluation_strategy="steps",
-        logging_steps=10,
+        logging_steps=50,
         lr_scheduler_type="linear",
         max_length=1024,
         max_prompt_length=512,
@@ -67,7 +79,7 @@ if __name__ == "__main__":
         per_device_eval_batch_size=1,
         warmup_ratio=0.1,
         save_total_limit=1,
-        save_strategy="steps",
+        save_strategy="epoch",
         max_grad_norm=1.0,
         seed=42
     )
