@@ -2,21 +2,21 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from generator import LLMGenerator
 
-def load_generator(model_name, device, access_token=None, temperature=0.8, repetition_penalty=1.0, top_p=0.95, top_k=50, checkpoint_path=None):
+def load_generator(model_name: str, device: str, access_token=None, temperature=0.8, repetition_penalty=1.0, top_p=0.95, top_k=50, checkpoint_path=None):
     """
     Load the generator model and tokenizer
     """
     
     # set generation parameters
     default_gen_params = {
-    "max_length": 200,
-    "max_new_tokens": None,
-    "temperature": 0.8,
-    "top_p": 0.95,
-    "repetition_penalty": 1,
-    "do_sample": True,
-    "min_new_tokens": 100,
-    "top_k": 50
+        "max_length": 200,
+        "max_new_tokens": None,
+        "temperature": 0.8,
+        "top_p": 0.95,
+        "repetition_penalty": 1,
+        "do_sample": True,
+        "min_new_tokens": 100,
+        "top_k": 50
     }
 
     default_gen_params["temperature"] = temperature

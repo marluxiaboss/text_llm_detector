@@ -13,51 +13,45 @@ from datasets import load_from_disk, concatenate_datasets, Dataset
 
 from abc import ABC, abstractmethod
 
+from generator import LLMGenerator
 from model_loader import load_generator
-
-
-class Parphraser(ABC):
-    """
-    Abstract class for a paraphraser
-    """
-
-    @abstractmethod
-    def paraphrase(self, text: str) -> str:
-        pass
-
-    @abstractmethod
-    def batch_paraphrase(self, texts: list, batch_size: int) -> list:
-        pass
-
-class LLMParaphraser(Parphraser):
-    """
-    Paraphraser using a language model
-    """
-
-    def __init__(self, tokenizer, model, device, n_paraphrasing=1):
-        self.tokenizer = tokenizer
-        self.model = model
-        self.device = device
-        self.n_paraphrasing = n_paraphrasing
-
-    def paraphrase(self, text: str) -> str:
-        pass
-
-    def batch_paraphrase(self, texts: list, batch_size: int) -> list:
-        pass
     
 class ArticleGenerator:
 
     """
     Generates news article given a prefix, a model and an optional prompt
+    
+    Parameters:
+    model : LLMGenerator
+        The model used to generate the articles
+    tokenizer : AutoTokenizer
+        The tokenizer used to tokenize the text
+    device : str
+        The device used for the model
+    
     """
 
-    def __init__(self, model, tokenizer, device):
+    def __init__(self, model: LLMGenerator, tokenizer: AutoTokenizer, device: str):
         self.model = model
         self.tokenizer = tokenizer
         self.device = device
 
-    def generate_articles(self, prefixes_with_prompt: list, prefixes: list, batch_size=4) -> list:
+    def generate_articles(self, prefixes_with_prompt: list, prefixes: list, batch_size: int = 4) -> list:
+        """
+        Generate articles given a list of prefixes and a list of prefixes with prompt
+        
+        Parameters:
+        prefixes_with_prompt : list
+            List of prefixes with prompt for the generation
+        prefixes : list
+            Same list as prefixes_with_prompt but without the prompt
+        batch_size : int, optional
+            Batch size for the generation, by default 4
+            
+        Returns:
+        list
+            List of generated articles
+        """
 
         articles = []
         with torch.no_grad():
@@ -71,8 +65,10 @@ class ArticleGenerator:
                 # since we use the same type of prompt for all samples, it should be on average the same length
                 first_sample = samples[0]
                 first_sample_tokenized_length = len(self.tokenizer(first_sample)["input_ids"])
-                max_length = 200 + first_sample_tokenized_length 
+                
+                # TODO: should be a parameter
                 min_new_tokens = 200
+                max_length = min_new_tokens + first_sample_tokenized_length 
                 outputs = self.model(samples, max_new_tokens=max_length, min_new_tokens=min_new_tokens)
                 res = [text.replace("\n", "") for text in outputs]
                 final_res = []
@@ -87,7 +83,31 @@ class ArticleGenerator:
 
         return articles
     
-def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_template=False, template_type=None, system_prompt=""):
+def transform_chat_template_with_prompt(prefix: str, prompt: str, tokenizer: AutoTokenizer,
+                                        use_chat_template: bool = False, template_type: str = None, system_prompt: str = "") -> str:
+    
+    """
+    Transform a prefix with a prompt into a chat template
+    
+    Parameters:
+    prefix : str
+        The prefix to use
+    prompt : str
+        The prompt to use
+    tokenizer : AutoTokenizer
+        The tokenizer to use
+    use_chat_template : bool, optional
+        Whether to use a chat template, by default False
+    template_type : str, optional
+        The type of template to use, by default None
+    system_prompt : str, optional
+        The system prompt to use, by default ""
+        
+    Returns:
+    str
+        The transformed prefix
+    """
+        
 
     if prefix != "":
         text_instruction = f"{prompt} {prefix}"
@@ -127,12 +147,19 @@ def transform_chat_template_with_prompt(prefix, prompt, tokenizer, use_chat_temp
     return text_template
 
 
-def regroup_pairs(merged_dataset, seed=42):
+def regroup_pairs(merged_dataset: Dataset, seed=42) -> Dataset:
     """
-    Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split
+    Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split.
+    
+    Parameters:
+    merged_dataset : Dataset
+        The dataset to regroup
+    seed : int, optional
+        The seed to use for the shuffling, by default 42
+        
     """
 
-    def fix_ids(dataset):
+    def fix_ids(dataset: Dataset):
         """
         Fix the ids of the dataset
         """
@@ -186,23 +213,18 @@ def regroup_pairs(merged_dataset, seed=42):
 
     return merged_dataset
 
-def apply_character_filters(text: str, character_filters: list) -> str:
-    for character_filter in character_filters:
-        text = character_filter.filter(text)
-    return text
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--dataset_path", type=str, help="Path to the fake true dataset (generated with generate_fake_true_dataset.py)", default="fake_true_dataset")
     parser.add_argument("--dataset_name_suffix", type=str, help="Suffix to add to the dataset name", default="new")
     parser.add_argument("--test_only", help="Whether to only keep the test split", default=False, action=argparse.BooleanOptionalAction)
-    parser.add_argument("--use_llm_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_article_generator", help="Whether to use the article generator", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--article_generator", type=str, help="Generator used to generate the articles, it should be a chat model", default="zephyr")
     parser.add_argument("--system_prompt", type=str, help="Prompt to use for the system in the chat template", default="")
     parser.add_argument("--prompt", type=str, help="Prompt to use for the article generator", default="")
-    parser.add_argument("--nb_paraphrasing", type=int, help="Number of paraphrasing to do", default=1)
+    parser.add_argument("--use_llm_paraphraser", help="Whether to use the article generator model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument("--nb_paraphrasing", type=int, help="Number of nested paraphrasing to do", default=1)
     parser.add_argument("--take_samples", type=int, help="Number of samples to take from the dataset", default=-1)
     parser.add_argument("--batch_size", type=int, help="Batch size for the paraphrasing", default=4)
     parser.add_argument("--temperature", type=float, help="Temperature for the generation, default one if not set", default=0.8)
@@ -226,8 +248,15 @@ if __name__ == "__main__":
 
     # only keep fake samples
     fake_dataset = dataset.filter(lambda x: x["label"] == 1)
-
+    
+    # We should not be able to both generate articles and paraphrase in one run
+    if args.use_article_generator and args.use_llm_paraphraser:
+        raise ValueError("You cannot set both use_article_generator and use_llm_paraphraser to True")
+    
+    # whether to paraphrase using the provided LLM.
+    # in this case, the fake articles are already generated
     if args.use_llm_paraphraser:
+        
         generator = args.article_generator
         print(f"Using article generator with {generator}")
 
@@ -259,7 +288,9 @@ if __name__ == "__main__":
 
         true_dataset = dataset.filter(lambda x: x["label"] == 0)
         
+        # cut the articles to a certain length (in number of characters)
         article_len = 500
+        
         # find indices of articles that are less than article_len characters
         indices_short_articles = [i for i, article in enumerate(fake_articles) if len(article) < article_len]
         print("Percentage of short articles: ", len(indices_short_articles) / len(fake_articles) * 100)
@@ -275,12 +306,13 @@ if __name__ == "__main__":
         dataset = concatenate_datasets([true_dataset, fake_dataset])
         dataset = regroup_pairs(dataset)
     
+    # if this is set to true, paraphrasing should be set to false
     if args.use_article_generator:
         generator = args.article_generator
         print(f"Using article generator with {generator}")
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        # load model
+        # load model and set the generation parameters
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model, tokenizer, use_chat_template, template_type = load_generator(generator, device, temperature=args.temperature, repetition_penalty=args.repetition_penalty, checkpoint_path=args.checkpoint_path)
         article_generator = ArticleGenerator(model, tokenizer, device)
