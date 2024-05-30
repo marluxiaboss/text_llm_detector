@@ -45,130 +45,7 @@ class LLMParaphraser(Parphraser):
 
     def batch_paraphrase(self, texts: list, batch_size: int) -> list:
         pass
-class HumarinParaphraser(LLMParaphraser):
-    """
-    Paraphraser using the Humarin model(see: humarin/chatgpt_paraphraser_on_T5_base)
-    """
-
-    def __init__(self, tokenizer, model, device, n_paraphrasing=1):
-        super().__init__(tokenizer, model, device, n_paraphrasing)
-        self.nltk_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-
-    def paraphrase(
-        self,
-        text,
-        num_beams=5,
-        num_beam_groups=5,
-        num_return_sequences=1,
-        repetition_penalty=10.0,
-        diversity_penalty=3.0,
-        no_repeat_ngram_size=2,
-        temperature=0.7,
-        max_length=128
-    ):
-        sentences = self.nltk_tokenizer.tokenize(text)
-        results_text = []
-        for i, sentence in enumerate(sentences):
-
-            text = sentence.strip()
-            input_ids = self.tokenizer(
-                f'paraphrase: {text}',
-                return_tensors="pt", padding="longest",
-                max_length=max_length,
-                truncation=True,
-            ).input_ids.to(self.device)
-            
-            outputs = self.model.generate(
-                input_ids, temperature=temperature, repetition_penalty=repetition_penalty,
-                num_return_sequences=num_return_sequences, no_repeat_ngram_size=no_repeat_ngram_size,
-                num_beams=num_beams, num_beam_groups=num_beam_groups,
-                max_length=max_length, diversity_penalty=diversity_penalty
-            )
-
-            res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
-            results_text.append(res[0])
-        res = " ".join(results_text)
-
-        return res
     
-    def batch_paraphrase(
-        self,
-        texts: list,
-        batch_size=4,
-        num_beams=5,
-        num_beam_groups=5,
-        num_return_sequences=1,
-        repetition_penalty=10.0,
-        diversity_penalty=3.0,
-        no_repeat_ngram_size=2,
-        temperature=0.7,
-        max_length=128                  
-    ) -> list:
-        # same as paraphrase, but with a list of text
-
-        sentences_list = [self.nltk_tokenizer.tokenize(text) for text in texts]
-        results_text = []
-
-        #for i in tqdm(range(0, len(sentences_list), batch_size), desc="Paraphrasing..."):
-        for i in range(0, len(sentences_list), batch_size):
-            
-            # if we are at the end of the list, we take the remaining elements
-            if i + batch_size > len(sentences_list):
-                batch = sentences_list[i:]
-            else:
-                batch = sentences_list[i:i+batch_size]
-
-            input_ids = self.tokenizer.batch_encode_plus(
-                [f'paraphrase: {sentence.strip()}' for sentences in batch for sentence in sentences],
-                return_tensors="pt", padding="longest",
-                max_length=max_length,
-                truncation=True,
-            ).input_ids.to(self.device)
-
-            outputs = self.model.generate(
-                input_ids, temperature=temperature, repetition_penalty=repetition_penalty,
-                num_return_sequences=num_return_sequences, no_repeat_ngram_size=no_repeat_ngram_size,
-                num_beams=num_beams, num_beam_groups=num_beam_groups,
-                max_length=max_length, diversity_penalty=diversity_penalty
-            )
-
-            res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
-            results_text.extend(res)
-
-        results_joined = []
-        i = 0
-        for sentence in sentences_list:
-            len_sent = len(sentence)
-            results_joined.append(" ".join(results_text[i:i+len_sent]))
-            i += len_sent
-
-
-        return results_joined
-
-class CharacterFilter(ABC):
-    """
-    Abstract class for a character filter
-    """
-    
-    def __init__(self):
-        pass
-
-    def filter(self, text: str) -> str:
-        pass
-
-class SingleCharacterFilter(CharacterFilter):
-    """
-    Filter a single character in a text
-    """
-    
-    def __init__(self, char, replacement_char=""):
-        self.char = char
-        self.replacement_char = replacement_char
-
-    def filter(self, text: str) -> str:
-        return text.replace(self.char, self.replacement_char)
-    
-
 class ArticleGenerator:
 
     """
@@ -318,11 +195,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--dataset_path", type=str, help="Path to the fake true dataset (generated with generate_fake_true_dataset.py)", default="fake_true_dataset")
-    parser.add_argument("--normalize_apostrophes", help="Whether to normalize apostrphes", default=False, action=argparse.BooleanOptionalAction)
-    parser.add_argument("--normalize_quotes", help="Whether to normalize quotes", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--dataset_name_suffix", type=str, help="Suffix to add to the dataset name", default="new")
     parser.add_argument("--test_only", help="Whether to only keep the test split", default=False, action=argparse.BooleanOptionalAction)
-    parser.add_argument("--use_humarin_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_llm_paraphraser", help="Whether to use the HumarinP model for paraphrasing", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--use_article_generator", help="Whether to use the article generator", default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--article_generator", type=str, help="Generator used to generate the articles, it should be a chat model", default="zephyr")
@@ -350,48 +224,9 @@ if __name__ == "__main__":
     else:
         dataset = dataset_full
 
-    # apply transformations
-    character_filters = []
-
-    if args.normalize_apostrophes:
-        character_filters.append(SingleCharacterFilter("’", "'"))
-
-    if args.normalize_quotes:
-        character_filters.append(SingleCharacterFilter("”", "\""))
-        character_filters.append(SingleCharacterFilter("“", "\""))
-
-    if character_filters:
-
-        # apply the character filters
-        dataset = dataset.map(lambda x: {"text": apply_character_filters(x["text"], character_filters)})
-
     # only keep fake samples
     fake_dataset = dataset.filter(lambda x: x["label"] == 1)
 
-    if args.use_humarin_paraphraser:
-        print("Using HumarinP paraphraser")
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        tokenizer = AutoTokenizer.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base")
-        model = AutoModelForSeq2SeqLM.from_pretrained("humarin/chatgpt_paraphraser_on_T5_base", torch_dtype=torch.bfloat16).to(device)
-        paraphraser = HumarinParaphraser(tokenizer, model, device, n_paraphrasing=args.nb_paraphrasing)
-
-        # copy the original dataset
-        fake_dataset_orig = copy.deepcopy(fake_dataset)
-
-        # apply the paraphraser
-        for i in range(paraphraser.n_paraphrasing):
-
-            #dataset = dataset.map(lambda x: {"text": paraphraser.paraphrase(x["text"])}, batched=True, batch_size=16)
-            fake_dataset = fake_dataset.map(lambda x: {"text": paraphraser.batch_paraphrase(x["text"], args.batch_size)}, batched=True, batch_size=args.batch_size)
-
-        fake_dataset = Dataset.from_dict(({"text": fake_dataset_orig["text"], "fake_paraphrased":  [text[:500] for text in fake_dataset["text"]], "label": [1]*len(fake_dataset)}))
-        true_dataset = Dataset.from_dict({"text": dataset.filter(lambda x: x["label"] == 0)["text"], "fake_paraphrased": dataset.filter(lambda x: x["label"] == 0)["text"], "label": [0]*len(dataset.filter(lambda x: x["label"] == 0))})
-
-        dataset = concatenate_datasets([true_dataset, fake_dataset])
-        dataset = regroup_pairs(dataset)
-        dataset = dataset.map(lambda x: {"text": x["fake_paraphrased"], "label": x["label"]})
-        dataset = dataset.remove_columns(["fake_paraphrased"])
-        
     if args.use_llm_paraphraser:
         generator = args.article_generator
         print(f"Using article generator with {generator}")
@@ -433,15 +268,12 @@ if __name__ == "__main__":
         #fake_articles = [article for i, article in enumerate(fake_articles) if i not in indices_short_articles]
         #true_dataset = true_dataset.select([i for i in range(len(true_dataset)) if i not in indices_short_articles])
         
-        
         fake_dataset = Dataset.from_dict({"text": [text[:article_len] for text in fake_articles], "label": [1] * len(fake_articles)})
         true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(true_dataset["text"])})
 
         # regroup the pairs to re-create the dataset as it was before
         dataset = concatenate_datasets([true_dataset, fake_dataset])
         dataset = regroup_pairs(dataset)
-        
-
     
     if args.use_article_generator:
         generator = args.article_generator
