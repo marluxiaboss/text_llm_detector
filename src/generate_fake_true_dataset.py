@@ -14,10 +14,70 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer, BertForSequenceCl
 from generator import LLMGenerator
 from model_loader import load_generator
 
+def format_news_dataset(true_dataset: Dataset, prefix_cutoff: int = 10, max_response_length_char: int = 500) -> DatasetDict:
+    """
+    Function used to format the news dataset, specifically the cnn_dailymail dataset
+    TODO: Should be its own script
+    
+    Parameters:
+    true_dataset : Dataset
+        The dataset to format
+    prefix_cutoff : int, optional
+        The number of words to keep in the instruction, by default 10
+    max_response_length_char : int, optional
+        The maximum length of the response in characters, by default 500
+        
+    Returns:
+    DatasetDict
+        The formatted dataset
+    """
 
-def create_train_from_dataset(dataset):
+    def remove_bloat(sample):
+        filtered_text = sample["article"]
+        nb_separator = filtered_text.count("--")
+        if nb_separator > 0:
+            filtered_text = filtered_text.split("--", 1)[1].strip()
+
+        # heurstic to handle cases where the instruction contains an input of this type:
+        # By . Jill Reilly . PUBLISHED: . 08:21 EST, 6 December 2012 . | . UPDATED: . 16:19 EST, 6
+        if "EST," in filtered_text.split():
+            split_est = filtered_text.split("EST,")
+            count_est = len(split_est)
+            filtered_text = split_est[count_est-1].split()[4:]
+            filtered_text = " ".join(filtered_text)
+        return {"article": filtered_text}
+
+    def format_news(sample):
+        
+        sample["instruction"] = " ".join(sample["article"].split()[:prefix_cutoff])
+        sample["context"] = ""
+        sample["response"] = " ".join(sample["article"].split()[prefix_cutoff:])
+        
+        # cut response to max_response_length_char, even if it cuts a word
+        sample["response"] = sample["response"][:max_response_length_char]
+        sample["category"] = "news"
+        return sample
+
+    true_dataset = true_dataset.map(remove_bloat)
+    true_dataset = true_dataset.map(format_news)
+    true_dataset = true_dataset.remove_columns(["article"])
+    true_dataset = true_dataset.remove_columns(["highlights"])
+
+    true_dataset = DatasetDict({"train": true_dataset})
+    return true_dataset
+
+def create_train_from_dataset(dataset: Dataset) -> DatasetDict:
     """
     Create a train split from a dataset
+    
+    Parameters:
+    dataset : Dataset
+        The dataset to create the train split from
+    
+    Returns:
+    DatasetDict
+        The dataset with the train split
+    
     """
 
     dataset_dict = DatasetDict()
@@ -25,9 +85,21 @@ def create_train_from_dataset(dataset):
 
     return dataset_dict
 
-def create_random_subset(dataset, n=10, seed=42):
+def create_random_subset(dataset: Dataset, n: int = 10, seed: int = 42) -> Dataset:
     """
     Create a random subset of the dataset
+    
+    Parameters:
+    dataset : Dataset
+        The dataset to create the random subset from
+    n : int, optional
+        The size of the subset, by default 10
+    seed : int, optional
+        The seed for the random number generator, by default 42
+    
+    Returns:
+    Dataset
+        The random subset of the dataset
     """
     if n > len(dataset):
         n = len(dataset)
@@ -36,9 +108,19 @@ def create_random_subset(dataset, n=10, seed=42):
     subset = dataset.select(indices)
     return subset
 
-def filter_duplicates(dataset, column):
+def filter_duplicates(dataset: Dataset, column: str) -> Dataset:
     """
     Filter out the duplicates in the dataset
+    
+    Parameters:
+    dataset : Dataset
+        The dataset to filter
+    column : str 
+        The column to filter duplicates on
+    
+    Returns:
+    Dataset
+        The dataset without duplicates
     """
     
     dataset_df = pd.DataFrame(dataset)
@@ -51,28 +133,25 @@ def filter_duplicates(dataset, column):
 
     return Dataset.from_pandas(dataset_df)
 
-def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
+def process_true_dataset(true_dataset: Dataset) -> DatasetDict:
     """
     Process the true dataset by creating the necessary columns and selecting a size according to
-    the fake dataset size
+    the fake dataset size.
+    
+    Parameters:
+    true_dataset : Dataset
+        The dataset of true samples (from the original dataset)
+    
+    Returns:
+    Dataset
+        The processed true dataset
     """
-    #dataset = load_dataset(dataset_path)
 
     true_dataset = true_dataset.select_columns(["response", "instruction", "context", "id"])
     true_dataset = true_dataset.rename_column("response", "text")
 
-    # select random samples from true_dataset to match fake_dataset size
-    #true_dataset = true_dataset.shuffle(seed=seed)
-    #true_dataset = true_dataset.select(range(len(fake_dataset["train"])))
-    #true_dataset = true_dataset.select(range(fake_dataset_size))
-    #true_dataset["train"] = true_dataset["train"].select(range(fake_dataset_size))
-
     # create label = 0 for true responses and label = 1 for fake responses
     true_dataset = true_dataset.map(lambda x: {"label": 0})
-
-    # save dataset
-    #true_dataset.save_to_disk("true_dataset")
-
 
     # drop duplicates on instruction by transforming to pandas dataframe
     true_dataset_df = pd.DataFrame(true_dataset["train"])
@@ -83,180 +162,152 @@ def process_true_dataset(true_dataset, fake_dataset_size, seed=42):
 
     # transform back to dataset
     true_dataset = Dataset.from_pandas(true_dataset_df)
-
     true_dataset = create_train_from_dataset(true_dataset)
 
     return true_dataset
 
 
-def generate_fake_responses(generator, true_dataset, gen_tokenizer, max_new_tokens, batch_size=2, use_chat_template=False,
-                             template_type=None, load_from_cache=False, prompt=""):
+def generate_fake_responses(generator : LLMGenerator, true_dataset : Dataset, gen_tokenizer : AutoTokenizer,
+                            max_new_tokens : int, batch_size: int = 2, use_chat_template: bool = False,
+                             template_type: str = None, prompt: str = "") -> list:
     """
-    Traverse dataset and generate responses for each instruction
+    Traverse dataset and generate responses for each instruction.
+    
+    Parameters:
+    generator : LLMGenerator
+        The generator model
+    true_dataset : Dataset
+        The dataset of true samples
+    gen_tokenizer : AutoTokenizer
+        The tokenizer
+    max_new_tokens : int
+        The maximum number of tokens to generate
+    batch_size : int, optional
+        The batch size for generation, by default 2
+    use_chat_template : bool, optional
+        Whether to use the chat template, by default False
+    template_type : str, optional
+        The type of template to use, by default None
+    prompt : str, optional
+        The prompt to use for generation, by default ""
+    
+    Returns:
+    list
+        The list of fake responses
     """
-
-
+    
     fake_responses = []
 
-    # save to which instructions we have generated a reponse, use when loading from cache
+    # save to which instructions we have generated a reponse, used when loading from cache (old feature, not used anymore)
     instructions = []
-    if load_from_cache == "True":
-        fake_responses_with_pos = []
-        cache_dir = "./fake_responses_cache"
+    
+    # transform into chat template
+    def transform_chat_template(sample, use_chat_template=False):
 
-        if os.path.exists(cache_dir):
-            
-            # iterate over all files in the cache directory
-            for file in tqdm(os.listdir(cache_dir), desc="Loading fake responses from cache..."):
-                if file.endswith(".json"):
-                    # load the file
-                    with open(os.path.join(cache_dir, file), "r") as f:
-                        # interpret each line as a json object
-                        for line in f:
-                            # interpret the line as a json object
-                            fake_responses_with_pos.append(json.loads(line))
-        else:
-            raise ValueError("Cache directory does not exist")
-
-
-        # format: {"instruction": "instruction", "response": "response", "posistion": "position"}
-        #fake_responses_with_pos = [(f"{x["instruction"]} {x["response"]}", x["position"]) for x in fake_responses_with_pos]
-        
-        print("len before: ", len(fake_responses_with_pos))
-        # remove duplicates in instruction
-        fake_responses_with_pos_unique = []
-        for x in fake_responses_with_pos:
-            # check if there exists an element with same instruction
-            if not any(d["instruction"] == x["instruction"] for d in fake_responses_with_pos_unique):
-                fake_responses_with_pos_unique.append(x)
-        fake_responses_with_pos_unique = [(f"{x["response"]}", x["position"], x["instruction"]) for x in fake_responses_with_pos_unique]
-        print("len after: ", len(fake_responses_with_pos_unique))
-
-        # fake_responses_with pos is of the format [(response_1, pos_1), (response_2, pos_2), ...]
-        # we need to sort the list by pos
-        fake_responses_with_pos_unique = sorted(fake_responses_with_pos_unique, key=lambda x: x[1])
-        fake_responses = [x[0] for x in fake_responses_with_pos_unique]
-
-        instructions = [x[2] for x in fake_responses_with_pos_unique]
-            
-    else:
-        # batch generation
-        batch_size = batch_size
-        # transform into chat template
-        def transform_chat_template(sample, use_chat_template=False):
-
-            if use_chat_template:
-                if sample["context"] != "":
-                    text_instruction = f"Context: {sample['context']} \n {prompt} {sample['instruction']}"
-                else:
-                    text_instruction = f"{prompt} {sample['instruction']}"
-                
-                match template_type:
-                    case "system_user":
-                        messages = [
-                        {"role": "system", "content": "You are a helpful assistant."},
-                        {"role": "user", "content": f"{text_instruction}"},
-                        ]
-                    case "user":
-                        messages = [
-                        {"role": "user", "content": f"{text_instruction}"},
-                        ]
-                    case _:
-                        raise ValueError("Template type not supported")
-
-                text_template = gen_tokenizer.apply_chat_template(
-                    messages,
-                    tokenize=False,
-                    add_generation_prompt=True
-                )
-
-                # force prefix on the generated response
-                text_template = f"{text_template}\n{sample["instruction"]}"
+        if use_chat_template:
+            if sample["context"] != "":
+                text_instruction = f"Context: {sample['context']} \n {prompt} {sample['instruction']}"
             else:
-                text_instruction = f"{prompt} {sample["instruction"]}"
-                text_template = text_instruction
-            return {"text_template": text_template}
-        
-        true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
-        true_dataset_list = true_dataset["text_template"]
-        
-        for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
-            batch = true_dataset_list[i:i+batch_size]
-            responses = generator(batch, max_new_tokens=max_new_tokens)
-            fake_responses.extend(responses)
+                text_instruction = f"{prompt} {sample['instruction']}"
+            
+            match template_type:
+                case "system_user":
+                    messages = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": f"{text_instruction}"},
+                    ]
+                case "user":
+                    messages = [
+                    {"role": "user", "content": f"{text_instruction}"},
+                    ]
+                case _:
+                    raise ValueError("Template type not supported")
+
+            text_template = gen_tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+
+            # force prefix on the generated response
+            text_template = f"{text_template}\n{sample["instruction"]}"
+        else:
+            text_instruction = f"{prompt} {sample["instruction"]}"
+            text_template = text_instruction
+        return {"text_template": text_template}
+    
+    true_dataset = true_dataset.map(lambda x: transform_chat_template(x, use_chat_template=use_chat_template))
+    true_dataset_list = true_dataset["text_template"]
+    
+    for i in tqdm(range(0, len(true_dataset_list), batch_size), desc="Generating fake responses"):
+        batch = true_dataset_list[i:i+batch_size]
+        responses = generator(batch, max_new_tokens=max_new_tokens)
+        fake_responses.extend(responses)
 
     return fake_responses, instructions
 
-def filter_instruction(sample):
+def filter_instruction(sample: dict):
     """
     Filter out the instruction from the generated response
     Note: only works if special tokens are not removed
-    """
-    """
-    text_instruction = f"Context: {sample['context']} \n {sample['instruction']}"
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": f"{text_instruction}"},
-    ]
-    text_template = gen_tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True
-    )
     
-    generated_response = sample["generated_response"]
-
-    response_without_instruction = generated_response.replace(text_template, "")
-
+    Parameters:
+    sample : dict
+        The sample to filter
+        
+    Returns:
+    dict
+        The sample with the instruction removed
     """
-    def remove_string_between(str, str_beg, str_end):
-        return str.split(str_beg)[0] + str_end + str.split(str_end)[1]
-
+    
     # removing everything between system and user (including system and user)
-    """
-    str_beg = "system"
-    str_end = "assistant"
-    response_without_instruction = remove_string_between(sample["generated_response"], str_beg, str_end).strip()
     response_without_instruction = sample["generated_response"]
-    """
-
-    response_without_instruction = sample["generated_response"]
-    # remove newline characters
-    #response_without_instruction = response_without_instruction.replace("\n", " ")
 
     # replace any number of newlines with a " "
     response_without_instruction = " ".join(response_without_instruction.split())
 
     return {"generated_response": response_without_instruction}
 
-def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokenizer, max_nb_tokens_input=100,
-                           max_new_tokens=100, seed=42, batch_size=2, use_chat_template=False, template_type=None, load_from_cache=False, prompt=""):
+def generate_fake_dataset(true_dataset : DatasetDict, generator : LLMGenerator, gen_tokenizer: AutoTokenizer, max_nb_tokens_input: int = 100,
+                           max_new_tokens: int = 100, batch_size: int = 2, use_chat_template: bool = False, template_type: str = None, prompt="") -> DatasetDict:
+    """
+    Generate a fake dataset from a true dataset by creating instructions from the true dataset and generating fake responses.
+    
+    Parameters:
+    true_dataset : DatasetDict
+        The dataset of true samples
+    generator : LLMGenerator
+        The generator model
+    gen_tokenizer : AutoTokenizer
+        The tokenizer
+    max_nb_tokens_input : int, optional
+        The maximum number of tokens for the input, by default 100
+    max_new_tokens : int, optional
+        The maximum number of tokens to generate, by default 100
+    batch_size : int, optional
+        The batch size for generation, by default 2
+    use_chat_template : bool, optional
+        Whether to use the chat template, by default False
+    template_type : str, optional
+        The type of chat template to use, by default None
+    prompt : str, optional
+        The prompt to use for generation, by default ""
+        
+    Returns:
+    DatasetDict
+        The fake dataset
+    """
+        
     
     # discard instructions that are more than max_nb_tokens_input tokens
     max_nb_tokens_input = max_nb_tokens_input
-
-    #ids = true_dataset["train"]["id"]
-
-    # tokenize the instructions
-    #true_dataset = true_dataset.map(lambda x: {"tokenized_instruction": gen_tokenizer(x["instruction"])})
-    #true_dataset = true_dataset.map(lambda x: {"tokenized_context": gen_tokenizer(x["context"])})
-    #dataset_before_len = len(true_dataset["train"])
-    #true_dataset = true_dataset.filter(lambda x: len(x["tokenized_instruction"]["input_ids"]) + len(x["tokenized_context"]["input_ids"]) <= max_nb_tokens_input)
-    #dataset_after_len = len(true_dataset["train"])
-    #print(f"Percent of data discarded after filtering out input > max_nb_tokens: {100*(1 - dataset_after_len/dataset_before_len):.2f}%")
-
-    #subset_size = fake_dataset_size
-    #train_subset = create_random_subset(true_dataset["train"], n=subset_size, seed=seed)
-    #train_subset = true_dataset["train"].select(range(subset_size))
     train_subset = true_dataset["train"]
     
-    fake_responses_train, instructions = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=load_from_cache, prompt=prompt)
+    fake_responses_train, instructions = generate_fake_responses(generator, train_subset, gen_tokenizer, max_new_tokens=max_new_tokens, batch_size=batch_size, use_chat_template=use_chat_template, template_type=template_type, prompt=prompt)
 
     print("len fake_responses_train: ", len(fake_responses_train))
     if instructions:
-        print("len before: ", len(train_subset))
         train_subset = train_subset.filter(lambda x: x["instruction"] in instructions)
-        print("len after: ", len(train_subset))
 
     fake_responses_train = Dataset.from_dict({"generated_response": fake_responses_train, "instruction": train_subset["instruction"],
                     "context": train_subset["context"], "true_response": train_subset["text"], "id": train_subset["id"]})
@@ -287,48 +338,75 @@ def generate_fake_dataset(true_dataset, fake_dataset_size, generator, gen_tokeni
 
     return fake_dataset
 
-def process_fake_dataset(fake_dataset, gen_tokenizer, max_response_length=-1):
+def process_fake_dataset(fake_dataset: Dataset) -> Dataset:
+    """
+    Process the fake dataset by creating the necessary columns and selecting a size according to
+    the true dataset size.
+    
+    Parameters:
+    fake_dataset : Dataset
+        The dataset of fake samples
+        
+    Returns:
+    Dataset
+        The processed fake dataset
+    """
 
     # filter out instruction from generated_response
     fake_dataset = fake_dataset.map(lambda x: filter_instruction(x))
 
+    # only select the fake samples
     fake_dataset = fake_dataset.map(lambda x: {"label": 1})
 
     # remove true_response from fake_dataset
     fake_dataset = fake_dataset.remove_columns(["true_response"])
 
-    # rename generated_response to response
+    # rename and select columns
     fake_dataset = fake_dataset.rename_column("generated_response", "text")
     fake_dataset = fake_dataset.select_columns(["text", "label", "instruction", "context", "id"])
 
-
-    ## cut responses to max_response_length characters
-    #if max_response_length > 0:
-    #    fake_dataset = fake_dataset.map(lambda x: {"text": x["text"][:max_response_length]})
-
     return fake_dataset
 
-def merge_true_fake_dataset(true_dataset, fake_dataset, seed=42):
+def merge_true_fake_dataset(true_dataset: DatasetDict, fake_dataset: DatasetDict) -> DatasetDict:
+    """
+    Merge the true and fake datasets
+    
+    Parameters:
+    true_dataset : DatasetDict
+        The true dataset
+        
+    fake_dataset : DatasetDict
+        The fake dataset
+    
+    Returns:
+    DatasetDict
+        The merged dataset
+    """
     
     merged = concatenate_datasets([true_dataset["train"], fake_dataset["train"]])
     merged_dataset = DatasetDict()
     merged_dataset["train"] = merged
 
-    # shuffle the dataset
-    #merged_dataset = merged_dataset.shuffle(seed=seed)
-
-    # save merged dataset
-    #merged_dataset.save_to_disk("merged_dataset")
-
     return merged_dataset
-def regroup_pairs(merged_dataset, seed=42):
+def regroup_pairs(merged_dataset: DatasetDict, seed: int = 42) -> DatasetDict:
     """
-    Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split
+    Regroup pairs of true and fake responses two by two so that they are in the same batch and in the same split.
+    
+    Parameters:
+    merged_dataset : DatasetDict
+        The merged dataset
+    seed : int, optional
+        The seed for the random number generator, by default 42
+        
+    Returns:
+    DatasetDict
+        The regrouped dataset
+    
     """
 
     def fix_ids(dataset):
         """
-        Fix the ids of the dataset
+        Fix the ids of the dataset so that the samples with same instruction have the same id
         """
         fake_responses_dataset = dataset.filter(lambda x: x["label"] == 1)["train"]
         true_responses_dataset = dataset.filter(lambda x: x["label"] == 0)["train"]
@@ -348,7 +426,6 @@ def regroup_pairs(merged_dataset, seed=42):
 
             for j, _ in enumerate(true_responses_text):
                 if " ".join(true_responses_text[j].split()[:10]) == prefix:
-                    #correct_ids_fake_dataset.append(true_reponses_labels[i])
                     correct_text_ordering_true.append(j)
                     correct_text_ordering_fake.append(i)
                     break   
@@ -382,15 +459,27 @@ def regroup_pairs(merged_dataset, seed=42):
 
     # remove id column
     merged_dataset = merged_dataset.remove_columns(["id"])
-    #merged_dataset = create_train_from_dataset(merged_dataset)
     print("merged_dataset: ", merged_dataset)
 
     return merged_dataset
 
 
-def split_merged_dataset_random(merged_dataset, eval_size=0.1, test_size=0.1):
+def split_merged_dataset_random(merged_dataset: DatasetDict, eval_size: float = 0.1, test_size: float = 0.1) -> DatasetDict:
     """
-    from https://discuss.huggingface.co/t/how-to-split-main-dataset-into-train-dev-test-as-datasetdict/1090/6
+    Create a train, eval, test split from the merged dataset
+    taken from https://discuss.huggingface.co/t/how-to-split-main-dataset-into-train-dev-test-as-datasetdict/1090/6
+    
+    Parameters:
+    merged_dataset : DatasetDict
+        The merged dataset
+    eval_size : float, optional
+        The size of the evaluation set, by default 0.1
+    test_size : float, optional
+        The size of the test set, by default 0.1
+        
+    Returns:
+    DatasetDict
+        The split dataset
     """
 
     merged_dataset_train_test_valid = merged_dataset["train"].train_test_split(test_size=test_size + eval_size)
@@ -408,9 +497,21 @@ def split_merged_dataset_random(merged_dataset, eval_size=0.1, test_size=0.1):
 
     return merged_dataset
 
-def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
+def split_merged_dataset(merged_dataset: DatasetDict, eval_size: float = 0.1, test_size: float = 0.1) -> DatasetDict:
     """
-    Same as above, but assumes that the dataset is already shuffled
+    Same as above, but assumes that the dataset is already shuffled.
+    
+    Parameters:
+    merged_dataset : DatasetDict
+        The merged dataset
+    eval_size : float, optional
+        The size of the evaluation set, by default 0.1
+    test_size : float, optional
+        The size of the test set, by default 0.1
+        
+    Returns:
+    DatasetDict
+        The split dataset
     """
 
     train_size = len(merged_dataset["train"])
@@ -428,7 +529,20 @@ def split_merged_dataset(merged_dataset, eval_size=0.1, test_size=0.1):
 
     return merged_dataset
 
-def balance_dataset(dataset, create_train=True):
+def balance_dataset(dataset: Dataset, create_train: bool = True) -> DatasetDict:
+    """
+    Rebalance the dataset so that the number of samples with label 0 and 1 are the same.
+    
+    Parameters:
+    dataset : Dataset
+        The dataset to balance
+    create_train : bool, optional
+        Whether to create a train split, by default True
+        
+    Returns:
+    DatasetDict
+        The balanced dataset
+    """
     label_0 = dataset.filter(lambda x: x["label"] == 0)
     label_1 = dataset.filter(lambda x: x["label"] == 1)
     nb_label_0 = len(label_0["text"])
@@ -446,24 +560,24 @@ def balance_dataset(dataset, create_train=True):
     
     return merged_dataset
 
-def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_length_char=500):
+def format_merged_dataset(merged_dataset: DatasetDict, max_repsonse_length_char : int = 500) -> DatasetDict:
     """
     Format the text into a template.
+    
+    Parameters:
+    merged_dataset : DatasetDict
+        The merged dataset
+    max_repsonse_length_char : int, optional
+        The maximum length of the response in characters, by default 500
+    
+    Returns:
+    DatasetDict
+        The formatted dataset
     """
 
     def format_text(sample):
 
         text = sample["text"]
-        #if use_chat_template:
-        #    #modified_text = f"Instruction: {sample['context']} \n {sample['instruction']} \n Answer: {text}"
-        #    if sample["label"] == 0:
-        #        modified_text = sample["context"] + "" + sample["instruction"] + " " + text
-        #    elif sample["label"] == 1:
-        #        modified_text = text
-        #    else:
-        #        raise ValueError("Label not supported")
-        #
-        #else:
         if sample["label"] == 0:
             modified_text = sample["context"] + "" + sample["instruction"] + " " + text
         elif sample["label"] == 1:
@@ -495,7 +609,7 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
 
         merged_dataset = balance_dataset(merged_dataset["train"], create_train=True)
 
-
+        # check the balancing again
         nb_label_0 = len(merged_dataset.filter(lambda x: x["label"] == 0)["train"]["text"])
         nb_label_1 = len(merged_dataset.filter(lambda x: x["label"] == 1)["train"]["text"])
 
@@ -507,43 +621,6 @@ def format_merged_dataset(merged_dataset, use_chat_template=False, max_repsonse_
 
     return merged_dataset
 
-def format_news_dataset(true_dataset, prefix_cutoff=20, max_response_length_char=500):
-
-    def remove_bloat(sample):
-        filtered_text = sample["article"]
-        nb_separator = filtered_text.count("--")
-        if nb_separator > 0:
-            filtered_text = filtered_text.split("--", 1)[1].strip()
-
-        # heurstic to handle cases where the instruction contains an input of this type:
-        # By . Jill Reilly . PUBLISHED: . 08:21 EST, 6 December 2012 . | . UPDATED: . 16:19 EST, 6
-        if "EST," in filtered_text.split():
-            split_est = filtered_text.split("EST,")
-            count_est = len(split_est)
-            filtered_text = split_est[count_est-1].split()[4:]
-            filtered_text = " ".join(filtered_text)
-        return {"article": filtered_text}
-
-    def format_news(sample):
-        
-        sample["instruction"] = " ".join(sample["article"].split()[:prefix_cutoff])
-        sample["context"] = ""
-        sample["response"] = " ".join(sample["article"].split()[prefix_cutoff:])
-        # cut response to max_response_length_char, even if it cuts a word
-        sample["response"] = sample["response"][:max_response_length_char]
-        sample["category"] = "news"
-        return sample
-
-    
-    true_dataset = true_dataset.map(remove_bloat)
-    true_dataset = true_dataset.map(format_news)
-    true_dataset = true_dataset.remove_columns(["article"])
-    true_dataset = true_dataset.remove_columns(["highlights"])
-
-    # keep id column
-
-    true_dataset = DatasetDict({"train": true_dataset})
-    return true_dataset
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -562,7 +639,6 @@ if __name__ == "__main__":
     parser.add_argument("--access_token", type=str, help="Huggingface access token used for Llama and Gemma", default="")
     parser.add_argument("--max_response_length", type=int, help="Max length of the response in characters", default=500)
     parser.add_argument("--prefix_cutoff", type=int, help="Number of words to keep in the instruction", default=10)
-    parser.add_argument("--load_from_cache", type=str, help="Load mutiple datasets chunk from cache", default="False")
     parser.add_argument("--prompt", type=str, help="Prompt to use for generation, placed before the prefix", default="")
     parser.add_argument("--repetition_penalty", type=float, help="Controls repetition penalty parameter of generation", default=1.0)
     parser.add_argument("--temperature", type=float, help="Controls temperature parameter of generation", default=0.8)
@@ -604,11 +680,9 @@ if __name__ == "__main__":
         true_dataset = load_dataset(args.true_dataset_path)
 
     elif args.true_dataset_path == 'cnn_dailymail':
+        
         # load true dataset from disk
         true_dataset = load_dataset(args.true_dataset_path, "3.0.0")["train"]
-
-        # only keep number of samples in true dataset according to fake_dataset_size
-        #true_dataset = true_dataset.shuffle(seed=args.seed)
 
         if 2 * args.fake_dataset_size < len(true_dataset):
             # make the dataset smaller in most cases to speed up the processing
@@ -628,15 +702,11 @@ if __name__ == "__main__":
     true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
 
     # generate fake dataset
-    #fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed, args.batch_size, use_chat_template=use_chat_template, template_type=template_type)
     fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
-                                          args.batch_size, use_chat_template=use_chat_template, template_type=template_type, load_from_cache=args.load_from_cache, prompt=args.prompt)
-    
-    #true_dataset.save_to_disk(f"true_dataset_{args.experiment_name}")
+                                          args.batch_size, use_chat_template=use_chat_template, template_type=template_type, prompt=args.prompt)
 
     # process fake dataset
     fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer, args.max_response_length)
-    #fake_dataset.save_to_disk(f"fake_dataset_{args.experiment_name}")
 
     # merge true and fake dataset
     merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset, args.seed)
@@ -646,10 +716,6 @@ if __name__ == "__main__":
 
     # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
     merged_dataset = regroup_pairs(merged_dataset)
-
-    # balance the dataset again
-    #merged_dataset = balance_dataset(merged_dataset["train"], create_train=True)
-
 
     nb_label_0 = len(merged_dataset["train"].filter(lambda x: x["label"] == 0)["text"])
     nb_label_1 = len(merged_dataset["train"].filter(lambda x: x["label"] == 1)["text"])
