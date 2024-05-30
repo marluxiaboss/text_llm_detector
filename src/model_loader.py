@@ -2,9 +2,33 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from generator import LLMGenerator
 
-def load_generator(model_name: str, device: str, access_token=None, temperature=0.8, repetition_penalty=1.0, top_p=0.95, top_k=50, checkpoint_path=None):
+def load_generator(model_name: str, device: str, access_token: str = None, temperature: float = 0.8,
+                   repetition_penalty: float = 1.0, top_p: float = 0.95, top_k: int = 50, checkpoint_path: str = None) -> LLMGenerator:
     """
-    Load the generator model and tokenizer
+    Load the specifed generator model and tokenizer
+    
+    Parameters
+    model_name: str
+        Name of the model to load among ["qwen_chat", "qwen_0.5b", "gpt2", "gemma_2b_chat", "gemma_2b", "phi", "mistral", "zephyr", "llama3_instruct", "phi_news"]
+    device: str
+        Device to load the model on
+    access_token: str, optional
+        Access token required for loading some models, by default None
+    temperature: float, optional
+        Temperature for generation, by default 0.8
+    repetition_penalty: float, optional
+        Repetition penalty for generation, by default 1.0
+    top_p: float, optional
+        Top p for generation, by default 0.95
+    top_k: int, optional
+        Top k for generation, by default 50
+    checkpoint_path: str, optional
+        Path to the checkpoint, by default None
+        
+    Returns
+    LLMGenerator
+        The loaded generator model
+        
     """
     
     # set generation parameters
@@ -62,6 +86,7 @@ def load_generator(model_name: str, device: str, access_token=None, temperature=
         #template for chat
         use_chat_template = False
         template_type = None
+        
     elif model_name == "gemma_2b_chat":
         gen_path = "google/gemma-2b-it"
         gen_model = AutoModelForCausalLM.from_pretrained(gen_path,  token=access_token, torch_dtype=torch.bfloat16).to(device)

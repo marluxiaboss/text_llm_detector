@@ -43,8 +43,7 @@ class DetectorTrainer:
     def __init__(self):
         pass
     
-    ### GENERAL METHODS ###
-
+    ### GENERAL METHODS (Builder pattern) ###
 
     def set_dataset(self, dataset_path, take_samples=-1, evaluation_mode=False):
     
