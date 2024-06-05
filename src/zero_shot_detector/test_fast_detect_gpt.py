@@ -270,7 +270,6 @@ def run(args):
     roc_auc = roc_auc_score(labels, probs)
     print(f'ROC AUC: {roc_auc * 100:.2f}%')
 
-
     results = compute_bootstrap_metrics(preds, labels)
 
     # create folder for the experiment
@@ -356,7 +355,6 @@ def predict_on_dataset(dataset):
     # calculate roc auc score
     probs = np.array(probs)
     
-
     return preds, labels
     
 

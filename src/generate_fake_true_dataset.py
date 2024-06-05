@@ -699,20 +699,20 @@ if __name__ == "__main__":
         raise ValueError("Dataset not supported")
 
     # process true dataset
-    true_dataset = process_true_dataset(true_dataset, args.fake_dataset_size, args.seed)
+    true_dataset = process_true_dataset(true_dataset)
 
     # generate fake dataset
-    fake_dataset = generate_fake_dataset(true_dataset, args.fake_dataset_size, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens, args.seed,
+    fake_dataset = generate_fake_dataset(true_dataset, generator, gen_tokenizer, args.max_nb_tokens_input, args.max_new_tokens,
                                           args.batch_size, use_chat_template=use_chat_template, template_type=template_type, prompt=args.prompt)
 
     # process fake dataset
-    fake_dataset = process_fake_dataset(fake_dataset, gen_tokenizer, args.max_response_length)
+    fake_dataset = process_fake_dataset(fake_dataset)
 
     # merge true and fake dataset
-    merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset, args.seed)
+    merged_dataset = merge_true_fake_dataset(true_dataset, fake_dataset)
 
     # format merged dataset into a template
-    merged_dataset = format_merged_dataset(merged_dataset, use_chat_template, args.max_response_length)
+    merged_dataset = format_merged_dataset(merged_dataset, args.max_response_length)
 
     # group pairs of true and fake responses two by two so that they are in the same batch and in the same split
     merged_dataset = regroup_pairs(merged_dataset)
