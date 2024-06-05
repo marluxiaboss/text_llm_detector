@@ -19,7 +19,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.utils import resample
-from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve, det_curve
 
 
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict, concatenate_datasets
@@ -874,11 +874,12 @@ class DetectorTrainer:
             flip_labels = False
         else:
             flip_labels = self.flip_labels
-            
-        print("predictions", predictions)
-        fwefwef
-        roc_auc = roc_auc_score(predictions.label_ids, predictions)
-        fpr, tpr, thresholds = roc_curve(predictions.label_ids, predictions)
+        
+        predictions_pos_class = predictions.predictions[:, 1]
+        print("predidctions_pos_class", predictions_pos_class)
+        roc_auc = roc_auc_score(predictions.label_ids, predictions_pos_class)
+        fpr, tpr, thresholds = roc_curve(predictions.label_ids, predictions_pos_class)
+        
         results = compute_bootstrap_metrics(preds, predictions.label_ids, flip_labels=flip_labels)
         
         log.info("Test metrics:")
@@ -890,13 +891,13 @@ class DetectorTrainer:
         log.info(f"fpr: {fpr}")
         log.info(f"tpr: {tpr}")
         log.info(f"thresholds: {thresholds}")
+        
+        results["roc_auc"] = roc_auc
+        results["fpr_at_thresholds"] = fpr.tolist()
+        results["tpr_at_thresholds"] = tpr.tolist()
+        results["thresholds"] = thresholds.tolist()
             
         # save the results to a json file
         with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
             test_metrics_file.write(results)
-            test_metrics_file.write({"roc_auc": roc_auc})
-            test_metrics_file.write({"fpr": fpr.tolist()})
-            test_metrics_file.write({"tpr": tpr.tolist()})
-            test_metrics_file.write({"thresholds": thresholds.tolist()})
-
  
