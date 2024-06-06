@@ -117,6 +117,12 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000, flip_labels=False)
                         metric_results[i] = 0
                     else:
                         metric_results[i] = nb_false_positives_i / (nb_false_positives_i + nb_true_negatives_i)
+                        
+                case "tp_rate":
+                    if  (nb_true_positives_i + nb_false_negatives_i) == 0:
+                        metric_results[i] = 0
+                    else:
+                        metric_results[i] = nb_true_positives_i / (nb_true_positives_i + nb_false_negatives_i)
             
         avg_metrics[metric] = np.mean(metric_results)
         std_metrics[metric] = np.std(metric_results)
@@ -370,13 +376,16 @@ def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, d
     
 
 # plots for experiment 2
-def create_df_from_test_logs(training_method, trained_on_models, dataset_names):
+def create_df_from_test_logs(training_method, trained_on_models, dataset_names, use_eval_split=False):
 
     results = []
     for detector in trained_on_models.keys():
         for model_code, base_model in trained_on_models[detector].items():
             for dataset in dataset_names:
-                results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
+                if use_eval_split:
+                    results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/eval/eval_metrics_fake_true_dataset_{dataset}_10k.json"
+                else:
+                    results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
 
                 with open(results_path, "r") as f:
                     result_dict = json.load(f)

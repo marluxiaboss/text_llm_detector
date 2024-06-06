@@ -47,7 +47,7 @@ class DetectorTrainer:
     
     ### GENERAL METHODS (Builder pattern) ###
 
-    def set_dataset(self, dataset_path, take_samples=-1, evaluation_mode=False):
+    def set_dataset(self, dataset_path, take_samples=-1, evaluation_mode=False, use_eval_set=False):
     
         dataset = load_from_disk(dataset_path)
         if evaluation_mode == "False":
@@ -64,8 +64,15 @@ class DetectorTrainer:
                 dataset_test = dataset["test"].select(range(int(take_samples / 10)))
                 dataset = DatasetDict({"train": dataset_train, "valid": dataset_valid, "test": dataset_test})
         else:
-            dataset_test = dataset["test"]
-            dataset = DatasetDict({"test": dataset_test})
+            
+            if use_eval_set:
+                dataset_valid = dataset["valid"]
+                
+                # here we consider the valid set as the test set for simplicity
+                dataset = DatasetDict({"test": dataset_valid})
+            else:
+                dataset_test = dataset["test"]
+                dataset = DatasetDict({"test": dataset_test})
 
         self.dataset = dataset
         self.dataset_name = dataset_path.split("/")[-1]
@@ -402,8 +409,12 @@ class DetectorTrainer:
     
         dataset_name = self.dataset_name
 
-        with open(f"{log_path}/test/log_{dataset_name}.txt", "w") as f:
-            f.write("")
+        #with open(f"{log_path}/test/log_{dataset_name}.txt", "w") as f:
+        #    f.write("")
+        
+        # check if test folder exists
+        if not os.path.isdir(f"{log_path}/test"):
+            os.makedirs(f"{log_path}/test")
 
         log = create_logger(__name__, silent=False, to_disk=True,
                                     log_file=f"{log_path}/test/log_{dataset_name}.txt")
@@ -859,6 +870,8 @@ class DetectorTrainer:
             predictions = np.argmax(logits, axis=-1)
             return metric.compute(predictions=predictions, references=labels)
 
+        test_dataset = dataset["test"]
+            
         # load trainer
         trainer = Trainer(
             model=model,
@@ -867,7 +880,7 @@ class DetectorTrainer:
                 output_dir=f"{experiment_path}/test",
             ),
             compute_metrics=compute_metrics,
-            eval_dataset=dataset["test"]
+            eval_dataset=test_dataset
         )
         
         log.info(f"Evaluating the best model on the test set of dataset {dataset_path}...")
@@ -921,7 +934,12 @@ class DetectorTrainer:
         #    test_metrics_file.write(results)
         
         if use_eval_set:
+            
+            if not os.path.isdir(f"{experiment_path}/eval"):
+                os.makedirs(f"{experiment_path}/eval")
+            
             json.dump(results, open(f"{experiment_path}/eval/eval_metrics_{dataset_name}.json", "w"), indent=4)
+            
         else:
             json.dump(results, open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w"), indent=4)
  
