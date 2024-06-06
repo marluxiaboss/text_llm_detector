@@ -30,6 +30,7 @@ import argparse
 import sys
 import adapters
 import jsonlines
+import json
 
 from datetime import datetime
 
@@ -205,6 +206,9 @@ class DetectorTrainer:
     def add_more_layers(self):
         LLMDetector.add_more_layers(self.detector)
         self.add_more_layers = True
+        
+    def set_classifier_threshold(self, threshold):
+        self.classifier_threshold = threshold
 
     
     ### METHODS FOR SETTING TRAINING PARAMTERS ###
@@ -833,7 +837,7 @@ class DetectorTrainer:
             for log in combined_logs:
                 combined_logs_file.write(log)
 
-    def test(self):
+    def test(self, use_eval_set=False):
 
         model = self.detector
         batch_size = self.batch_size
@@ -896,8 +900,28 @@ class DetectorTrainer:
         results["fpr_at_thresholds"] = fpr.tolist()
         results["tpr_at_thresholds"] = tpr.tolist()
         results["thresholds"] = thresholds.tolist()
+        
+        
+        if self.classifier_threshold is not None:
+            preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 1, 0)
+            
+            results_at_threshold = compute_bootstrap_metrics(preds_at_threshold, predictions.label_ids, flip_labels=flip_labels)
+            log.info("Test metrics at specific given threshold:")
+            
+            for key, value in results_at_threshold.items():
+                log.info(f"{key}: {value}")
+                
+            # add them to results dict as f"{key}_at_given_threshold"
+            results["given_threshold"] = self.classifier_threshold
+            for key, value in results_at_threshold.items():
+                results[f"{key}_at_given_threshold"] = value
             
         # save the results to a json file
-        with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
-            test_metrics_file.write(results)
+        #with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
+        #    test_metrics_file.write(results)
+        
+        if use_eval_set:
+            json.dump(results, open(f"{experiment_path}/eval/eval_metrics_{dataset_name}.json", "w"), indent=4)
+        else:
+            json.dump(results, open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w"), indent=4)
  

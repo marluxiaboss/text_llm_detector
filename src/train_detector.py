@@ -73,7 +73,9 @@ if __name__ == "__main__":
     parser.add_argument("--stop_after_n_samples", type=int, help="Stop training after n samples", default=-1)
     parser.add_argument("--stop_on_perfect_acc", type=str, help="Whether to stop training when the model reaches 99.9% accuracy", default="False")
     parser.add_argument("--stop_on_loss_plateau", help="Whether to stop the training when the eval loss plateaus", default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument("--classifier_threshold", type=float, help="Threshold for the classifier", default=None)
     parser.add_argument("--experiment_path", type=str, help="Path to the experiment folder", default="")
+    parser.add_argument("--use_eval_set", action=argparse.BooleanOptionalAction, help="Whether to use the eval set for training", default=False)
     args = parser.parse_args()
 
     # builder for training
@@ -166,8 +168,11 @@ if __name__ == "__main__":
 
         # create log file
         detector_trainer.create_test_logger(log_path=experiment_path)
+        
+        # set a threshold for classification if provided
+        detector_trainer.set_classifier_threshold(args.classifier_threshold)
 
-        detector_trainer.test()
+        detector_trainer.test(args.use_eval_set)
     else:
         raise ValueError("Evaluation mode must be either True or False")
 
