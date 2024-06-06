@@ -71,7 +71,7 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000, flip_labels=False)
         nb_true_positives[i] = np.sum((data[bootstrap_sample] == 1) & (labels[bootstrap_sample] == 1))
         nb_true_negatives[i] = np.sum((data[bootstrap_sample] == 0) & (labels[bootstrap_sample] == 0))
     
-    metrics = ["accuracy", "precision", "recall", "f1_score", "fp_rate"]
+    metrics = ["accuracy", "precision", "recall", "f1_score", "fp_rate", "tp_rate"]
     avg_metrics = {}
     std_metrics = {}
     for metric in metrics:

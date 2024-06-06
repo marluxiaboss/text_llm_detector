@@ -893,7 +893,6 @@ class DetectorTrainer:
             flip_labels = self.flip_labels
         
         predictions_pos_class = predictions.predictions[:, 1]
-        print("predidctions_pos_class", predictions_pos_class)
         roc_auc = roc_auc_score(predictions.label_ids, predictions_pos_class)
         fpr, tpr, thresholds = roc_curve(predictions.label_ids, predictions_pos_class)
         
@@ -913,7 +912,6 @@ class DetectorTrainer:
         results["fpr_at_thresholds"] = fpr.tolist()
         results["tpr_at_thresholds"] = tpr.tolist()
         results["thresholds"] = thresholds.tolist()
-        
         
         if self.classifier_threshold is not None:
             preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 1, 0)

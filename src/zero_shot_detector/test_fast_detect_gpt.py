@@ -18,7 +18,7 @@ import jsonlines
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_from_disk
 from torch.utils.data import DataLoader
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, roc_curve
 
 
 from tqdm import tqdm
@@ -173,11 +173,14 @@ class ProbEstimator:
         return cnt_fake / (cnt_real + cnt_fake)
 
 
-def load_test_dataset(dataset_path):
+def load_test_dataset(dataset_path, use_eval_set=False):
 
     dataset = load_from_disk(dataset_path)
     try:
-        dataset_test = dataset["test"]
+        if use_eval_set:
+            dataset_test = dataset["valid"]
+        else:
+            dataset_test = dataset["test"]
     except KeyError:
         dataset_test = dataset
 
@@ -219,7 +222,7 @@ def run(args):
     criterion_fn = get_sampling_discrepancy_analytic
     prob_estimator = ProbEstimator(args)
 
-    dataset = load_test_dataset(args.dataset_path)
+    dataset = load_test_dataset(args.dataset_path, args.use_eval_set)
 
     # maybe need to tokenize the dataset twice, once for each tokenizer
     if args.reference_model_name != args.scoring_model_name:
@@ -268,14 +271,46 @@ def run(args):
     # calculate roc auc score
     probs = np.array(probs)
     roc_auc = roc_auc_score(labels, probs)
-    print(f'ROC AUC: {roc_auc * 100:.2f}%')
+    
+    fpr, tpr, thresholds = roc_curve(labels, probs)
 
     results = compute_bootstrap_metrics(preds, labels)
+    
+    print("Test metrics:")
+    for key, value in results.items():
+        print(f"{key}: {value}")
+    print(f'ROC AUC: {roc_auc * 100:.2f}%')
+    print(f"fpr: {fpr}")
+    print(f"tpr: {tpr}")
+    print(f"thresholds: {thresholds}")
+    
+    results["roc_auc"] = roc_auc
+    results["fpr"] = fpr.tolist()
+    results["tpr"] = tpr.tolist()
+    results["thresholds"] = thresholds.tolist()
+    
+    if args.classifier_threshold is not None:
+        preds_at_threshold = np.array(probs > args.classifier_threshold, dtype=int)
+        results_at_threshold = compute_bootstrap_metrics(preds_at_threshold, labels)
+        print(f"Test metrics at threshold {args.classifier_threshold}:")
+        
+        for key, value in results_at_threshold.items():
+            print(f"{key}: {value}")
+        
+        results["given_threshold"] = args.classifier_threshold
+        for key, value in results_at_threshold.items():
+            results[f"{key}_at_given_threshold"] = value
 
-    # create folder for the experiment
-    os.makedirs(f"{experiment_path}/test", exist_ok=True)
-    with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
-        test_metrics_file.write(results)
+    if args.use_eval_set:
+        # create folder for the experiment
+        os.makedirs(f"{experiment_path}/eval", exist_ok=True)
+        with jsonlines.open(f"{experiment_path}/eval/eval_metrics_{dataset_name}.json", "w") as test_metrics_file:
+            test_metrics_file.write(results)
+    else:   
+        # create folder for the experiment
+        os.makedirs(f"{experiment_path}/test", exist_ok=True)
+        with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
+            test_metrics_file.write(results)
 
     # results for random prediction
     random_preds = np.random.randint(0, 2, len(labels))
@@ -367,6 +402,8 @@ if __name__ == '__main__':
     parser.add_argument('--ref_path', type=str, default="src/zero_shot_detector/local_infer_ref")
     parser.add_argument('--device', type=str, default="cuda")
     parser.add_argument('--cache_dir', type=str, default="../cache")
+    parser.add_argument("--classifier_threshold", type=float, default=None, help="Threshold for the classifier")
+    parser.add_argument("--use_eval_set", action=argparse.BooleanOptionalAction, help="Whether to use the eval set for training", default=False)
     args = parser.parse_args()
 
     run(args)
