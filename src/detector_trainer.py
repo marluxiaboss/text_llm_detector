@@ -931,13 +931,28 @@ class DetectorTrainer:
         #with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
         #    test_metrics_file.write(results)
         
+        
+        # define where to save the results
         if use_eval_set:
             
             if not os.path.isdir(f"{experiment_path}/eval"):
                 os.makedirs(f"{experiment_path}/eval")
             
-            json.dump(results, open(f"{experiment_path}/eval/eval_metrics_{dataset_name}.json", "w"), indent=4)
+            json_res_file_path = f"{experiment_path}/eval/eval_metrics_{dataset_name}.json"
             
         else:
-            json.dump(results, open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w"), indent=4)
+            if self.classifier_threshold is not None:
+                if not os.path.isdir(f"{experiment_path}/test_at_threshold"):
+                    os.makedirs(f"{experiment_path}/test_at_threshold")
+                    
+                json_res_file_path = f"{experiment_path}/test_at_threshold/test_metrics_{dataset_name}.json"
+                
+            else:
+                if not os.path.isdir(f"{experiment_path}/test"):
+                    os.makedirs(f"{experiment_path}/test")
+            
+                json_res_file_path = f"{experiment_path}/test/test_metrics_{dataset_name}.json"
+                
+        with open(json_res_file_path, "w") as f:
+            f.write(json.dumps(results, indent=4))
  
