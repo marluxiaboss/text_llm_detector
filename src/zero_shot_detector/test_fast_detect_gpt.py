@@ -270,9 +270,22 @@ def run(args):
     
     # calculate roc auc score
     probs = np.array(probs)
-    roc_auc = roc_auc_score(labels, probs)
     
-    fpr, tpr, thresholds = roc_curve(labels, probs)
+    nb_pos_labels = np.sum(labels)
+    nb_neg_labels = len(labels) - nb_pos_labels
+        
+    if nb_pos_labels == 0 or nb_neg_labels == 0:
+        print("Only one class detected, cannot compute ROC AUC")
+        roc_auc = 0
+        fpr = np.zeros(1)
+        tpr = np.zeros(1)
+        thresholds = np.zeros(1)
+        roc_auc = roc_auc_score(labels, probs)
+        fpr, tpr, thresholds = roc_curve(labels, probs)
+        
+    else:
+        roc_auc = roc_auc_score(labels, probs)
+        fpr, tpr, thresholds = roc_curve(labels, probs)
 
     results = compute_bootstrap_metrics(preds, labels)
     

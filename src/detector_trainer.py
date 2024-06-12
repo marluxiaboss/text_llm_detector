@@ -906,6 +906,9 @@ class DetectorTrainer:
         else:
             roc_auc = roc_auc_score(predictions.label_ids, predictions_pos_class)
             fpr, tpr, thresholds = roc_curve(predictions.label_ids, predictions_pos_class)
+            
+        if flip_labels:
+            fpr, tpr = 1 - fpr, 1 - tpr
         
         results = compute_bootstrap_metrics(preds, predictions.label_ids, flip_labels=flip_labels)
         
@@ -926,13 +929,11 @@ class DetectorTrainer:
         
         if self.classifier_threshold is not None:
             
-            if not flip_labels:
-                preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 1, 0)
+            #if flip_labels:
+            #    self.classifier_threshold = 1 - self.classifier_threshold
             
-            # special case for roberta_base_open_ai
-            else:
-                preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 0, 1)
-            
+            preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 1, 0)
+
             results_at_threshold = compute_bootstrap_metrics(preds_at_threshold, predictions.label_ids, flip_labels=flip_labels)
             log.info("Test metrics at specific given threshold:")
             

@@ -83,10 +83,10 @@ def compute_bootstrap_metrics(data, labels, n_bootstrap=1000, flip_labels=False)
             nb_true_negatives_i = nb_true_negatives[i]
             
             if flip_labels:
-                nb_false_positives_i = nb_true_negatives_i
-                nb_false_negatives_i = nb_true_positives_i
-                nb_true_positives_i = nb_false_positives_i
-                nb_true_negatives_i = nb_false_negatives_i
+                nb_false_positives_i = nb_false_negatives[i]
+                nb_false_negatives_i = nb_false_positives[i]
+                nb_true_positives_i = nb_true_negatives[i]
+                nb_true_negatives_i = nb_true_positives[i]
             
             # we need to test cases where the denominator is 0 because there might dataset with only 0 labels or 1 labels
             match metric:
