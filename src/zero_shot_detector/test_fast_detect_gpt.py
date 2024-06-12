@@ -285,8 +285,8 @@ def run(args):
     print(f"thresholds: {thresholds}")
     
     results["roc_auc"] = roc_auc
-    results["fpr"] = fpr.tolist()
-    results["tpr"] = tpr.tolist()
+    results["fpr_at_thresholds"] = fpr.tolist()
+    results["tpr_at_thresholds"] = tpr.tolist()
     results["thresholds"] = thresholds.tolist()
     
     if args.classifier_threshold is not None:
@@ -301,16 +301,29 @@ def run(args):
         for key, value in results_at_threshold.items():
             results[f"{key}_at_given_threshold"] = value
 
-    if args.use_eval_set:
-        # create folder for the experiment
-        os.makedirs(f"{experiment_path}/eval", exist_ok=True)
-        with jsonlines.open(f"{experiment_path}/eval/eval_metrics_{dataset_name}.json", "w") as test_metrics_file:
-            test_metrics_file.write(results)
-    else:   
-        # create folder for the experiment
-        os.makedirs(f"{experiment_path}/test", exist_ok=True)
-        with jsonlines.open(f"{experiment_path}/test/test_metrics_{dataset_name}.json", "w") as test_metrics_file:
-            test_metrics_file.write(results)
+        # define where to save the results
+        if args.use_eval_set:
+            
+            if not os.path.isdir(f"{experiment_path}/eval"):
+                os.makedirs(f"{experiment_path}/eval")
+            
+            json_res_file_path = f"{experiment_path}/eval/eval_metrics_{dataset_name}.json"
+            
+        else:
+            if args.classifier_threshold is not None:
+                if not os.path.isdir(f"{experiment_path}/test_at_threshold"):
+                    os.makedirs(f"{experiment_path}/test_at_threshold")
+                    
+                json_res_file_path = f"{experiment_path}/test_at_threshold/test_metrics_{dataset_name}.json"
+                
+            else:
+                if not os.path.isdir(f"{experiment_path}/test"):
+                    os.makedirs(f"{experiment_path}/test")
+            
+                json_res_file_path = f"{experiment_path}/test/test_metrics_{dataset_name}.json"
+                
+        with open(json_res_file_path, "w") as f:
+            f.write(json.dumps(results, indent=4))
 
     # results for random prediction
     random_preds = np.random.randint(0, 2, len(labels))

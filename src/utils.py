@@ -376,7 +376,7 @@ def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, d
     
 
 # plots for experiment 2
-def create_df_from_test_logs(training_method, trained_on_models, dataset_names, use_eval_split=False):
+def create_df_from_test_logs(training_method, trained_on_models, dataset_names, use_eval_split=False, use_test_at_threshold=False):
 
     results = []
     for detector in trained_on_models.keys():
@@ -385,7 +385,10 @@ def create_df_from_test_logs(training_method, trained_on_models, dataset_names, 
                 if use_eval_split:
                     results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/eval/eval_metrics_fake_true_dataset_{dataset}_10k.json"
                 else:
-                    results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
+                    if use_test_at_threshold:
+                        results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/test_at_threshold/test_metrics_fake_true_dataset_{dataset}_10k.json"
+                    else:   
+                        results_path = f"./saved_training_logs_experiment_2/{detector}/{training_method}/fake_true_dataset_{base_model}_10k/{model_code}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
 
                 with open(results_path, "r") as f:
                     result_dict = json.load(f)
@@ -433,13 +436,28 @@ def create_df_from_test_logs_modified(training_method, trained_on_models, datase
 
     return results_df
 
-def add_test_logs_to_results_df(results_df, test_logs_dict):
+def add_test_logs_to_results_df(results_df, test_logs_dict, use_timestamp=False, use_eval_split=False, use_test_at_threshold=False):
     results = []
     detector = list(test_logs_dict.keys())[0]
     results_dict = test_logs_dict[detector]
     for timestamp, dataset in results_dict.items():
-        results_path = f"./saved_training_logs_experiment_2/{detector}/{timestamp}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
-
+        if use_timestamp:
+            if use_eval_split:
+                results_path = f"./saved_training_logs_experiment_2/{detector}/{timestamp}/eval/eval_metrics_fake_true_dataset_{dataset}_10k.json"
+            else:
+                if use_test_at_threshold:
+                    results_path = f"./saved_training_logs_experiment_2/{detector}/{timestamp}/test_at_threshold/test_metrics_fake_true_dataset_{dataset}_10k.json"
+                else:
+                    results_path = f"./saved_training_logs_experiment_2/{detector}/{timestamp}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
+        else:
+            if use_eval_split:
+                results_path = f"./saved_training_logs_experiment_2/{detector}/eval/eval_metrics_fake_true_dataset_{dataset}_10k.json"
+            else:
+                if use_test_at_threshold:
+                    results_path = f"./saved_training_logs_experiment_2/{detector}/test_at_threshold/test_metrics_fake_true_dataset_{dataset}_10k.json"
+                else:   
+                    results_path = f"./saved_training_logs_experiment_2/{detector}/test/test_metrics_fake_true_dataset_{dataset}_10k.json"
+        
         with open(results_path, "r") as f:
             result_dict = json.load(f)
             result_dict["base_detector"] = detector
