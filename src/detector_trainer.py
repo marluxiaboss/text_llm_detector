@@ -893,8 +893,19 @@ class DetectorTrainer:
             flip_labels = self.flip_labels
         
         predictions_pos_class = predictions.predictions[:, 1]
-        roc_auc = roc_auc_score(predictions.label_ids, predictions_pos_class)
-        fpr, tpr, thresholds = roc_curve(predictions.label_ids, predictions_pos_class)
+        
+        nb_pos_labels = np.sum(predictions.label_ids)
+        nb_neg_labels = len(predictions.label_ids) - nb_pos_labels
+        
+        if nb_pos_labels == 0 or nb_neg_labels == 0:
+            log.info("Only one class in the dataset, cannot compute roc_auc")
+            roc_auc = 0
+            fpr = np.zeros(1)
+            tpr = np.zeros(1)
+            thresholds = np.zeros(1)
+        else:
+            roc_auc = roc_auc_score(predictions.label_ids, predictions_pos_class)
+            fpr, tpr, thresholds = roc_curve(predictions.label_ids, predictions_pos_class)
         
         results = compute_bootstrap_metrics(preds, predictions.label_ids, flip_labels=flip_labels)
         
@@ -914,7 +925,13 @@ class DetectorTrainer:
         results["thresholds"] = thresholds.tolist()
         
         if self.classifier_threshold is not None:
-            preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 1, 0)
+            
+            if not flip_labels:
+                preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 1, 0)
+            
+            # special case for roberta_base_open_ai
+            else:
+                preds_at_threshold = np.where(predictions.predictions[:, 1] > self.classifier_threshold, 0, 1)
             
             results_at_threshold = compute_bootstrap_metrics(preds_at_threshold, predictions.label_ids, flip_labels=flip_labels)
             log.info("Test metrics at specific given threshold:")
