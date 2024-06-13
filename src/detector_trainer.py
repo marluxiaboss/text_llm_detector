@@ -908,7 +908,12 @@ class DetectorTrainer:
             fpr, tpr, thresholds = roc_curve(predictions.label_ids, predictions_pos_class)
             
         if flip_labels:
-            fpr, tpr = 1 - fpr, 1 - tpr
+            labels_flipped = 1 - predictions.label_ids
+            preds_flipped = predictions.predictions[:, 0]
+            roc_auc = roc_auc_score(labels_flipped, preds_flipped)
+            fpr, tpr, thresholds = roc_curve(labels_flipped, preds_flipped)
+            
+        #    fpr, tpr = 1 - fpr, 1 - tpr
         
         results = compute_bootstrap_metrics(preds, predictions.label_ids, flip_labels=flip_labels)
         
