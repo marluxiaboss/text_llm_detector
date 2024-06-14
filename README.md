@@ -11,16 +11,28 @@
 <a name="file_structure"></a>
 
 ### 0. Model classes
-- `generator.py`: wrapper arround any LLM used to generate text from a prompt
-- `detector.py`: wrapper around any BERT type (bi-directional encoder) used to classify text as human or LLM generated
+- `src/generator.py`: wrapper arround any LLM used to generate text from a prompt
+- `src/detector.py`: wrapper around any BERT type (bi-directional encoder) used to classify text as human or LLM generated
+- `src/detector_trainer.py`: class for training and testing detectors (except Fast-DetectGPT)
+
+
 
 ### 1. Python scripts
-- `generate_fake_true_dataset.py`: takes an LLM and generate responses using prompts from a given dataset
-- `train_detector.py`: train a chosen detector on a dataset created by `generate_fake_true_dataset.py`, can also be used to test an already trained model
-- `utils.py`
-- `create_experiment_plots.py`: creates the plots using the training logs created by `train_detector.py`
+- `src/generate_fake_true_dataset.py`: takes an LLM and generate responses using prompts from a given dataset
+- `src/generate_round_robin_dataset.py`: used to generate the Round-Robin dataset from the other datasets
+- `src/generate_fake_true_dataset_adversarial`: used to generate the adversarial datasets to escape the detector
+- `src/format_out_of_domain_dataset.py`: used to format the Xsum dataset for testing the detectors on it
+- `src/train_detector.py`: train a chosen detector on a dataset created by `generate_fake_true_dataset.py`, can also be used to test an already trained model
+- `src/utils.py`
+- `src/zero_shot_detector/test_fast_detect_gpt.py`: script to test Fast-DetectGPT
 
-### 2. Training logs file structure
+### 2. Jupyter notebooks
+
+- `notebooks/main_paper_plots`: plots in the main part of the paper
+- `notebooks/appendix_plots`: plots in the appendix part of the paper
+- `notebooks/find_threshold`: used to find the appropriate thresholds for the target FPR
+
+### 3. Training logs file structure
 
 ```
 saved_training_logs  
@@ -48,8 +60,10 @@ saved_training_logs
 
 ```
 
-### 3. Datasets
-- `fake_true_datasets` folder contains all the generated datasets 
+### 4. Datasets
+- `fake_true_datasets`: folder containing all the generated datasets 
+- `fake_true_datasets/modifed_dataset` folder containing the adversarial version of the dataset above
+
 
 ## Reproducing the experiments and the plots
 
