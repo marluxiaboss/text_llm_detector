@@ -35,77 +35,69 @@ saved_training_logs
                 │   args_logs.txt (training arguments)
                 │   log.txt (terminal logs of the training)
                 │ 
-                └───plots (training plots)
-                │
+                └───eval
+                │   eval_metrics_{dataset_name}.json (metrics on eval set to find thresholds)
                 └───saved_models 
-                    best_model.pt (best model on eval set obtained during training)
+                │   best_model.pt (best model on eval set obtained during training)
                 │ 
                 └───test
-                    test_metrics_{dataset_name}.json (metrics on test set)
+                │   test_metrics_{dataset_name}.json (metrics on test set)
                 │ 
-                └───wandb
+                └───test_at_threshold
+                    test_metrics_{dataset_name}.json (metrics on test set with a specific threshold)
 
 ```
 
 ### 3. Datasets
-- `fake_true_datasets` folder contains all the datasets 
+- `fake_true_datasets` folder contains all the generated datasets 
 
-## Experiments
+## Reproducing the experiments and the plots
 
-### Experiment 1
-**Goal:** Test degradation of the base model using different training methods
-- Tested training methods: finetuning classification head only, finetuning adapter (PEFT method) and full finetuning
-- Tested models: RoBERTa-large and DistilRoBERTa-base
-- Dataset used: `fake_true_dataset_mistral_10k` (see below to create this dataset)
+We provide scripts to run the experiments and get the data. We also provide notebooks to use this data to produce the plots in the paper.
+We also provide the data we obtained when running the experiments and the generated dataset
 
-- Degradation is checked using Masked Language Model task on the following dataset: [Fact-Completion dataset](https://huggingface.co/datasets/Polyglot-or-Not/Fact-Completion?row=0)
+generated datasets: `fake_true_datasets`
+results data (main paper): `saved_training_logs_experiment_2`
+results data (degradation check in appendix): `saved_training_logs_experiment_1`
 
+### Main paper part
 
-**Steps to reproduce:**
-- Generate the datasets of fake and true samples by launching ...sh script, the script creates `fake_true_dataset_{dataset_name}_10k` for each dataset
-- launch `script_experiment1.sh` to launch the training with all the different models, the results are saved in `saved_training_logs` (see [file structure](#file-structure))
-- Use the json files `training_logs.json` to create the plots. (To update)
+#### Generate the data
+Run all scripts in: `script/generate_dataset`
 
+#### Training the models
+Run all scripts in: `scripts/experiment_1_training`
+Then you need to change the timestamps in the subsequent testing/threshold finding scripts according to the new trained models.
 
-### Experiment 2
-**Goal:** Test a detector trained on a specific dataset with another unseen dataset
-- Tested models: RoBERTa-large, DistilRoBERTa-base, ELECTRA-large, T5-3b
-- Tested training method: finetuning classification head only, finetuning adapter (PEFT method) and full finetuning
-- Datasets used: `fake_true_dataset_gpt2_10k`, `fake_true_dataset_gemma_10k`, `fake_true_dataset_phi_10k`, `fake_true_dataset_mistral_10k`
+#### Finding the thresholds
+Run: `scripts/experiment1/experiment_1_testing/test_with_threshold/slurm_script_find_thresholds_full_finetuning.sh`
+Run: `scripts/experiment2/test_with_threshold/slurm_script_find_thresholds.sh`
+Then run the cells in notebook: `notebooks/find_threshold.ipynb` and adjust the thresholds in the subsequent testing scripts.
 
-- Models are trained on their respective dataset with the corresponding method until they reach a degradation threshold (see experiment 1 above).
-- Create 2 table per training method: 1 table reporting the f1-score and another reporting the false postive rate (6 tables in total)
+#### Testing the detectors
+Run all scripts in: `scripts/experiment_1/test_with_threshold` with the correct thresholds modified in the script
+Run all scripts in: `scripts/experiment_2/test_with_threshold` with the correct thresholds modified in the script
 
-- Table 1: detectors trained with frozen base, f1 score
-                                            
-|                                              | generator_1 | generator_2 | generator_3 | ... | generator_1_FT_chat | 
-|----------------------------------------------|-------------|-------------|-------------|-----|---------------------|
-| detector_1_trained_on_gen1                   |             |             |             |     |                     |  
-| detector_1_trained_on_gen2                   |             |             |             |     |                     |  
-| detector_1_trained_on_gen3                   |             |             |             |     |                     |  
-| ...                                          |             |             |             |     |                     |  
-| detector_1_trained_on_gen1,2,3 (Round Robin) |             |             |             |     |                     |  
-| detector_2_trained_on_gen1                   |             |             |             |     |                     | 
-| ...                                          |             |             |             |     |                     | 
-| detector_3_trained_on_gen1                   |             |             |             |     |                     | 
-| ...                                          |             |             |             |     |                     | 
+#### Plots
+Run all cells in notebook: `notebooks/main_paper_plots.ipynb` with the correct timestamps for the results (see log file structure)
 
+### Appendix part
+You should run all scripts for the main paper part first.
+
+#### Degradation check
+Run all scripts in: `scripts/experiment_1/check_degradation`
+
+#### Plots 
+Run all cells in notebook: `notebooks/appendix_plot.ipynb`
 
 
 
-- Table 2: detectors trained with adapter method (PEFT), f1 score
-- Table 3: detectors trained with full finetuning, f1 score
-- repeat same with false positive rate...
-                                        
 
 
-### Experiment 3 
-TODO
-
-- Same but with prompting and paraphrasing to evade detectors 
 
 
 ## Datasets used
 
 - [CNN Dailymail Dataset](https://huggingface.co/datasets/cnn_dailymail?row=31) to create fake and true news samples
+- [Xsum Dataset](https://huggingface.co/datasets/EdinburghNLP/xsum) to test the detectors on another news dataset
 - [Fact completion](https://huggingface.co/datasets/Polyglot-or-Not/Fact-Completion?row=0) to test detector degradation
