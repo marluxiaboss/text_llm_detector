@@ -314,7 +314,7 @@ def plot_compared_model_size_eval_acc(eval_acc_df_distil_freeze_base, eval_acc_d
     plt.show()
 
 
-def plot_panel_model_and_training_method_eval_acc(eval_acc_df_distil_adapter, eval_acc_df_distil_full, eval_acc_df_large_adapter, eval_acc_df_large_full, save_path=None):
+def plot_panel_model_and_training_method_eval_acc(eval_acc_df_distil_adapter, eval_acc_df_distil_full, eval_acc_df_large_adapter, eval_acc_df_large_full, save=False):
     fig, ax = plt.subplots(1,2,figsize= (12,6), sharey = True, sharex = True)
 
     ### Adapter method ###
@@ -340,9 +340,12 @@ def plot_panel_model_and_training_method_eval_acc(eval_acc_df_distil_adapter, ev
     # show y ticks each 0.05
     ax[0].set_yticks(np.arange(0.5, 1, 0.05))
     ax[1].set_yticks(np.arange(0.5, 1, 0.05))
+    
+    if save:
+        plt.savefig("notebooks/plots/check_degradation_eval_loss.png")
 
 
-def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, degrad_loss_df_distil_full, degrad_loss_df_large_adapter, degrad_loss_df_large_full, save_path=None):
+def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, degrad_loss_df_distil_full, degrad_loss_df_large_adapter, degrad_loss_df_large_full, save=False):
     fig, ax = plt.subplots(1,2,figsize= (12,6), sharey = True, sharex = True)
 
     ### Adapter method ###
@@ -371,8 +374,8 @@ def plot_panel_model_and_training_method_degrad(degrad_loss_df_distil_adapter, d
     ax[1].axhline(y=10.5, color='r', linestyle='--')
     ax[1].text(0, 10.55, "random model baseline", color = 'red')
 
-    if save_path:
-        plt.savefig(f"{save_path}/degrad_loss_vs_nb_samples_panel.png")
+    if save:
+        plt.savefig("notebooks/plots/check_degradation.png")
     
 
 # plots for experiment 2
