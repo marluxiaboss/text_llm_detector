@@ -15,6 +15,21 @@ print_current_time () {
     echo $current_date_time;
 }
 
+# GENERATING ADVERSARIAL TEXT
+generators=("gemma_2b_chat" "zephyr" "llama3_instruct")
+
+for i in ${!generators[@]}; do
+
+    prompt=Continue to write this news article:
+    repetition_penalty=1.2
+    generator=${generators[$i]}
+    dataset_suffix="repetition_penalty_1.2_$generator"
+    print_current_time
+    echo "Generating dataset with $generator"
+    python src/generate_fake_true_dataset_adversarial.py --dataset_path=fake_true_datasets/fake_true_dataset_phi_10k  --dataset_name_suffix=$dataset_suffix --test_only --batch_size=2 --use_article_generator --prompt="$prompt" --article_generator=$generator --repetition_penalty=$repetition_penalty --take_samples=1000
+
+done
+
 # TESTING DETECTORS
 
 trained_on_datasets=("mistral" "round_robin")

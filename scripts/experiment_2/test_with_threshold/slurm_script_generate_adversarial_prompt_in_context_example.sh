@@ -23,6 +23,31 @@ print_current_time () {
     echo $current_date_time;
 }
 
+# GENERATING ADVERSARIAL TEXT
+generators=("gemma_2b_chat" "zephyr" "llama3_instruct")
+
+for i in ${!generators[@]}; do
+
+    #prompt="Write a CNN style news article starting with:"
+    #prompt="You are a news writer working for CNN, your job is to write a news article starting with:"
+    system_prompt="You will receive an example of news article delimited by <ARTICLE_START> and <ARTICLE_END>. You will write news articles following the same writing style to immitate the original writer's writing."
+    prompt="Here is an example of a news article:
+<ARTICLE_START>
+Dozens more bodies have been recovered from a mass grave at a hospital in Khan Younis, according to the Gaza General Directorate of Civil Defense.
+The Civil Defense said 324 bodies had now been recovered at the Nasser Medical Complex following the withdrawal of Israeli forces from the area earlier this month.
+In the latest recovery efforts, the bodies of 51 people of "various categories and ages" had been recovered. Of them, 30 bodies were identified.
+Col. Yamen Abu Suleiman, Director of Civil Defense in Khan Younis, previously told CNN that some of the bodies had been found with hands and feet tied, and there were signs of field executions.
+The Civil Defense said Wednesday that crews would continue search and recovery operations in the coming days. 
+<ARTICLE_END>
+Write a news article in the same style as the article above starting with: "
+    generator=${generators[$i]}
+    dataset_suffix="in_context_example_$generator"
+    print_current_time  
+    echo "Generating dataset with $generator"
+    python src/generate_fake_true_dataset_adversarial.py --dataset_path=fake_true_datasets/fake_true_dataset_phi_10k  --dataset_name_suffix=$dataset_suffix --test_only --batch_size=2 --use_article_generator --prompt="$prompt" --system_prompt="$system_prompt" --article_generator=$generator --take_samples=1000
+
+done
+
 # TESTING DETECTORS
 trained_on_datasets=("mistral" "round_robin")
 tested_on_datasets=("gemma_2b_chat" "zephyr" "llama3_instruct")

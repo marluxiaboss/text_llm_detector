@@ -15,6 +15,23 @@ print_current_time () {
     echo $current_date_time;
 }
 
+# GENERATING ADVERSARIAL TEXT
+generators=("gemma_2b_chat" "zephyr" "llama3_instruct")
+
+for i in ${!generators[@]}; do
+
+    #prompt="Write a CNN style news article starting with:"
+    #prompt="You are a news writer working for CNN, your job is to write a news article starting with:"
+    system_prompt="You are an intern news writer for CNN. You write news articles with grammar and spelling errors, like all humans do. Some of your sentences don't make a lot of sense due to unexpected words used."
+    prompt="Your job is to write a news article starting with:"
+    generator=${generators[$i]}
+    dataset_suffix="cnn_style_$generator"
+    print_current_time  
+    echo "Generating dataset with $generator"
+    python src/generate_fake_true_dataset_adversarial.py --dataset_path=fake_true_datasets/fake_true_dataset_phi_10k  --dataset_name_suffix=$dataset_suffix --test_only --batch_size=2 --use_article_generator --prompt="$prompt" --system_prompt="$system_prompt" --article_generator=$generator --take_samples=1000
+
+done
+
 # TESTING DETECTORS
 trained_on_datasets=("mistral" "round_robin")
 tested_on_datasets=("gemma_2b_chat" "zephyr" "llama3_instruct")

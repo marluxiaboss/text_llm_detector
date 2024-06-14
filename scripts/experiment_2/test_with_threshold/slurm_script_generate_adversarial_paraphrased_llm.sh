@@ -15,6 +15,19 @@ print_current_time () {
     echo $current_date_time;
 }
 
+# GENERATING ADVERSARIAL TEXT
+generators=("gemma_2b_chat" "zephyr" "llama3_instruct")
+
+for i in ${!generators[@]}; do
+    curr_dataset=${datasets[$i]}
+    generator=${generators[$i]}
+    dataset_suffix="paraphrased_llm_$generator"
+    print_current_time
+    echo "Parphrasing dataset with llm paraphraser with $generator"
+    python src/generate_fake_true_dataset_adversarial.py --dataset_path=fake_true_datasets/fake_true_dataset_phi_10k  --dataset_name_suffix=$dataset_suffix --test_only --use_llm_paraphraser  --batch_size=2 --take_samples=1000 --article_generator=$generator --nb_paraphrasing=1
+
+done
+
 # TESTING DETECTORS
 trained_on_datasets=("mistral" "round_robin")
 tested_on_datasets=("gemma_2b_chat" "zephyr" "llama3_instruct")
