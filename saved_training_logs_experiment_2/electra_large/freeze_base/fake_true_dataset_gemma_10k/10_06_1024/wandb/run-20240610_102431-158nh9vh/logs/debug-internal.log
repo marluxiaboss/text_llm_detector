@@ -1,0 +1,900 @@
+2024-06-10 10:24:33,587 INFO    StreamThr :1265296 [internal.py:wandb_internal():86] W&B internal server running at pid: 1265296, started at: 2024-06-10 10:24:33.528433
+2024-06-10 10:24:33,588 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status
+2024-06-10 10:24:33,707 INFO    WriterThread:1265296 [datastore.py:open_for_write():87] open: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/run-158nh9vh.wandb
+2024-06-10 10:24:33,936 DEBUG   SenderThread:1265296 [sender.py:send():378] send: header
+2024-06-10 10:24:34,159 DEBUG   SenderThread:1265296 [sender.py:send():378] send: run
+2024-06-10 10:24:34,825 INFO    SenderThread:1265296 [dir_watcher.py:__init__():211] watching files in: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files
+2024-06-10 10:24:34,826 INFO    SenderThread:1265296 [sender.py:_start_run_threads():1099] run started: 158nh9vh with start time 1718007873.704686
+2024-06-10 10:24:34,833 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: check_version
+2024-06-10 10:24:34,833 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: check_version
+2024-06-10 10:24:34,900 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: run_start
+2024-06-10 10:24:34,905 DEBUG   HandlerThread:1265296 [system_info.py:__init__():26] System info init
+2024-06-10 10:24:34,905 DEBUG   HandlerThread:1265296 [system_info.py:__init__():41] System info init done
+2024-06-10 10:24:34,905 INFO    HandlerThread:1265296 [system_monitor.py:start():194] Starting system monitor
+2024-06-10 10:24:34,905 INFO    SystemMonitor:1265296 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-06-10 10:24:34,905 INFO    HandlerThread:1265296 [system_monitor.py:probe():214] Collecting system info
+2024-06-10 10:24:34,905 INFO    SystemMonitor:1265296 [interfaces.py:start():190] Started cpu monitoring
+2024-06-10 10:24:34,905 INFO    SystemMonitor:1265296 [interfaces.py:start():190] Started disk monitoring
+2024-06-10 10:24:34,906 INFO    SystemMonitor:1265296 [interfaces.py:start():190] Started gpu monitoring
+2024-06-10 10:24:34,906 INFO    SystemMonitor:1265296 [interfaces.py:start():190] Started memory monitoring
+2024-06-10 10:24:34,906 INFO    SystemMonitor:1265296 [interfaces.py:start():190] Started network monitoring
+2024-06-10 10:24:34,955 DEBUG   HandlerThread:1265296 [system_info.py:probe():150] Probing system
+2024-06-10 10:24:34,957 DEBUG   HandlerThread:1265296 [system_info.py:_probe_git():135] Probing git
+2024-06-10 10:24:34,963 DEBUG   HandlerThread:1265296 [system_info.py:_probe_git():143] Probing git done
+2024-06-10 10:24:34,963 DEBUG   HandlerThread:1265296 [system_info.py:probe():198] Probing system done
+2024-06-10 10:24:34,963 DEBUG   HandlerThread:1265296 [system_monitor.py:probe():223] {'os': 'Linux-5.15.0-83-generic-x86_64-with-glibc2.35', 'python': '3.12.2', 'heartbeatAt': '2024-06-10T08:24:34.955620', 'startedAt': '2024-06-10T08:24:31.240453', 'docker': None, 'cuda': None, 'args': ('--batch_size=64', '--num_epochs=1', '--log_mode=online', '--freeze_base=True', '--use_adapter=False', '--save_dir=./saved_training_logs_experiment_2', '--dataset_path=./fake_true_datasets/fake_true_dataset_gemma_10k', '--detector=electra_large', '--eval_steps=500', '--wandb_experiment_name=detector_training_experiment2', '--learning_rate=1e-3'), 'state': 'running', 'program': '/cluster/raid/home/dash/text_llm_detector/src/train_detector.py', 'codePathLocal': 'src/train_detector.py', 'codePath': 'src/train_detector.py', 'git': {'remote': 'git@github.com:marluxiaboss/text_llm_detector.git', 'commit': 'b2170ba13e996364bf2440c510871fc6e8c889dd'}, 'email': None, 'root': '/cluster/raid/home/dash/text_llm_detector', 'host': 'node01', 'username': 'dash', 'executable': '/cluster/raid/home/dash/miniforge3/envs/llm_detector/bin/python', 'cpu_count': 128, 'cpu_count_logical': 128, 'cpu_freq': {'current': 2275.4091640625, 'min': 1500.0, 'max': 2250.0}, 'cpu_freq_per_core': [{'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3387.675, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3389.437, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3391.115, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}], 'disk': {'/': {'total': 97.87200164794922, 'used': 31.066936492919922}}, 'gpu': 'NVIDIA A100-PCIE-40GB', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA A100-PCIE-40GB', 'memory_total': 42949672960}], 'memory': {'total': 503.7052917480469}}
+2024-06-10 10:24:34,963 INFO    HandlerThread:1265296 [system_monitor.py:probe():224] Finished collecting system info
+2024-06-10 10:24:34,963 INFO    HandlerThread:1265296 [system_monitor.py:probe():227] Publishing system info
+2024-06-10 10:24:34,963 DEBUG   HandlerThread:1265296 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-06-10 10:24:35,827 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/conda-environment.yaml
+2024-06-10 10:24:40,632 DEBUG   HandlerThread:1265296 [system_info.py:_save_conda():219] Saving conda packages done
+2024-06-10 10:24:40,634 INFO    HandlerThread:1265296 [system_monitor.py:probe():229] Finished publishing system info
+2024-06-10 10:24:40,637 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:24:40,637 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:24:40,637 DEBUG   SenderThread:1265296 [sender.py:send():378] send: files
+2024-06-10 10:24:40,637 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-metadata.json with policy now
+2024-06-10 10:24:40,791 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: python_packages
+2024-06-10 10:24:40,791 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: python_packages
+2024-06-10 10:24:40,791 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:24:40,791 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:24:40,792 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:24:41,030 DEBUG   SenderThread:1265296 [sender.py:send():378] send: telemetry
+2024-06-10 10:24:41,142 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/conda-environment.yaml
+2024-06-10 10:24:41,142 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-metadata.json
+2024-06-10 10:24:41,142 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/requirements.txt
+2024-06-10 10:24:41,142 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:24:41,217 INFO    wandb-upload_0:1265296 [upload_job.py:push():131] Uploaded file /tmp/tmpv_l7jyyzwandb/tkm0ikbg-wandb-metadata.json
+2024-06-10 10:24:43,467 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:24:43,494 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:24:45,192 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:24:45,192 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:24:45,192 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:24:45,192 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:24:45,193 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:24:45,495 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:24:45,495 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:24:47,497 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:24:50,194 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:24:55,194 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:24:55,792 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:24:55,792 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:24:55,792 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:24:56,218 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:24:56,219 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:24:57,936 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:00,219 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:05,221 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:06,612 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/config.yaml
+2024-06-10 10:25:10,686 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:11,014 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:25:11,015 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:25:11,015 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:25:12,660 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:12,661 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:25:12,661 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:25:12,662 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:25:12,667 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:25:13,668 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:14,259 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:14,260 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:25:14,260 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:25:14,261 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:25:14,668 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:25:15,668 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:16,261 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:21,261 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:25,155 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:25,155 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:26,146 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:25:26,171 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:25:26,172 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:25:26,410 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:27,450 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:31,411 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:34,907 DEBUG   SystemMonitor:1265296 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-06-10 10:25:34,908 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:25:36,909 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:41,909 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:42,816 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:25:42,816 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:25:42,816 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:25:43,534 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:44,522 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:44,523 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:25:44,523 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:25:44,524 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:25:44,534 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:25:45,535 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:46,074 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:46,074 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:25:46,074 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:25:46,075 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:25:46,535 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:25:47,075 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:47,536 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:52,076 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:56,980 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:56,980 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:25:57,540 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:25:57,972 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:25:57,998 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:25:57,998 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:25:58,041 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:26:03,233 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:04,909 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:26:08,910 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:13,911 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:15,882 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:26:15,922 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:26:17,630 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:26:17,631 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:26:17,631 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:26:17,813 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:26:18,178 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:26:18,179 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:26:19,280 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:26:19,280 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:19,280 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:26:19,280 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:26:19,311 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:26:19,471 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:26:20,349 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:26:20,883 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:26:21,492 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:26:24,472 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:25,883 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:26:29,472 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:30,207 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:26:30,207 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:26:31,671 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:26:34,910 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:26:34,911 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:36,657 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:26:36,702 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:26:40,732 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:45,733 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:46,991 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:26:47,519 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:26:49,080 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:26:49,080 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:26:49,080 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:26:49,084 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:26:49,520 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:26:50,679 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:26:50,680 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:26:50,680 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:26:50,681 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:26:51,521 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:26:51,521 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:26:51,650 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:26:51,657 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:56,658 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:26:56,992 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:01,599 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:01,599 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:01,998 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:02,599 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:03,859 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:04,911 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:27:07,912 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:12,913 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:16,075 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:16,076 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:27:17,838 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:17,839 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:27:17,839 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:27:18,004 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:27:18,004 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:18,013 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:27:18,013 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:19,393 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:19,394 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:27:19,394 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:27:19,395 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:27:20,005 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:27:20,006 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:21,076 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:22,007 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:23,395 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:26,076 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:28,395 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:30,326 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:30,326 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:31,075 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:27:31,139 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:32,066 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:32,067 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:27:32,067 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:27:32,227 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:27:32,253 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:27:33,359 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:33,623 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:33,623 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:33,623 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:27:33,623 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:27:33,643 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:27:34,359 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:27:34,912 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:27:35,360 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:36,078 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:38,913 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:41,078 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:43,914 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:44,594 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:44,595 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:46,075 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:27:46,242 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:46,243 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:27:46,243 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:27:46,244 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:27:46,495 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:27:47,496 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:47,812 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:47,813 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:27:47,813 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:27:47,814 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:27:48,496 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:27:49,497 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:27:49,814 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:51,079 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:54,815 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:27:56,079 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:27:58,818 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:58,818 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:27:59,818 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:01,734 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:04,818 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:04,966 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:28:09,967 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:14,134 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:28:14,135 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:28:15,135 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:15,368 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:15,785 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:28:15,786 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:28:15,786 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:28:15,788 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:28:16,369 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:28:17,369 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:17,391 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:28:17,391 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:28:17,391 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:28:17,392 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:28:18,370 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:28:19,371 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:20,135 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:28:20,393 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:25,135 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:28:25,393 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:28,360 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:28:28,360 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:28:29,318 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:28:29,374 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:31,255 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:34,915 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:28:36,915 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:41,916 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:46,916 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:47,625 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:28:47,666 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:28:49,618 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:49,718 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:28:49,719 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:28:49,719 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:28:49,921 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:28:50,669 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:28:51,662 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:28:51,662 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:28:51,663 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:28:51,846 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:28:51,864 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:28:51,864 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:52,626 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:28:52,846 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:28:53,898 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:28:57,627 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:28:57,847 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:02,612 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:02,612 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:02,785 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:29:02,936 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:02,991 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:29:04,916 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:29:06,318 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:08,917 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:13,917 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:18,917 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:22,782 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:29:22,826 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:29:24,548 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:24,594 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:24,595 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:29:24,595 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:29:24,740 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:29:24,767 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:29:25,890 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:26,148 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:26,148 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:29:26,148 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:29:26,337 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:29:26,934 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:29:27,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:29:27,935 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:30,337 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:32,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:29:34,917 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:29:35,918 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:37,080 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:37,080 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:37,782 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:29:38,730 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:38,731 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:29:38,731 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:29:38,732 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:29:38,938 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:29:39,939 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:40,294 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:40,294 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:29:40,295 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:29:40,295 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:29:40,939 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:29:41,296 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:41,940 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:42,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:29:46,296 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:47,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:29:51,279 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:51,279 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:52,279 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:29:52,782 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:29:53,094 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:53,095 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:29:53,095 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:29:53,250 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:29:53,580 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:29:53,581 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:54,664 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:29:54,664 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:29:54,664 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:29:54,864 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:29:55,746 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:29:55,746 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:57,747 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:29:57,785 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:29:57,864 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:02,786 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:30:02,864 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:04,918 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:30:05,682 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:05,682 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:07,294 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:07,295 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:07,295 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:07,296 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:07,751 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:07,751 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:07,782 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:30:08,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:08,958 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:08,959 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:08,959 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:08,960 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:09,752 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:09,752 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:11,753 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:12,786 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:30:13,960 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:17,787 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:30:18,961 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:19,937 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:19,938 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:21,434 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:21,793 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:21,794 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:21,794 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:21,958 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:22,485 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:22,782 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:30:23,450 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:23,451 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:23,451 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:23,625 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:23,652 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:23,652 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:24,626 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:25,818 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:27,788 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:30:29,626 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:32,788 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:30:34,445 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:34,445 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:34,920 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:30:34,921 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:35,822 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:36,062 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:36,062 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:36,062 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:36,064 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:36,822 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:37,682 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:37,682 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:37,682 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:37,683 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:37,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:30:37,955 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:37,955 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:40,129 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:40,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:42,789 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:30:45,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:47,789 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:30:48,719 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:48,719 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:51,116 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:51,116 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:51,116 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:51,116 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:51,359 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:51,839 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:51,839 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:52,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:30:53,238 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:53,239 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:30:53,239 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:53,434 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:54,049 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:30:54,049 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:55,190 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:30:56,434 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:57,790 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:01,435 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:02,791 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:04,231 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:04,231 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:04,921 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:31:05,435 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:05,849 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:05,850 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:05,850 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:05,853 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:06,435 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:06,853 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:07,437 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:07,468 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:07,468 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:07,469 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:07,470 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:07,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:08,437 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:09,438 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:12,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:12,791 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:17,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:17,792 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:18,512 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:18,512 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:19,779 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:20,129 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:20,129 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:20,129 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:20,384 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:20,844 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:21,748 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:21,748 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:21,748 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:22,015 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:22,252 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:22,252 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:22,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:23,456 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:23,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:27,793 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:28,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:32,793 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:32,802 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:32,802 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:33,802 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:34,420 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:34,420 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:34,420 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:34,422 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:34,922 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:31:34,975 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:35,976 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:36,038 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:36,038 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:36,038 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:36,039 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:36,976 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:37,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:37,977 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:39,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:42,794 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:44,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:47,089 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:47,089 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:47,795 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:31:48,704 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:48,704 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:48,704 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:48,706 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:48,981 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:49,981 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:50,323 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:50,323 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:50,323 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:31:50,323 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:50,324 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:50,982 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:31:51,982 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:31:52,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:55,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:57,795 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:32:00,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:01,374 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:01,374 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:02,796 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:32:02,991 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:02,991 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:32:02,991 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:02,992 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:04,072 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:32:04,072 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:04,687 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:04,688 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:32:04,688 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:04,865 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:04,923 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:32:05,204 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:32:05,204 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:05,923 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:07,388 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:07,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:32:11,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:12,796 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:32:15,735 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:15,736 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:17,351 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:17,351 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:17,352 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:32:17,352 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:17,354 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:17,797 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:32:17,966 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:32:17,966 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:18,967 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:18,967 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:32:18,967 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:18,968 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:19,967 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:32:19,967 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:21,968 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:22,783 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:32:22,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:27,784 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:27,798 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:32:30,015 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:30,015 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:32,102 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:33,015 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:34,924 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:32:38,925 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:43,925 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:48,489 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:32:48,489 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:32:49,490 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:49,978 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:50,251 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:50,251 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:32:50,251 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:50,433 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:51,030 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:32:51,901 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:51,901 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:32:51,901 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:52,100 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:52,144 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:32:52,145 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:53,276 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:32:54,489 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:32:55,100 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:59,490 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:33:00,100 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:02,878 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:02,878 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:03,609 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:33:04,987 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:33:05,130 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:05,736 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:10,130 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:15,131 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:20,131 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:22,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:33:22,542 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:33:24,210 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:24,254 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:24,255 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:33:24,255 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:24,442 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:25,360 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:33:25,360 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:25,442 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:25,815 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:25,815 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:33:25,815 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:25,984 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:26,448 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:33:27,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:33:27,553 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:30,984 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:32,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:33:34,926 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:33:36,773 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:36,773 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:36,773 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:37,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:33:38,430 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:38,431 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:33:38,431 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:38,432 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:38,557 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:33:39,558 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:39,993 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:39,994 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:33:39,994 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:39,995 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:40,558 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:33:41,559 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:41,995 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:42,503 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:33:46,995 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:47,504 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:33:50,996 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:50,997 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:51,996 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:52,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:33:52,650 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:52,651 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:33:52,651 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:52,652 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:53,564 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:33:53,564 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:54,221 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:54,221 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:33:54,221 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:54,222 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:54,564 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:33:55,625 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:33:57,223 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:57,505 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:02,223 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:02,505 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:04,927 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:34:05,246 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:05,246 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:06,960 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:06,960 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:06,960 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:07,128 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:07,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:07,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:34:08,180 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:08,180 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:08,710 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:08,711 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:08,711 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:08,875 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:09,356 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:09,356 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:11,531 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:12,506 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:13,009 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:17,506 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:18,010 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:19,707 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:19,707 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:21,324 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:21,325 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:21,325 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:21,327 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:21,536 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:21,536 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:22,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:34:22,982 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:22,983 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:22,983 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:22,984 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:23,781 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:23,781 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:23,984 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:25,834 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:27,507 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:28,985 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:32,508 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:33,985 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:33,987 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:33,987 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:34,928 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:34:35,604 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:35,605 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:35,605 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:35,606 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:35,973 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:35,973 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:37,225 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:37,226 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:37,226 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:37,227 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:37,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:34:37,974 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:37,975 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:39,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:39,976 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:42,509 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:44,503 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:47,509 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:34:48,278 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:48,278 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:49,175 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:49,893 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:49,893 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:49,893 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:49,894 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:49,895 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:50,175 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:51,176 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:51,252 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:34:51,252 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:34:51,252 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:34:51,253 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:34:52,177 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:34:52,502 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:34:53,177 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:34:55,503 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:34:57,510 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: keepalive
+2024-06-10 10:35:00,503 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:35:02,304 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:35:02,304 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:35:02,346 DEBUG   SenderThread:1265296 [sender.py:send():378] send: telemetry
+2024-06-10 10:35:02,347 DEBUG   SenderThread:1265296 [sender.py:send():378] send: exit
+2024-06-10 10:35:02,347 INFO    SenderThread:1265296 [sender.py:send_exit():585] handling exit code: 0
+2024-06-10 10:35:02,347 INFO    SenderThread:1265296 [sender.py:send_exit():587] handling runtime: 627
+2024-06-10 10:35:02,348 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:35:02,348 INFO    SenderThread:1265296 [sender.py:send_exit():593] send defer
+2024-06-10 10:35:02,348 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,348 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 0
+2024-06-10 10:35:02,348 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,348 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 0
+2024-06-10 10:35:02,348 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 1
+2024-06-10 10:35:02,348 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,349 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 1
+2024-06-10 10:35:02,349 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,349 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 1
+2024-06-10 10:35:02,349 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 2
+2024-06-10 10:35:02,349 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,349 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 2
+2024-06-10 10:35:02,349 INFO    HandlerThread:1265296 [system_monitor.py:finish():203] Stopping system monitor
+2024-06-10 10:35:02,349 DEBUG   SystemMonitor:1265296 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-06-10 10:35:02,349 INFO    HandlerThread:1265296 [interfaces.py:finish():202] Joined cpu monitor
+2024-06-10 10:35:02,350 DEBUG   SystemMonitor:1265296 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-06-10 10:35:02,350 INFO    HandlerThread:1265296 [interfaces.py:finish():202] Joined disk monitor
+2024-06-10 10:35:02,464 INFO    HandlerThread:1265296 [interfaces.py:finish():202] Joined gpu monitor
+2024-06-10 10:35:02,465 INFO    HandlerThread:1265296 [interfaces.py:finish():202] Joined memory monitor
+2024-06-10 10:35:02,465 INFO    HandlerThread:1265296 [interfaces.py:finish():202] Joined network monitor
+2024-06-10 10:35:02,465 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,465 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 2
+2024-06-10 10:35:02,465 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 3
+2024-06-10 10:35:02,465 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,465 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 3
+2024-06-10 10:35:02,465 DEBUG   SenderThread:1265296 [sender.py:send():378] send: stats
+2024-06-10 10:35:02,466 DEBUG   SenderThread:1265296 [sender.py:send():378] send: history
+2024-06-10 10:35:02,466 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:35:02,467 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:35:02,467 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,467 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 3
+2024-06-10 10:35:02,467 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 4
+2024-06-10 10:35:02,467 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,467 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 4
+2024-06-10 10:35:02,467 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,467 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 4
+2024-06-10 10:35:02,467 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 5
+2024-06-10 10:35:02,467 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,467 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 5
+2024-06-10 10:35:02,467 DEBUG   SenderThread:1265296 [sender.py:send():378] send: summary
+2024-06-10 10:35:02,468 INFO    SenderThread:1265296 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:35:02,468 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,468 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 5
+2024-06-10 10:35:02,468 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 6
+2024-06-10 10:35:02,468 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,468 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 6
+2024-06-10 10:35:02,468 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,468 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 6
+2024-06-10 10:35:02,471 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:35:02,620 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 7
+2024-06-10 10:35:02,620 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:02,620 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 7
+2024-06-10 10:35:02,620 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:02,620 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 7
+2024-06-10 10:35:03,136 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 8
+2024-06-10 10:35:03,136 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:03,136 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 8
+2024-06-10 10:35:03,136 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:03,136 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 8
+2024-06-10 10:35:03,136 INFO    SenderThread:1265296 [job_builder.py:build():298] Attempting to build job artifact
+2024-06-10 10:35:03,137 INFO    SenderThread:1265296 [job_builder.py:_get_source_type():428] is repo sourced job
+2024-06-10 10:35:03,152 INFO    SenderThread:1265296 [job_builder.py:build():404] adding wandb-job metadata file
+2024-06-10 10:35:03,158 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 9
+2024-06-10 10:35:03,158 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:03,158 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 9
+2024-06-10 10:35:03,158 DEBUG   SenderThread:1265296 [sender.py:send():378] send: artifact
+2024-06-10 10:35:03,285 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/config.yaml
+2024-06-10 10:35:03,285 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:35:03,285 INFO    Thread-12 :1265296 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:35:03,307 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:35:03,917 INFO    SenderThread:1265296 [sender.py:send_artifact():1443] sent artifact job-git_github.com_marluxiaboss_text_llm_detector.git_src_train_detector.py - {'id': 'QXJ0aWZhY3Q6ODY2MzIxMzM1', 'state': 'COMMITTED', 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjE2ODgyNjkzMQ==', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6ODY2MzIxMzM1', 'versionIndex': 5}}}
+2024-06-10 10:35:03,917 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:03,917 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 9
+2024-06-10 10:35:03,917 INFO    SenderThread:1265296 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-06-10 10:35:04,286 INFO    SenderThread:1265296 [dir_watcher.py:finish():388] scan: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files
+2024-06-10 10:35:04,286 INFO    SenderThread:1265296 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/config.yaml config.yaml
+2024-06-10 10:35:04,286 INFO    SenderThread:1265296 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/conda-environment.yaml conda-environment.yaml
+2024-06-10 10:35:04,286 INFO    SenderThread:1265296 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-metadata.json wandb-metadata.json
+2024-06-10 10:35:04,286 INFO    SenderThread:1265296 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/requirements.txt requirements.txt
+2024-06-10 10:35:04,288 INFO    SenderThread:1265296 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log output.log
+2024-06-10 10:35:04,290 INFO    SenderThread:1265296 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json wandb-summary.json
+2024-06-10 10:35:04,291 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 10
+2024-06-10 10:35:04,291 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:35:04,291 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:04,291 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 10
+2024-06-10 10:35:04,293 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:04,293 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 10
+2024-06-10 10:35:04,293 INFO    SenderThread:1265296 [file_pusher.py:finish():172] shutting down file pusher
+2024-06-10 10:35:04,307 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:35:04,307 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:35:04,669 INFO    wandb-upload_1:1265296 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/config.yaml
+2024-06-10 10:35:04,702 INFO    wandb-upload_4:1265296 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/wandb-summary.json
+2024-06-10 10:35:04,719 INFO    wandb-upload_2:1265296 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/requirements.txt
+2024-06-10 10:35:04,722 INFO    wandb-upload_0:1265296 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/conda-environment.yaml
+2024-06-10 10:35:04,747 INFO    wandb-upload_3:1265296 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/files/output.log
+2024-06-10 10:35:04,947 INFO    Thread-11 (_thread_body):1265296 [sender.py:transition_state():613] send defer: 11
+2024-06-10 10:35:04,948 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:04,948 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 11
+2024-06-10 10:35:04,948 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:04,948 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 11
+2024-06-10 10:35:04,948 INFO    SenderThread:1265296 [file_pusher.py:join():178] waiting for file pusher
+2024-06-10 10:35:04,948 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 12
+2024-06-10 10:35:04,948 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:04,948 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 12
+2024-06-10 10:35:04,948 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:04,948 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 12
+2024-06-10 10:35:04,948 INFO    SenderThread:1265296 [file_stream.py:finish():595] file stream finish called
+2024-06-10 10:35:05,307 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:35:05,413 INFO    SenderThread:1265296 [file_stream.py:finish():599] file stream finish is done
+2024-06-10 10:35:05,413 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 13
+2024-06-10 10:35:05,413 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:35:05,413 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:05,413 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 13
+2024-06-10 10:35:05,413 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:05,413 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 13
+2024-06-10 10:35:05,413 INFO    SenderThread:1265296 [sender.py:transition_state():613] send defer: 14
+2024-06-10 10:35:05,413 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:35:05,413 INFO    HandlerThread:1265296 [handler.py:handle_request_defer():172] handle defer: 14
+2024-06-10 10:35:05,414 DEBUG   SenderThread:1265296 [sender.py:send():378] send: final
+2024-06-10 10:35:05,414 DEBUG   SenderThread:1265296 [sender.py:send():378] send: footer
+2024-06-10 10:35:05,414 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:35:05,414 INFO    SenderThread:1265296 [sender.py:send_request_defer():609] handle sender defer: 14
+2024-06-10 10:35:05,414 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:35:05,414 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:35:05,414 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:35:05,414 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: server_info
+2024-06-10 10:35:05,415 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: server_info
+2024-06-10 10:35:05,458 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: get_summary
+2024-06-10 10:35:05,458 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: sampled_history
+2024-06-10 10:35:05,459 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: job_info
+2024-06-10 10:35:05,550 DEBUG   SenderThread:1265296 [sender.py:send_request():405] send_request: job_info
+2024-06-10 10:35:05,550 DEBUG   HandlerThread:1265296 [handler.py:handle_request():146] handle_request: shutdown
+2024-06-10 10:35:05,550 INFO    HandlerThread:1265296 [handler.py:finish():869] shutting down handler
+2024-06-10 10:35:06,459 INFO    WriterThread:1265296 [datastore.py:close():296] close: ./saved_training_logs_experiment_2/electra_large/freeze_base/fake_true_dataset_gemma_10k/10_06_1024/wandb/run-20240610_102431-158nh9vh/run-158nh9vh.wandb
+2024-06-10 10:35:06,550 INFO    SenderThread:1265296 [sender.py:finish():1521] shutting down sender
+2024-06-10 10:35:06,550 INFO    SenderThread:1265296 [file_pusher.py:finish():172] shutting down file pusher
+2024-06-10 10:35:06,550 INFO    SenderThread:1265296 [file_pusher.py:join():178] waiting for file pusher

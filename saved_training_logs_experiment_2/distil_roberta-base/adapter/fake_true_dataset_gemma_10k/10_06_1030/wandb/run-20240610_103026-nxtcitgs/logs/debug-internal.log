@@ -1,0 +1,812 @@
+2024-06-10 10:30:28,704 INFO    StreamThr :1265620 [internal.py:wandb_internal():86] W&B internal server running at pid: 1265620, started at: 2024-06-10 10:30:28.704187
+2024-06-10 10:30:28,705 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status
+2024-06-10 10:30:28,707 INFO    WriterThread:1265620 [datastore.py:open_for_write():87] open: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/run-nxtcitgs.wandb
+2024-06-10 10:30:28,708 DEBUG   SenderThread:1265620 [sender.py:send():378] send: header
+2024-06-10 10:30:28,714 DEBUG   SenderThread:1265620 [sender.py:send():378] send: run
+2024-06-10 10:30:29,082 INFO    SenderThread:1265620 [dir_watcher.py:__init__():211] watching files in: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files
+2024-06-10 10:30:29,082 INFO    SenderThread:1265620 [sender.py:_start_run_threads():1099] run started: nxtcitgs with start time 1718008228.705362
+2024-06-10 10:30:29,089 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: check_version
+2024-06-10 10:30:29,089 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: check_version
+2024-06-10 10:30:29,149 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: run_start
+2024-06-10 10:30:29,153 DEBUG   HandlerThread:1265620 [system_info.py:__init__():26] System info init
+2024-06-10 10:30:29,154 DEBUG   HandlerThread:1265620 [system_info.py:__init__():41] System info init done
+2024-06-10 10:30:29,154 INFO    HandlerThread:1265620 [system_monitor.py:start():194] Starting system monitor
+2024-06-10 10:30:29,154 INFO    SystemMonitor:1265620 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-06-10 10:30:29,154 INFO    HandlerThread:1265620 [system_monitor.py:probe():214] Collecting system info
+2024-06-10 10:30:29,154 INFO    SystemMonitor:1265620 [interfaces.py:start():190] Started cpu monitoring
+2024-06-10 10:30:29,154 INFO    SystemMonitor:1265620 [interfaces.py:start():190] Started disk monitoring
+2024-06-10 10:30:29,155 INFO    SystemMonitor:1265620 [interfaces.py:start():190] Started gpu monitoring
+2024-06-10 10:30:29,155 INFO    SystemMonitor:1265620 [interfaces.py:start():190] Started memory monitoring
+2024-06-10 10:30:29,155 INFO    SystemMonitor:1265620 [interfaces.py:start():190] Started network monitoring
+2024-06-10 10:30:29,229 DEBUG   HandlerThread:1265620 [system_info.py:probe():150] Probing system
+2024-06-10 10:30:29,231 DEBUG   HandlerThread:1265620 [system_info.py:_probe_git():135] Probing git
+2024-06-10 10:30:29,237 DEBUG   HandlerThread:1265620 [system_info.py:_probe_git():143] Probing git done
+2024-06-10 10:30:29,237 DEBUG   HandlerThread:1265620 [system_info.py:probe():198] Probing system done
+2024-06-10 10:30:29,237 DEBUG   HandlerThread:1265620 [system_monitor.py:probe():223] {'os': 'Linux-5.15.0-83-generic-x86_64-with-glibc2.35', 'python': '3.12.2', 'heartbeatAt': '2024-06-10T08:30:29.229657', 'startedAt': '2024-06-10T08:30:26.908679', 'docker': None, 'cuda': None, 'args': ('--batch_size=16', '--num_epochs=1', '--log_mode=online', '--freeze_base=True', '--use_adapter=True', '--save_dir=./saved_training_logs_experiment_2', '--dataset_path=./fake_true_datasets/fake_true_dataset_gemma_10k', '--detector=distil_roberta-base', '--eval_steps=500', '--wandb_experiment_name=detector_training_experiment2', '--learning_rate=3e-4'), 'state': 'running', 'program': '/cluster/raid/home/dash/text_llm_detector/src/train_detector.py', 'codePathLocal': 'src/train_detector.py', 'codePath': 'src/train_detector.py', 'git': {'remote': 'git@github.com:marluxiaboss/text_llm_detector.git', 'commit': 'b2170ba13e996364bf2440c510871fc6e8c889dd'}, 'email': None, 'root': '/cluster/raid/home/dash/text_llm_detector', 'host': 'node01', 'username': 'dash', 'executable': '/cluster/raid/home/dash/miniforge3/envs/llm_detector/bin/python', 'cpu_count': 128, 'cpu_count_logical': 128, 'cpu_freq': {'current': 2267.8740625, 'min': 1500.0, 'max': 2250.0}, 'cpu_freq_per_core': [{'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3388.453, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3394.189, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}], 'disk': {'/': {'total': 97.87200164794922, 'used': 31.066986083984375}}, 'gpu': 'NVIDIA A100-PCIE-40GB', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA A100-PCIE-40GB', 'memory_total': 42949672960}], 'memory': {'total': 503.7052917480469}}
+2024-06-10 10:30:29,237 INFO    HandlerThread:1265620 [system_monitor.py:probe():224] Finished collecting system info
+2024-06-10 10:30:29,237 INFO    HandlerThread:1265620 [system_monitor.py:probe():227] Publishing system info
+2024-06-10 10:30:29,237 DEBUG   HandlerThread:1265620 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-06-10 10:30:30,084 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/conda-environment.yaml
+2024-06-10 10:30:32,614 DEBUG   HandlerThread:1265620 [system_info.py:_save_conda():219] Saving conda packages done
+2024-06-10 10:30:32,616 INFO    HandlerThread:1265620 [system_monitor.py:probe():229] Finished publishing system info
+2024-06-10 10:30:32,619 DEBUG   SenderThread:1265620 [sender.py:send():378] send: files
+2024-06-10 10:30:32,619 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-metadata.json with policy now
+2024-06-10 10:30:32,773 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: python_packages
+2024-06-10 10:30:32,774 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: python_packages
+2024-06-10 10:30:32,774 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:30:32,774 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:30:32,775 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:30:33,001 DEBUG   SenderThread:1265620 [sender.py:send():378] send: telemetry
+2024-06-10 10:30:33,085 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/conda-environment.yaml
+2024-06-10 10:30:33,085 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-metadata.json
+2024-06-10 10:30:33,085 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/requirements.txt
+2024-06-10 10:30:33,085 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:33,213 INFO    wandb-upload_0:1265620 [upload_job.py:push():131] Uploaded file /tmp/tmpm1380yhnwandb/b5j23s9c-wandb-metadata.json
+2024-06-10 10:30:34,002 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:34,068 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:34,672 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:34,673 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:34,673 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:34,674 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:35,093 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:35,093 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:30:37,095 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:37,466 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:37,466 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:37,467 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:37,467 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:37,468 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:38,142 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:30:39,443 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:39,468 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:41,575 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:41,575 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:41,575 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:41,576 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:42,179 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:42,179 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:42,179 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:42,464 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:42,513 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:30:43,514 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:45,247 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:45,247 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:45,247 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:45,247 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:45,247 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:45,414 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:45,726 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:30:47,999 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:50,415 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:51,891 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:30:51,937 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:30:51,937 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:30:52,107 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:52,126 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:52,126 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:52,311 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:52,347 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:30:53,497 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:54,022 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:54,023 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:54,023 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:54,201 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:54,530 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:30:55,662 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:55,833 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:30:55,833 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:55,833 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:55,833 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:56,028 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:56,714 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:30:58,025 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:30:59,079 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:59,079 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:59,079 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:59,079 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:59,317 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:30:59,807 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:30:59,807 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:30:59,807 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:30:59,839 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:00,210 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:00,410 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:00,410 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:00,410 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:00,411 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:01,211 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:01,211 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:01,413 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:02,211 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/config.yaml
+2024-06-10 10:31:03,439 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:03,439 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:03,439 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:03,439 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:03,440 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:03,533 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:03,533 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:03,533 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:03,534 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:04,137 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:04,137 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:04,138 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:04,138 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:04,212 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:04,741 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:04,741 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:04,741 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:04,742 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:05,213 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:05,213 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:06,743 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:06,890 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:31:06,891 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:31:06,891 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:07,213 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:07,494 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:07,495 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:07,495 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:07,495 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:07,496 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:07,870 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:07,870 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:07,871 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:07,871 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:08,214 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:08,486 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:08,486 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:08,486 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:08,487 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:09,215 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:09,215 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:11,472 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:11,473 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:11,473 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:11,473 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:11,474 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:11,613 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:11,614 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:11,614 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:11,614 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:12,216 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:12,217 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:12,217 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:12,218 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:12,218 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:12,219 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:12,821 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:12,822 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:12,822 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:12,823 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:13,216 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:13,217 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:15,218 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:15,485 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:15,486 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:15,486 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:15,486 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:15,488 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:15,950 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:15,950 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:15,950 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:15,951 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:16,218 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:16,548 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:16,549 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:16,549 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:16,549 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:17,219 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:17,219 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:17,550 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:19,419 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:19,487 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:19,488 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:19,488 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:19,488 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:19,708 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:20,484 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:21,681 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:22,709 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:26,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:26,597 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:31:26,598 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:31:26,855 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:26,855 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:26,855 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:27,049 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:27,486 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:27,486 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:27,486 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:27,498 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:27,689 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:28,084 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:28,601 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:29,156 DEBUG   SystemMonitor:1265620 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-06-10 10:31:29,157 DEBUG   SenderThread:1265620 [sender.py:send():378] send: stats
+2024-06-10 10:31:29,791 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:31,612 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:31,612 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:31,612 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:31,700 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:31,872 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:33,701 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:34,304 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:34,304 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:34,304 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:34,304 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:34,305 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:34,811 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:34,811 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:34,811 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:34,813 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:34,873 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:35,411 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:35,411 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:35,411 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:35,791 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:35,873 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:35,873 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:37,874 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:38,305 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:38,306 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:38,306 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:38,306 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:38,306 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:38,536 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:38,536 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:38,536 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:38,537 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:38,875 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:39,135 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:39,135 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:39,135 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:39,135 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:39,136 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:39,733 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:39,733 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:39,733 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:39,734 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:39,875 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:39,875 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:41,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:41,582 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:31:41,582 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:31:41,876 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:42,305 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:42,305 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:42,305 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:42,306 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:42,306 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:42,860 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:42,860 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:42,861 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:42,861 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:42,877 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:43,462 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:43,462 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:43,462 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:43,464 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:43,877 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:43,877 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:44,464 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:45,878 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:46,310 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:46,310 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:46,310 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:46,310 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:46,311 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:46,588 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:46,589 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:46,589 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:46,590 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:46,879 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:47,188 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:47,188 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:47,188 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:47,189 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:47,787 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:47,787 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:47,787 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:47,788 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:47,879 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:47,879 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:49,788 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:49,880 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:50,314 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:50,314 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:50,913 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:50,913 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:50,914 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:50,914 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:51,513 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:51,514 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:51,514 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:51,514 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:51,881 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:51,881 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:53,882 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:54,323 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:54,323 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:54,324 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:54,324 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:54,324 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:54,648 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:54,648 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:54,648 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:54,649 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:54,883 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:55,248 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:31:55,249 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:55,249 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:55,249 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:55,250 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:55,883 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:55,884 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:56,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:31:56,543 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:31:56,543 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:31:57,884 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:31:58,333 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:58,333 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:58,333 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:58,333 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:58,334 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:58,380 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:58,380 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:58,380 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:58,381 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:58,885 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:58,980 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:58,980 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:58,980 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:58,981 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:59,159 DEBUG   SenderThread:1265620 [sender.py:send():378] send: stats
+2024-06-10 10:31:59,581 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:31:59,581 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:31:59,581 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:31:59,582 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:31:59,885 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:31:59,885 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:00,583 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:01,887 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:02,347 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:02,347 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:02,347 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:02,347 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:02,348 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:02,716 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:02,716 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:02,716 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:02,717 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:02,887 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:03,315 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:03,315 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:03,315 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:03,317 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:03,947 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:03,947 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:06,131 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:06,317 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:06,355 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:06,355 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:06,355 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:06,355 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:06,448 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:06,532 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:06,532 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:06,532 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:06,710 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:07,045 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:07,046 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:07,046 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:07,218 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:07,272 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:07,272 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:07,698 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:07,698 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:07,698 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:07,860 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:08,324 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:09,464 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:10,417 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:10,417 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:10,463 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:10,463 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:10,642 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:10,892 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:10,892 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:10,892 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:11,069 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:11,490 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:11,490 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:11,490 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:11,490 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:11,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:32:11,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:32:11,676 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:11,676 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:32:11,835 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:11,836 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:14,063 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:14,486 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:14,486 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:14,486 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:14,486 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:14,625 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:14,643 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:14,643 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:14,643 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:14,830 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:15,195 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:15,196 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:15,224 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:15,224 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:15,224 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:15,409 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:15,875 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:15,875 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:15,875 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:15,876 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:16,196 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:16,877 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:17,196 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:18,551 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:18,551 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:18,551 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:18,551 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:18,552 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:19,013 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:19,014 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:19,014 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:19,016 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:19,197 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:19,612 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:19,612 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:19,613 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:19,613 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:20,198 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:21,198 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:22,565 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:22,565 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:22,565 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:22,565 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:22,566 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:22,566 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:22,750 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:22,750 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:22,750 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:22,751 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:23,199 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:23,351 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:23,351 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:23,351 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:23,353 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:23,949 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:23,949 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:23,949 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:23,951 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:24,199 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:25,200 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:26,544 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:32:26,544 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:32:26,544 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:32:26,586 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:26,586 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:26,715 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:26,715 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:26,716 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:27,092 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:27,093 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:27,093 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:27,094 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:27,201 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:27,692 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:27,692 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:27,693 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:27,693 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:27,694 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:28,202 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:29,160 DEBUG   SenderThread:1265620 [sender.py:send():378] send: stats
+2024-06-10 10:32:29,202 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:30,603 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:30,604 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:30,604 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:30,604 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:30,606 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:30,834 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:30,834 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:30,834 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:30,835 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:31,203 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:31,435 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:31,436 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:31,436 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:31,594 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:32,133 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:32,133 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:32,133 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:32,307 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:32,316 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:33,307 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:33,448 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:34,739 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:34,740 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:34,740 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:34,740 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:34,884 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:35,293 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:35,294 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:35,294 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:35,446 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:35,535 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:35,893 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:35,893 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:35,893 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:36,079 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:36,587 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:37,727 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:38,765 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:38,765 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:38,765 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:38,765 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:38,765 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:38,957 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:39,234 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:39,235 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:39,235 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:39,421 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:39,822 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:39,891 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:39,891 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:39,891 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:40,054 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:40,549 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:40,549 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:40,549 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:40,722 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:40,874 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:41,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:32:41,543 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:32:41,543 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:32:42,006 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:43,146 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:43,146 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:43,701 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:43,702 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:43,702 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:43,739 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:44,007 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:44,007 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:44,302 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:44,302 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:44,302 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:44,302 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:44,303 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:45,138 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:45,138 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:47,127 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:47,127 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:47,127 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:47,127 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:47,331 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:47,349 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:47,536 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:47,537 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:47,537 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:48,184 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:48,629 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:48,677 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:48,677 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:49,524 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:49,524 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:49,700 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:49,700 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:50,585 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:51,346 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:51,347 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:51,347 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:51,347 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:51,394 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:51,529 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:51,529 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:51,529 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:51,707 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:51,725 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:51,726 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:51,995 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:51,995 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:51,995 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:52,171 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:52,594 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:52,594 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:52,595 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:52,786 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:52,822 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:54,007 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:54,787 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:32:55,130 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:55,373 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:55,373 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:55,373 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:55,373 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:55,531 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:55,782 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:55,783 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:55,783 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:55,977 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:56,182 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:56,426 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:56,427 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:56,427 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:56,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:32:56,542 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: stop_status
+2024-06-10 10:32:56,592 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:56,592 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: stop_status
+2024-06-10 10:32:57,183 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:32:57,183 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:32:59,161 DEBUG   SenderThread:1265620 [sender.py:send():378] send: stats
+2024-06-10 10:32:59,578 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:59,579 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:59,579 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:59,579 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:59,580 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:32:59,627 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:32:59,628 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:32:59,628 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:32:59,628 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:00,184 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:33:00,228 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:00,228 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:00,228 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:33:00,228 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:00,229 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:00,828 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: partial_history
+2024-06-10 10:33:00,828 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:33:00,828 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:00,829 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:00,897 DEBUG   SenderThread:1265620 [sender.py:send():378] send: telemetry
+2024-06-10 10:33:00,898 DEBUG   SenderThread:1265620 [sender.py:send():378] send: exit
+2024-06-10 10:33:00,898 INFO    SenderThread:1265620 [sender.py:send_exit():585] handling exit code: 0
+2024-06-10 10:33:00,898 INFO    SenderThread:1265620 [sender.py:send_exit():587] handling runtime: 151
+2024-06-10 10:33:00,899 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:00,899 INFO    SenderThread:1265620 [sender.py:send_exit():593] send defer
+2024-06-10 10:33:00,899 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:00,899 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 0
+2024-06-10 10:33:00,899 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:00,899 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 0
+2024-06-10 10:33:00,899 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 1
+2024-06-10 10:33:00,899 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:00,900 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 1
+2024-06-10 10:33:00,900 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:00,900 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 1
+2024-06-10 10:33:00,900 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 2
+2024-06-10 10:33:00,900 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:00,900 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 2
+2024-06-10 10:33:00,900 INFO    HandlerThread:1265620 [system_monitor.py:finish():203] Stopping system monitor
+2024-06-10 10:33:00,900 DEBUG   SystemMonitor:1265620 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-06-10 10:33:00,900 DEBUG   SystemMonitor:1265620 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-06-10 10:33:00,901 INFO    HandlerThread:1265620 [interfaces.py:finish():202] Joined cpu monitor
+2024-06-10 10:33:00,901 INFO    HandlerThread:1265620 [interfaces.py:finish():202] Joined disk monitor
+2024-06-10 10:33:01,014 INFO    HandlerThread:1265620 [interfaces.py:finish():202] Joined gpu monitor
+2024-06-10 10:33:01,014 INFO    HandlerThread:1265620 [interfaces.py:finish():202] Joined memory monitor
+2024-06-10 10:33:01,014 INFO    HandlerThread:1265620 [interfaces.py:finish():202] Joined network monitor
+2024-06-10 10:33:01,014 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:01,014 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 2
+2024-06-10 10:33:01,015 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 3
+2024-06-10 10:33:01,015 DEBUG   SenderThread:1265620 [sender.py:send():378] send: stats
+2024-06-10 10:33:01,015 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:01,015 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 3
+2024-06-10 10:33:01,015 DEBUG   SenderThread:1265620 [sender.py:send():378] send: history
+2024-06-10 10:33:01,016 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: summary_record
+2024-06-10 10:33:01,016 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:01,016 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:01,016 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 3
+2024-06-10 10:33:01,016 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 4
+2024-06-10 10:33:01,017 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:01,017 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 4
+2024-06-10 10:33:01,017 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:01,017 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 4
+2024-06-10 10:33:01,017 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 5
+2024-06-10 10:33:01,017 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:01,017 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 5
+2024-06-10 10:33:01,017 DEBUG   SenderThread:1265620 [sender.py:send():378] send: summary
+2024-06-10 10:33:01,018 INFO    SenderThread:1265620 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-06-10 10:33:01,018 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:01,018 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 5
+2024-06-10 10:33:01,018 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 6
+2024-06-10 10:33:01,018 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:01,018 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 6
+2024-06-10 10:33:01,018 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:01,018 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 6
+2024-06-10 10:33:01,020 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: status_report
+2024-06-10 10:33:01,182 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 7
+2024-06-10 10:33:01,182 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:01,182 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 7
+2024-06-10 10:33:01,182 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:01,182 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 7
+2024-06-10 10:33:01,184 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/config.yaml
+2024-06-10 10:33:01,184 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:33:01,185 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:33:01,898 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:33:03,061 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 8
+2024-06-10 10:33:03,061 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:33:03,061 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:03,061 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 8
+2024-06-10 10:33:03,061 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:03,061 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 8
+2024-06-10 10:33:03,061 INFO    SenderThread:1265620 [job_builder.py:build():298] Attempting to build job artifact
+2024-06-10 10:33:03,062 INFO    SenderThread:1265620 [job_builder.py:_get_source_type():428] is repo sourced job
+2024-06-10 10:33:03,085 INFO    SenderThread:1265620 [job_builder.py:build():404] adding wandb-job metadata file
+2024-06-10 10:33:03,090 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 9
+2024-06-10 10:33:03,090 DEBUG   SenderThread:1265620 [sender.py:send():378] send: artifact
+2024-06-10 10:33:03,091 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:03,091 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 9
+2024-06-10 10:33:03,185 INFO    Thread-12 :1265620 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:33:03,799 INFO    SenderThread:1265620 [sender.py:send_artifact():1443] sent artifact job-git_github.com_marluxiaboss_text_llm_detector.git_src_train_detector.py - {'id': 'QXJ0aWZhY3Q6ODY2MzIxMzM1', 'state': 'COMMITTED', 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjE2ODgyNjkzMQ==', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6ODY2MzIxMzM1', 'versionIndex': 5}}}
+2024-06-10 10:33:03,799 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:03,799 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 9
+2024-06-10 10:33:03,799 INFO    SenderThread:1265620 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-06-10 10:33:03,898 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:33:04,309 INFO    SenderThread:1265620 [dir_watcher.py:finish():388] scan: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files
+2024-06-10 10:33:04,353 INFO    SenderThread:1265620 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/config.yaml config.yaml
+2024-06-10 10:33:04,353 INFO    SenderThread:1265620 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/conda-environment.yaml conda-environment.yaml
+2024-06-10 10:33:04,353 INFO    SenderThread:1265620 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-metadata.json wandb-metadata.json
+2024-06-10 10:33:04,354 INFO    SenderThread:1265620 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/requirements.txt requirements.txt
+2024-06-10 10:33:04,356 INFO    SenderThread:1265620 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log output.log
+2024-06-10 10:33:04,357 INFO    SenderThread:1265620 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json wandb-summary.json
+2024-06-10 10:33:04,358 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 10
+2024-06-10 10:33:04,358 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:33:04,358 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:04,358 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 10
+2024-06-10 10:33:04,359 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:04,359 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 10
+2024-06-10 10:33:04,359 INFO    SenderThread:1265620 [file_pusher.py:finish():172] shutting down file pusher
+2024-06-10 10:33:04,721 INFO    wandb-upload_2:1265620 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/requirements.txt
+2024-06-10 10:33:04,899 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:33:04,899 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:33:04,951 INFO    wandb-upload_3:1265620 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/output.log
+2024-06-10 10:33:04,968 INFO    wandb-upload_1:1265620 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/conda-environment.yaml
+2024-06-10 10:33:04,987 INFO    wandb-upload_4:1265620 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/wandb-summary.json
+2024-06-10 10:33:05,005 INFO    wandb-upload_0:1265620 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/files/config.yaml
+2024-06-10 10:33:05,339 INFO    Thread-11 (_thread_body):1265620 [sender.py:transition_state():613] send defer: 11
+2024-06-10 10:33:05,339 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:05,339 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 11
+2024-06-10 10:33:05,339 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:05,339 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 11
+2024-06-10 10:33:05,339 INFO    SenderThread:1265620 [file_pusher.py:join():178] waiting for file pusher
+2024-06-10 10:33:05,340 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 12
+2024-06-10 10:33:05,340 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:05,340 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 12
+2024-06-10 10:33:05,340 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:05,340 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 12
+2024-06-10 10:33:05,340 INFO    SenderThread:1265620 [file_stream.py:finish():595] file stream finish called
+2024-06-10 10:33:05,899 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:33:05,921 INFO    SenderThread:1265620 [file_stream.py:finish():599] file stream finish is done
+2024-06-10 10:33:05,921 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 13
+2024-06-10 10:33:05,921 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:33:05,921 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:05,921 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 13
+2024-06-10 10:33:05,921 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:05,921 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 13
+2024-06-10 10:33:05,921 INFO    SenderThread:1265620 [sender.py:transition_state():613] send defer: 14
+2024-06-10 10:33:05,921 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: defer
+2024-06-10 10:33:05,922 INFO    HandlerThread:1265620 [handler.py:handle_request_defer():172] handle defer: 14
+2024-06-10 10:33:05,922 DEBUG   SenderThread:1265620 [sender.py:send():378] send: final
+2024-06-10 10:33:05,922 DEBUG   SenderThread:1265620 [sender.py:send():378] send: footer
+2024-06-10 10:33:05,922 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: defer
+2024-06-10 10:33:05,922 INFO    SenderThread:1265620 [sender.py:send_request_defer():609] handle sender defer: 14
+2024-06-10 10:33:05,922 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: poll_exit
+2024-06-10 10:33:05,922 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: poll_exit
+2024-06-10 10:33:05,922 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: internal_messages
+2024-06-10 10:33:05,923 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: server_info
+2024-06-10 10:33:05,923 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: server_info
+2024-06-10 10:33:05,966 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: get_summary
+2024-06-10 10:33:05,966 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: sampled_history
+2024-06-10 10:33:05,967 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: job_info
+2024-06-10 10:33:06,066 DEBUG   SenderThread:1265620 [sender.py:send_request():405] send_request: job_info
+2024-06-10 10:33:06,066 DEBUG   HandlerThread:1265620 [handler.py:handle_request():146] handle_request: shutdown
+2024-06-10 10:33:06,066 INFO    HandlerThread:1265620 [handler.py:finish():869] shutting down handler
+2024-06-10 10:33:06,967 INFO    WriterThread:1265620 [datastore.py:close():296] close: ./saved_training_logs_experiment_2/distil_roberta-base/adapter/fake_true_dataset_gemma_10k/10_06_1030/wandb/run-20240610_103026-nxtcitgs/run-nxtcitgs.wandb
+2024-06-10 10:33:07,066 INFO    SenderThread:1265620 [sender.py:finish():1521] shutting down sender
+2024-06-10 10:33:07,066 INFO    SenderThread:1265620 [file_pusher.py:finish():172] shutting down file pusher
+2024-06-10 10:33:07,066 INFO    SenderThread:1265620 [file_pusher.py:join():178] waiting for file pusher

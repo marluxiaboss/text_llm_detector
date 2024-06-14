@@ -8,8 +8,6 @@
 - `src/detector.py`: wrapper around any BERT type (bi-directional encoder) used to classify text as human or LLM generated
 - `src/detector_trainer.py`: class for training and testing detectors (except Fast-DetectGPT)
 
-
-
 ### 1. Python scripts
 - `src/generate_fake_true_dataset.py`: takes an LLM and generate responses using prompts from a given dataset
 - `src/generate_round_robin_dataset.py`: used to generate the Round-Robin dataset from the other datasets
@@ -54,16 +52,15 @@ saved_training_logs
 ```
 
 ### 4. Datasets
-- `fake_true_datasets`: folder containing all the generated datasets  
-- `fake_true_datasets/modifed_dataset` folder containing the adversarial version of the dataset above
+- `fake_true_datasets`: folder containing all the generated datasets  (need to run the scripts to have them)
+- `fake_true_datasets/modifed_dataset` folder containing the adversarial version of the dataset above (need to run the scripts to have them)
 
 
 ## Reproducing the experiments and the plots
 
 We provide scripts to run the experiments and get the data. We also provide notebooks to use this data to produce the plots in the paper.  
-We also provide the data we obtained when running the experiments and the generated dataset.
+We also provide the data we obtained when running the experiments. You need to replace them to be able to re-run the experiments.
 
-Generated datasets: `fake_true_datasets`  
 Results data (main paper): `saved_training_logs_experiment_2`  
 Results data (degradation check in appendix): `saved_training_logs_experiment_1`
 

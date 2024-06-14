@@ -1,0 +1,979 @@
+2024-05-02 14:24:14,132 INFO    StreamThr :4051703 [internal.py:wandb_internal():86] W&B internal server running at pid: 4051703, started at: 2024-05-02 14:24:14.131807
+2024-05-02 14:24:14,133 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status
+2024-05-02 14:24:14,136 INFO    WriterThread:4051703 [datastore.py:open_for_write():87] open: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/run-rljtq32l.wandb
+2024-05-02 14:24:14,137 DEBUG   SenderThread:4051703 [sender.py:send():378] send: header
+2024-05-02 14:24:14,155 DEBUG   SenderThread:4051703 [sender.py:send():378] send: run
+2024-05-02 14:24:14,564 INFO    SenderThread:4051703 [dir_watcher.py:__init__():211] watching files in: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files
+2024-05-02 14:24:14,564 INFO    SenderThread:4051703 [sender.py:_start_run_threads():1099] run started: rljtq32l with start time 1714652654.133953
+2024-05-02 14:24:14,574 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: check_version
+2024-05-02 14:24:14,574 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: check_version
+2024-05-02 14:24:14,639 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: run_start
+2024-05-02 14:24:14,644 DEBUG   HandlerThread:4051703 [system_info.py:__init__():26] System info init
+2024-05-02 14:24:14,644 DEBUG   HandlerThread:4051703 [system_info.py:__init__():41] System info init done
+2024-05-02 14:24:14,644 INFO    HandlerThread:4051703 [system_monitor.py:start():194] Starting system monitor
+2024-05-02 14:24:14,644 INFO    SystemMonitor:4051703 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-05-02 14:24:14,644 INFO    HandlerThread:4051703 [system_monitor.py:probe():214] Collecting system info
+2024-05-02 14:24:14,644 INFO    SystemMonitor:4051703 [interfaces.py:start():190] Started cpu monitoring
+2024-05-02 14:24:14,645 INFO    SystemMonitor:4051703 [interfaces.py:start():190] Started disk monitoring
+2024-05-02 14:24:14,645 INFO    SystemMonitor:4051703 [interfaces.py:start():190] Started gpu monitoring
+2024-05-02 14:24:14,645 INFO    SystemMonitor:4051703 [interfaces.py:start():190] Started memory monitoring
+2024-05-02 14:24:14,645 INFO    SystemMonitor:4051703 [interfaces.py:start():190] Started network monitoring
+2024-05-02 14:24:14,741 DEBUG   HandlerThread:4051703 [system_info.py:probe():150] Probing system
+2024-05-02 14:24:14,744 DEBUG   HandlerThread:4051703 [system_info.py:_probe_git():135] Probing git
+2024-05-02 14:24:14,761 DEBUG   HandlerThread:4051703 [system_info.py:_probe_git():143] Probing git done
+2024-05-02 14:24:14,761 DEBUG   HandlerThread:4051703 [system_info.py:probe():198] Probing system done
+2024-05-02 14:24:14,761 DEBUG   HandlerThread:4051703 [system_monitor.py:probe():223] {'os': 'Linux-5.15.0-83-generic-x86_64-with-glibc2.35', 'python': '3.12.2', 'heartbeatAt': '2024-05-02T12:24:14.741672', 'startedAt': '2024-05-02T12:24:14.075985', 'docker': None, 'cuda': None, 'args': ('--batch_size=32', '--num_epochs=1', '--log_mode=online', '--freeze_base=True', '--use_adapter=True', '--save_dir=./saved_training_logs_experiment_1', '--dataset_path=./fake_true_datasets/fake_true_dataset_mistral_10k', '--detector=distil_roberta-base', '--check_degradation=500', '--wandb_experiment_name=detector_training_experiment1', '--learning_rate=3e-4'), 'state': 'running', 'program': '/cluster/raid/home/dash/text_llm_detector/src/train_detector.py', 'codePathLocal': 'src/train_detector.py', 'codePath': 'src/train_detector.py', 'git': {'remote': 'git@github.com:marluxiaboss/text_llm_detector.git', 'commit': 'b2170ba13e996364bf2440c510871fc6e8c889dd'}, 'email': None, 'root': '/cluster/raid/home/dash/text_llm_detector', 'host': 'node01', 'username': 'dash', 'executable': '/cluster/raid/home/dash/miniforge3/envs/llm_detector/bin/python', 'cpu_count': 128, 'cpu_count_logical': 128, 'cpu_freq': {'current': 2302.9860546875, 'min': 1500.0, 'max': 2250.0}, 'cpu_freq_per_core': [{'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3385.282, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3382.728, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3372.977, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3380.245, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 3361.234, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}, {'current': 2250.0, 'min': 1500.0, 'max': 2250.0}], 'disk': {'/': {'total': 97.87200164794922, 'used': 30.9310302734375}}, 'gpu': 'NVIDIA A100-PCIE-40GB', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA A100-PCIE-40GB', 'memory_total': 42949672960}], 'memory': {'total': 503.7052917480469}}
+2024-05-02 14:24:14,761 INFO    HandlerThread:4051703 [system_monitor.py:probe():224] Finished collecting system info
+2024-05-02 14:24:14,761 INFO    HandlerThread:4051703 [system_monitor.py:probe():227] Publishing system info
+2024-05-02 14:24:14,762 DEBUG   HandlerThread:4051703 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-05-02 14:24:15,566 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/conda-environment.yaml
+2024-05-02 14:24:18,490 DEBUG   HandlerThread:4051703 [system_info.py:_save_conda():219] Saving conda packages done
+2024-05-02 14:24:18,493 INFO    HandlerThread:4051703 [system_monitor.py:probe():229] Finished publishing system info
+2024-05-02 14:24:18,498 DEBUG   SenderThread:4051703 [sender.py:send():378] send: files
+2024-05-02 14:24:18,499 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-metadata.json with policy now
+2024-05-02 14:24:18,569 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/conda-environment.yaml
+2024-05-02 14:24:18,569 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-metadata.json
+2024-05-02 14:24:18,686 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: python_packages
+2024-05-02 14:24:18,686 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: python_packages
+2024-05-02 14:24:18,687 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:24:18,687 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:24:18,688 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:24:18,865 DEBUG   SenderThread:4051703 [sender.py:send():378] send: telemetry
+2024-05-02 14:24:19,072 INFO    wandb-upload_0:4051703 [upload_job.py:push():131] Uploaded file /tmp/tmp4cyvyat9wandb/z249u0o8-wandb-metadata.json
+2024-05-02 14:24:19,571 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/requirements.txt
+2024-05-02 14:24:19,866 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:24,866 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:29,866 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:33,686 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:24:33,687 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:24:33,687 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:24:34,883 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:39,884 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:44,886 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:45,821 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/config.yaml
+2024-05-02 14:24:48,687 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:24:48,688 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:24:48,688 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:24:48,824 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:24:50,444 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:50,827 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:24:52,829 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:24:54,830 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:24:55,477 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:24:56,832 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:24:57,643 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:24:57,833 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:24:58,240 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:24:58,240 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:24:58,240 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:24:58,242 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:24:58,835 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:24:58,835 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_created():271] file/dir created: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:24:59,837 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:00,564 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:00,839 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:01,840 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:02,841 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:03,683 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:03,684 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:03,684 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:03,685 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:03,842 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:03,843 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:03,918 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:25:03,918 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:25:03,958 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:25:06,168 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:06,232 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:10,235 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: keepalive
+2024-05-02 14:25:10,712 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:10,712 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:10,713 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:10,714 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:11,309 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:11,309 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:11,309 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:11,309 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:11,311 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:11,561 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:11,561 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:13,564 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:14,565 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:14,645 DEBUG   SystemMonitor:4051703 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-05-02 14:25:14,647 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:25:15,566 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:16,567 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:16,647 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:16,971 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:16,971 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:16,971 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:16,985 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:17,811 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:17,811 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:20,734 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:21,986 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:25,123 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:25:25,123 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:25:25,123 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:25:25,638 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:25,638 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:25,638 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:25,991 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:26,176 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:26,432 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:26,432 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:26,432 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:26,809 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:27,439 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:27,439 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:27,809 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:30,918 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:32,163 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:33,753 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:34,599 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:35,973 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:37,370 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:38,635 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:38,780 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:39,936 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:40,122 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:25:40,122 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:25:40,123 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:25:41,272 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:42,554 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:42,564 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:42,564 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:42,564 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:42,925 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:43,909 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:43,926 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:44,801 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:25:45,711 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:49,802 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:54,802 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:25:55,812 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:25:55,812 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:25:55,813 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:25:55,974 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:55,989 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:55,989 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:55,992 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:56,610 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:56,611 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:56,611 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:56,677 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:56,916 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:57,162 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:25:57,163 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:25:57,163 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:25:57,471 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:25:57,678 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:25:57,678 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:59,680 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:25:59,809 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:00,681 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:01,683 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:02,651 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:02,651 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:02,651 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:02,658 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:02,684 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:02,684 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:03,163 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:03,163 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:03,163 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:03,684 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:03,759 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:04,249 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:04,249 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:04,249 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:04,355 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:04,685 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:04,897 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:05,686 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:06,687 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:07,689 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:08,690 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:09,322 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:09,322 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:09,322 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:09,346 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:09,692 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:09,692 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:10,347 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:12,056 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:14,768 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:26:15,768 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:16,448 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:26:16,448 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:26:16,449 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:26:16,882 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:16,883 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:16,883 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:16,884 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:17,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:17,436 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:17,436 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:17,831 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:17,909 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:18,832 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:19,833 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:20,809 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:20,834 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:21,836 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:22,837 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:23,210 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:23,211 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:23,211 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:23,213 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:23,384 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:23,385 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:23,385 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:23,386 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:23,838 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:23,838 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:23,983 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:23,983 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:23,983 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:23,985 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:24,579 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:24,579 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:24,579 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:24,580 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:24,839 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:25,840 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:25,869 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:26,841 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:27,843 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:28,844 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:29,845 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:29,872 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:30,872 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:32,237 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:35,872 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:36,562 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:26:36,562 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:26:36,562 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:26:37,215 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:37,215 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:37,216 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:37,326 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:37,544 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:37,813 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:37,813 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:37,813 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:37,815 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:38,544 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:39,546 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:40,549 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:40,887 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:41,550 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:42,551 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:43,270 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:43,271 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:43,271 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:43,272 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:43,552 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:43,553 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:44,650 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:26:46,258 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:46,651 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:51,651 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:52,036 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:26:52,037 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:26:52,037 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:26:52,574 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:52,575 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:52,575 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:52,676 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:53,126 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:53,667 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:53,667 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:53,667 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:53,677 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:26:53,678 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:53,726 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:55,679 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:56,680 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:57,423 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:26:57,682 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:58,683 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:26:58,806 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:58,807 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:58,807 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:58,809 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:59,064 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:59,064 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:59,064 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:59,066 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:59,659 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:26:59,660 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:26:59,660 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:26:59,661 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:26:59,684 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:01,685 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:02,438 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:02,687 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:03,688 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:04,689 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:05,471 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:05,472 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:05,472 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:05,473 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:05,690 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:05,691 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:07,474 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:08,057 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:12,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:27:12,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:27:12,060 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:27:12,222 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:12,300 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:12,300 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:12,302 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:12,419 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:12,793 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:12,793 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:12,793 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:12,793 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:13,389 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:13,421 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:13,445 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:13,445 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:13,445 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:13,461 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:14,422 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:14,651 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:27:15,423 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:16,424 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:17,426 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:18,359 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:18,427 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:18,739 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:18,739 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:18,740 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:18,742 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:19,253 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:19,253 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:19,253 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:19,255 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:19,428 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:19,851 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:19,851 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:19,851 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:19,853 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:20,428 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:21,429 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:22,431 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:23,432 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:23,989 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:24,433 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:25,371 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:25,372 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:25,372 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:25,373 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:25,434 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:25,435 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:25,715 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:25,716 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:25,716 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:25,717 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:26,312 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:26,312 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:26,312 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:26,323 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:26,435 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:27,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:27:27,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:27:27,059 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:27:27,436 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:28,437 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:29,389 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:29,439 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:30,440 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:31,441 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:32,443 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:33,217 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:33,217 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:33,217 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:33,221 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:33,388 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:33,388 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:33,388 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:33,443 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:33,444 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:33,985 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:34,274 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:34,274 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:34,274 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:34,444 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:34,583 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:35,445 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:35,445 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:35,582 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:35,582 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:35,583 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:35,583 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:35,617 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:36,446 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:37,447 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:38,448 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:39,449 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:40,451 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:40,517 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:41,119 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:41,119 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:41,119 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:41,119 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:41,138 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:41,452 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:41,452 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:41,716 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:41,716 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:41,716 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:41,733 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:42,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:27:42,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:27:42,059 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:27:42,453 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:43,454 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:44,455 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:44,652 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:27:45,457 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:46,459 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:46,808 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:47,196 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:47,196 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:47,196 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:47,198 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:47,460 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:47,460 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:49,846 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:52,199 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:54,271 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:54,271 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:54,271 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:54,273 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:54,871 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:27:54,871 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:27:54,871 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:27:55,017 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:27:55,176 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:27:55,176 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:57,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:27:57,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:27:57,059 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:27:57,177 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:57,291 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:27:58,179 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:27:59,180 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:00,181 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:00,650 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:00,651 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:00,651 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:00,653 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:00,910 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:00,910 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:00,910 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:00,912 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:01,182 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:01,508 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:01,509 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:01,509 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:01,511 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:02,182 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:02,426 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:03,184 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:04,185 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:05,186 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:06,187 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:07,188 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:07,353 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:07,353 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:07,353 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:07,356 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:07,439 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:07,439 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:07,440 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:07,440 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:07,441 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:08,036 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:08,037 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:08,037 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:08,039 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:08,189 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:08,635 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:08,635 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:08,635 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:08,637 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:09,190 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:09,190 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:10,191 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:11,192 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:12,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:28:12,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:28:12,059 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:28:12,194 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:13,195 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:13,297 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:14,037 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:14,037 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:14,037 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:14,039 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:14,197 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:14,197 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:14,552 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:14,552 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:14,552 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:14,554 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:14,654 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:28:15,149 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:15,150 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:15,150 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:15,152 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:15,198 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:15,198 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:17,200 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:18,201 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:18,385 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:19,202 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:20,204 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:20,932 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:20,933 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:20,933 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:20,942 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:21,204 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:21,275 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:21,275 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:21,275 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:21,874 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:22,205 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:22,584 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:22,585 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:22,585 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:22,591 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:23,400 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:23,833 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:23,834 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:24,834 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:25,836 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:26,837 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:27,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:28:27,059 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:28:27,059 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:28:27,838 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:28,306 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:28,306 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:28,306 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:28,479 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:28,484 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:28,484 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:28,484 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:28,484 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:28,490 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:28,839 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:28,840 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:29,077 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:29,078 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:29,078 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:29,079 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:29,675 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:29,676 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:29,676 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:29,677 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:29,840 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:29,840 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:31,842 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:32,843 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:33,579 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:33,845 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:34,846 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:34,971 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:35,571 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:35,572 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:35,572 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:35,574 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:35,846 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:36,170 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:36,170 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:36,170 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:36,172 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:36,847 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:37,848 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:38,581 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:38,849 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:39,850 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:40,852 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:41,620 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:41,620 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:41,620 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:41,622 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:41,853 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:41,853 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:43,622 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:44,288 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:44,655 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:28:48,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:28:48,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:28:48,436 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:28:48,656 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:48,962 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:48,963 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:48,963 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:48,965 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:48,965 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:49,517 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:49,517 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:49,517 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:49,657 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:49,966 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:49,966 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:51,967 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:52,969 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:53,777 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:53,970 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:54,971 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:55,171 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:55,171 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:55,171 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:55,173 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:55,428 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:55,428 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:55,428 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:55,430 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:55,972 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:55,972 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:56,028 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:28:56,028 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:28:56,028 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:28:56,029 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:28:56,973 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:28:57,974 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:58,814 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:28:58,978 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:28:59,979 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:00,980 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:01,847 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:01,847 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:01,847 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:01,866 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:01,934 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:01,934 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:01,935 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:01,981 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:01,982 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:02,379 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:02,532 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:02,533 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:02,533 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:02,982 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:03,131 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:03,238 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:03,238 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:03,238 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:03,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:29:03,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:29:03,711 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:03,712 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:29:03,953 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:03,983 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:03,983 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:05,985 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:06,986 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:07,987 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:08,594 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:08,594 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:08,595 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:08,610 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:08,989 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:08,989 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:09,109 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:09,110 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:09,110 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:09,110 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:09,143 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:09,707 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:09,708 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:09,708 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:09,714 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:09,990 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:09,990 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:11,992 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:12,993 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:14,606 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:14,656 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:29:14,656 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:15,302 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:15,302 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:15,302 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:15,649 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:15,744 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:15,744 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:15,744 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:15,850 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:15,850 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:16,247 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:17,131 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:17,172 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:17,172 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:17,172 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:17,577 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:18,398 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:18,398 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:18,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:29:18,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:29:18,436 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:29:19,680 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:20,625 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:23,286 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:24,681 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:25,671 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:25,926 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:27,322 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:28,566 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:29,888 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:30,682 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:31,244 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:32,506 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:33,253 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:33,253 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:33,253 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:33,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:29:33,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:29:33,639 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:33,639 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:29:33,714 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:33,770 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:33,973 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:33,973 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:34,327 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:34,400 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:34,401 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:34,401 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:34,791 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:34,810 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:35,177 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:35,177 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:35,178 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:35,515 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:36,048 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:36,091 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:36,091 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:38,545 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:39,547 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:40,548 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:41,091 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:41,549 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:42,550 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:43,551 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:44,498 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:44,553 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:44,657 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:29:45,097 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:45,098 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:45,098 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:45,100 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:45,554 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:45,554 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:45,695 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:45,695 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:45,695 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:46,112 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:46,112 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:46,555 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:47,557 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:48,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:29:48,436 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-02 14:29:48,436 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: stop_status
+2024-05-02 14:29:48,558 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:49,559 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:50,560 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:51,144 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:51,144 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:51,144 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:51,144 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:51,146 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:51,562 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:51,562 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:51,572 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:51,573 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:51,573 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:51,593 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:52,170 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:52,171 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:52,171 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:52,189 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:52,562 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:53,563 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:54,663 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:55,665 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:56,189 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:29:56,666 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:57,667 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:58,586 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:58,587 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:58,587 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:58,591 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:58,668 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:58,668 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:58,845 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:58,845 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:58,846 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:58,851 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:59,443 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: partial_history
+2024-05-02 14:29:59,443 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:29:59,443 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:29:59,454 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:29:59,669 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:29:59,670 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:29:59,720 DEBUG   SenderThread:4051703 [sender.py:send():378] send: telemetry
+2024-05-02 14:29:59,721 DEBUG   SenderThread:4051703 [sender.py:send():378] send: exit
+2024-05-02 14:29:59,721 INFO    SenderThread:4051703 [sender.py:send_exit():585] handling exit code: 0
+2024-05-02 14:29:59,721 INFO    SenderThread:4051703 [sender.py:send_exit():587] handling runtime: 345
+2024-05-02 14:30:00,721 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-02 14:30:01,386 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:30:01,386 INFO    SenderThread:4051703 [sender.py:send_exit():593] send defer
+2024-05-02 14:30:01,388 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,388 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 0
+2024-05-02 14:30:01,388 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:30:01,552 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: poll_exit
+2024-05-02 14:30:01,552 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,552 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 0
+2024-05-02 14:30:01,552 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 1
+2024-05-02 14:30:01,552 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,552 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 1
+2024-05-02 14:30:01,552 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,552 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 1
+2024-05-02 14:30:01,552 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 2
+2024-05-02 14:30:01,552 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,552 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 2
+2024-05-02 14:30:01,552 INFO    HandlerThread:4051703 [system_monitor.py:finish():203] Stopping system monitor
+2024-05-02 14:30:01,552 DEBUG   SystemMonitor:4051703 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-05-02 14:30:01,553 DEBUG   SystemMonitor:4051703 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-05-02 14:30:01,554 INFO    HandlerThread:4051703 [interfaces.py:finish():202] Joined cpu monitor
+2024-05-02 14:30:01,554 INFO    HandlerThread:4051703 [interfaces.py:finish():202] Joined disk monitor
+2024-05-02 14:30:01,671 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/config.yaml
+2024-05-02 14:30:01,671 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:30:01,671 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:30:01,677 INFO    HandlerThread:4051703 [interfaces.py:finish():202] Joined gpu monitor
+2024-05-02 14:30:01,677 INFO    HandlerThread:4051703 [interfaces.py:finish():202] Joined memory monitor
+2024-05-02 14:30:01,677 INFO    HandlerThread:4051703 [interfaces.py:finish():202] Joined network monitor
+2024-05-02 14:30:01,677 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,677 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 2
+2024-05-02 14:30:01,677 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 3
+2024-05-02 14:30:01,677 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,677 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 3
+2024-05-02 14:30:01,678 DEBUG   SenderThread:4051703 [sender.py:send():378] send: stats
+2024-05-02 14:30:01,679 DEBUG   SenderThread:4051703 [sender.py:send():378] send: history
+2024-05-02 14:30:01,679 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: summary_record
+2024-05-02 14:30:01,688 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:30:01,688 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,688 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 3
+2024-05-02 14:30:01,688 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 4
+2024-05-02 14:30:01,688 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,688 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 4
+2024-05-02 14:30:01,688 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,688 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 4
+2024-05-02 14:30:01,688 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 5
+2024-05-02 14:30:01,688 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,688 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 5
+2024-05-02 14:30:01,688 DEBUG   SenderThread:4051703 [sender.py:send():378] send: summary
+2024-05-02 14:30:01,698 INFO    SenderThread:4051703 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-05-02 14:30:01,698 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,698 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 5
+2024-05-02 14:30:01,698 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 6
+2024-05-02 14:30:01,698 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,698 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 6
+2024-05-02 14:30:01,698 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,698 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 6
+2024-05-02 14:30:01,698 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 7
+2024-05-02 14:30:01,698 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:30:01,698 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:01,698 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 7
+2024-05-02 14:30:01,699 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:01,699 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 7
+2024-05-02 14:30:01,721 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-02 14:30:02,671 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:30:03,672 INFO    Thread-12 :4051703 [dir_watcher.py:_on_file_modified():288] file/dir modified: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:30:03,947 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 8
+2024-05-02 14:30:03,947 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: poll_exit
+2024-05-02 14:30:03,947 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:03,947 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 8
+2024-05-02 14:30:03,947 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:03,947 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 8
+2024-05-02 14:30:03,947 INFO    SenderThread:4051703 [job_builder.py:build():298] Attempting to build job artifact
+2024-05-02 14:30:03,948 INFO    SenderThread:4051703 [job_builder.py:_get_source_type():428] is repo sourced job
+2024-05-02 14:30:03,976 INFO    SenderThread:4051703 [job_builder.py:build():404] adding wandb-job metadata file
+2024-05-02 14:30:03,995 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 9
+2024-05-02 14:30:03,995 DEBUG   SenderThread:4051703 [sender.py:send():378] send: artifact
+2024-05-02 14:30:03,996 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:03,996 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 9
+2024-05-02 14:30:04,722 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-02 14:30:04,781 INFO    SenderThread:4051703 [sender.py:send_artifact():1443] sent artifact job-git_github.com_marluxiaboss_text_llm_detector.git_src_train_detector.py - {'id': 'QXJ0aWZhY3Q6ODE1ODA0MjM3', 'state': 'COMMITTED', 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjE2ODY1NDQ2MA==', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6ODE3MDEwNjMy', 'versionIndex': 2}}}
+2024-05-02 14:30:04,781 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:04,781 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 9
+2024-05-02 14:30:04,781 INFO    SenderThread:4051703 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-05-02 14:30:05,673 INFO    SenderThread:4051703 [dir_watcher.py:finish():388] scan: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files
+2024-05-02 14:30:05,674 INFO    SenderThread:4051703 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/config.yaml config.yaml
+2024-05-02 14:30:05,674 INFO    SenderThread:4051703 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/conda-environment.yaml conda-environment.yaml
+2024-05-02 14:30:05,675 INFO    SenderThread:4051703 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-metadata.json wandb-metadata.json
+2024-05-02 14:30:05,676 INFO    SenderThread:4051703 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/requirements.txt requirements.txt
+2024-05-02 14:30:05,676 INFO    SenderThread:4051703 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log output.log
+2024-05-02 14:30:05,677 INFO    SenderThread:4051703 [dir_watcher.py:finish():402] scan save: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json wandb-summary.json
+2024-05-02 14:30:05,678 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 10
+2024-05-02 14:30:05,678 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: poll_exit
+2024-05-02 14:30:05,679 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:05,680 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 10
+2024-05-02 14:30:05,680 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:05,680 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 10
+2024-05-02 14:30:05,680 INFO    SenderThread:4051703 [file_pusher.py:finish():172] shutting down file pusher
+2024-05-02 14:30:05,722 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-02 14:30:05,723 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: poll_exit
+2024-05-02 14:30:06,085 INFO    wandb-upload_0:4051703 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/config.yaml
+2024-05-02 14:30:06,101 INFO    wandb-upload_1:4051703 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/conda-environment.yaml
+2024-05-02 14:30:06,120 INFO    wandb-upload_2:4051703 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/requirements.txt
+2024-05-02 14:30:06,122 INFO    wandb-upload_4:4051703 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/wandb-summary.json
+2024-05-02 14:30:06,266 INFO    wandb-upload_3:4051703 [upload_job.py:push():131] Uploaded file ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/files/output.log
+2024-05-02 14:30:06,466 INFO    Thread-11 (_thread_body):4051703 [sender.py:transition_state():613] send defer: 11
+2024-05-02 14:30:06,467 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:06,467 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 11
+2024-05-02 14:30:06,467 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:06,467 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 11
+2024-05-02 14:30:06,467 INFO    SenderThread:4051703 [file_pusher.py:join():178] waiting for file pusher
+2024-05-02 14:30:06,467 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 12
+2024-05-02 14:30:06,467 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:06,467 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 12
+2024-05-02 14:30:06,467 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:06,467 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 12
+2024-05-02 14:30:06,467 INFO    SenderThread:4051703 [file_stream.py:finish():595] file stream finish called
+2024-05-02 14:30:06,723 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-02 14:30:07,116 INFO    SenderThread:4051703 [file_stream.py:finish():599] file stream finish is done
+2024-05-02 14:30:07,116 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 13
+2024-05-02 14:30:07,116 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: poll_exit
+2024-05-02 14:30:07,117 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:07,117 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 13
+2024-05-02 14:30:07,117 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: status_report
+2024-05-02 14:30:07,117 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:07,117 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 13
+2024-05-02 14:30:07,117 INFO    SenderThread:4051703 [sender.py:transition_state():613] send defer: 14
+2024-05-02 14:30:07,117 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: defer
+2024-05-02 14:30:07,117 INFO    HandlerThread:4051703 [handler.py:handle_request_defer():172] handle defer: 14
+2024-05-02 14:30:07,117 DEBUG   SenderThread:4051703 [sender.py:send():378] send: final
+2024-05-02 14:30:07,117 DEBUG   SenderThread:4051703 [sender.py:send():378] send: footer
+2024-05-02 14:30:07,117 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: defer
+2024-05-02 14:30:07,117 INFO    SenderThread:4051703 [sender.py:send_request_defer():609] handle sender defer: 14
+2024-05-02 14:30:07,117 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-02 14:30:07,117 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: poll_exit
+2024-05-02 14:30:07,118 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-02 14:30:07,118 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: server_info
+2024-05-02 14:30:07,118 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: server_info
+2024-05-02 14:30:07,162 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: get_summary
+2024-05-02 14:30:07,162 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: sampled_history
+2024-05-02 14:30:07,163 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: job_info
+2024-05-02 14:30:07,263 DEBUG   SenderThread:4051703 [sender.py:send_request():405] send_request: job_info
+2024-05-02 14:30:07,263 DEBUG   HandlerThread:4051703 [handler.py:handle_request():146] handle_request: shutdown
+2024-05-02 14:30:07,263 INFO    HandlerThread:4051703 [handler.py:finish():869] shutting down handler
+2024-05-02 14:30:08,163 INFO    WriterThread:4051703 [datastore.py:close():296] close: ./saved_training_logs_experiment_1/distil_roberta-base/adapter/fake_true_dataset_mistral_10k/02_05_1424/wandb/run-20240502_142414-rljtq32l/run-rljtq32l.wandb
+2024-05-02 14:30:08,263 INFO    SenderThread:4051703 [sender.py:finish():1521] shutting down sender
+2024-05-02 14:30:08,263 INFO    SenderThread:4051703 [file_pusher.py:finish():172] shutting down file pusher
+2024-05-02 14:30:08,263 INFO    SenderThread:4051703 [file_pusher.py:join():178] waiting for file pusher
