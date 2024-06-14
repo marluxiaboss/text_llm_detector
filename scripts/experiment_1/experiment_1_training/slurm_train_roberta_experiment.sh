@@ -32,7 +32,6 @@ for i in ${!training_methods[@]}; do
             batch_size="64"
             freeze_base="True"
             use_adapter="False"
-            check_degradation=500
             eval_steps=500
             stop_after_n_samples=-1
 
@@ -42,7 +41,6 @@ for i in ${!training_methods[@]}; do
             batch_size="16"
             freeze_base="True"
             use_adapter="True"
-            check_degradation=500
             eval_steps=500
             stop_after_n_samples=-1
 
@@ -52,7 +50,6 @@ for i in ${!training_methods[@]}; do
             batch_size="16"
             freeze_base="False"
             use_adapter="False"
-            check_degradation=200
             eval_steps=200
             stop_after_n_samples=-1
             #stop_after_n_samples=3000
