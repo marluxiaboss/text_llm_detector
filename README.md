@@ -54,48 +54,48 @@ saved_training_logs
 ```
 
 ### 4. Datasets
-- `fake_true_datasets`: folder containing all the generated datasets 
+- `fake_true_datasets`: folder containing all the generated datasets  
 - `fake_true_datasets/modifed_dataset` folder containing the adversarial version of the dataset above
 
 
 ## Reproducing the experiments and the plots
 
-We provide scripts to run the experiments and get the data. We also provide notebooks to use this data to produce the plots in the paper.
-We also provide the data we obtained when running the experiments and the generated dataset
+We provide scripts to run the experiments and get the data. We also provide notebooks to use this data to produce the plots in the paper.  
+We also provide the data we obtained when running the experiments and the generated dataset.
 
-generated datasets: `fake_true_datasets`
-results data (main paper): `saved_training_logs_experiment_2`
-results data (degradation check in appendix): `saved_training_logs_experiment_1`
+Generated datasets: `fake_true_datasets`  
+Results data (main paper): `saved_training_logs_experiment_2`  
+Results data (degradation check in appendix): `saved_training_logs_experiment_1`
 
 ### Main paper part
 
 #### Generate the data
-Run all scripts in: `script/generate_dataset`
+Run all scripts in: `script/generate_dataset`  
 
 #### Training the models
-Run all scripts in: `scripts/experiment_1_training`
+Run all scripts in: `scripts/experiment_1_training`  
 Then you need to change the timestamps in the subsequent testing/threshold finding scripts according to the new trained models.
 
 #### Finding the thresholds
-Run: `scripts/experiment1/experiment_1_testing/test_with_threshold/slurm_script_find_thresholds_full_finetuning.sh`
-Run: `scripts/experiment2/test_with_threshold/slurm_script_find_thresholds.sh`
+Run: `scripts/experiment1/experiment_1_testing/test_with_threshold/slurm_script_find_thresholds_full_finetuning.sh`  
+Run: `scripts/experiment2/test_with_threshold/slurm_script_find_thresholds.sh`  
 Then run the cells in notebook: `notebooks/find_threshold.ipynb` and adjust the thresholds in the subsequent testing scripts.
 
 #### Testing the detectors
-Run all scripts in: `scripts/experiment_1/test_with_threshold` with the correct thresholds modified in the script
-Run all scripts in: `scripts/experiment_2/test_with_threshold` with the correct thresholds modified in the script
+Run all scripts in: `scripts/experiment_1/test_with_threshold` with the correct thresholds modified in the script  
+Run all scripts in: `scripts/experiment_2/test_with_threshold` with the correct thresholds modified in the script  
 
 #### Plots
-Run all cells in notebook: `notebooks/main_paper_plots.ipynb` with the correct timestamps for the results (see log file structure)
+Run all cells in notebook: `notebooks/main_paper_plots.ipynb` with the correct timestamps for the results (see log file structure)  
 
 ### Appendix part
-You should run all scripts for the main paper part first.
+You should run all scripts for the main paper part first.  
 
 #### Degradation check
-Run all scripts in: `scripts/experiment_1/check_degradation`
+Run all scripts in: `scripts/experiment_1/check_degradation`  
 
 #### Plots 
-Run all cells in notebook: `notebooks/appendix_plot.ipynb`
+Run all cells in notebook: `notebooks/appendix_plot.ipynb`  
 
 
 
