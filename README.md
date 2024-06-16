@@ -67,7 +67,7 @@ Results data (degradation check in appendix): `saved_training_logs_experiment_1`
 ### Main paper part
 
 #### Generate the data
-Run all scripts in: `script/generate_dataset`  
+Run all scripts in: `scripts/generate_dataset`  
 
 #### Training the models
 Run all scripts in: `scripts/experiment_1_training`  
@@ -92,7 +92,7 @@ You should run all scripts for the main paper part first.
 Run all scripts in: `scripts/experiment_1/check_degradation`  
 
 #### Plots 
-Run all cells in notebook: `notebooks/appendix_plot.ipynb`  
+Run all cells in notebook: `notebooks/appendix_plots.ipynb`  
 
 
 
