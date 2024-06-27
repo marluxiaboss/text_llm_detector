@@ -30,9 +30,9 @@ saved_training_logs
 │
 └───{detector_name} (e.g. roberta_large)
     │
-    └───{training_method} (e.g. freeze_base)
+    └───{training_method} (e.g. full_finetuning)
         │ 
-        └───{dataset_name} (e.g. fake_true_dataset_gpt2_10k)
+        └───{dataset_name} (e.g. fake_true_dataset_mistral_10k)
             │  
             └───{experiment_time} (e.g. 12_12_1212)
                 │   args_logs.txt (training arguments)
