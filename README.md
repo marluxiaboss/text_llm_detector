@@ -16,6 +16,7 @@
 - `src/train_detector.py`: train a chosen detector on a dataset created by `generate_fake_true_dataset.py`, can also be used to test an already trained model
 - `src/utils.py`
 - `src/zero_shot_detector/test_fast_detect_gpt.py`: script to test Fast-DetectGPT
+- `src/zero_shot_detector/test_gpt_zero.py`: script to test GPTZero
 
 ### 2. Jupyter notebooks
 
