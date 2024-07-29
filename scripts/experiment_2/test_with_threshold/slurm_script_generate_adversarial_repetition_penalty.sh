@@ -98,4 +98,18 @@ for i in ${!tested_on_datasets[@]}; do
     python src/zero_shot_detector/test_fast_detect_gpt.py --reference_model_name=gpt-j-6B --classifier_threshold=$classifier_threshold --dataset_path=$dataset_path
 done
 
+# GPTZero
+current_detector="gpt_zero"
+echo testing with $current_detector
+print_current_time
+thresholds_gpt_zero=("0.052343355792348105" "0.034219332135828756" "0.052343355792348105")
+
+for i in ${!tested_on_datasets[@]}; do
+    echo Testing GPTZero on ${tested_on_datasets[$i]}
+    classifier_threshold=${thresholds_gpt_zero[$i]}
+    dataset_path="fake_true_datasets/modified_datasets/fake_true_dataset_phi_10k_repetition_penalty_1.2_${tested_on_datasets[$i]}"
+    python src/zero_shot_detector/test_gpt_zero.py --classifier_threshold=$classifier_threshold --dataset_path=$dataset_path --use_api_key
+done
+
+
 conda deactivate

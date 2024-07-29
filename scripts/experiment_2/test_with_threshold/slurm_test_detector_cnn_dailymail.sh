@@ -75,4 +75,16 @@ echo Testing fast-detect-gpt on $dataset_name
 classifier_threshold=$threshold_fast_detect_gpt
 python src/zero_shot_detector/test_fast_detect_gpt.py --reference_model_name=gpt-j-6B --classifier_threshold=$classifier_threshold --dataset_path=$dataset_path
 
+# GPTZero
+current_detector="gpt_zero"
+echo testing with $current_detector
+print_current_time
+threshold_gpt_zero="0.034219332135828756"
+
+echo Testing GPTZero on $dataset_name
+classifier_threshold=$threshold_gpt_zero
+python src/zero_shot_detector/test_gpt_zero.py --classifier_threshold=$classifier_threshold --dataset_path=$dataset_path --use_api_key
+
+
+
 conda deactivate

@@ -55,4 +55,6 @@ for i in ${!tested_on_datasets[@]}; do
     python src/zero_shot_detector/test_fast_detect_gpt.py --reference_model_name=gpt-j-6B --dataset_path=fake_true_datasets/$dataset_name --use_eval_set
 done
 
+
+
 conda deactivate
