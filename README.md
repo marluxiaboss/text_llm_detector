@@ -56,6 +56,7 @@ saved_training_logs
 - `fake_true_datasets`: folder containing all the generated datasets  (need to run the scripts to have them)
 - `fake_true_datasets/modifed_dataset` folder containing the adversarial version of the dataset above (need to run the scripts to have them)
 
+We provide a link to a google drive to see an example of how it could look like after running the scripts: [data link](https://drive.google.com/drive/folders/18x33deOTvugtZB9z9OEYey4A0y40Q68b?usp=drive_link)
 
 ## Reproducing the experiments and the plots
 
