@@ -339,7 +339,6 @@ if __name__ == "__main__":
         #fake_articles = [article for i, article in enumerate(fake_articles) if i not in indices_short_articles]
         #true_dataset = true_dataset.select([i for i in range(len(true_dataset)) if i not in indices_short_articles])
         
-        
         fake_dataset = Dataset.from_dict({"text": [text[:article_len] for text in fake_articles], "label": [1] * len(fake_articles)})
         true_dataset = Dataset.from_dict({"text": true_dataset["text"], "label": [0] * len(true_dataset["text"])})
 
@@ -361,6 +360,7 @@ if __name__ == "__main__":
         df_test = pd.DataFrame(dataset)
         #df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
         df_test.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_test.json", force_ascii=False, indent=4)
+    
     # load to pandas train split
     else:
         df_train = pd.DataFrame(dataset['train'])
@@ -377,10 +377,3 @@ if __name__ == "__main__":
         df_test = pd.DataFrame(dataset['test'])
         df_test["text"] = df_test["text"].apply(lambda x: x.split("\n"))
         df_test.to_json(f"{modified_dataset_folder_base}/{dataset_name}_{args.dataset_name_suffix}_test.json", force_ascii=False, indent=4)
-
-
-
-    
-
-
-

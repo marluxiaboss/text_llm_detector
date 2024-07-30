@@ -1,7 +1,3 @@
-# Copyright (c) Guangsheng Bao.
-#
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
 import random
 
 import numpy as np
@@ -32,8 +28,6 @@ for module_path in SRC_PATH:
     if module_path not in sys.path:
         sys.path.append(module_path)
 from utils import *
-
-
 
 def predict_gpt_zero(text, api_key, debug_mode=False):
     
