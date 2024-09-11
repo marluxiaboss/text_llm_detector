@@ -56,7 +56,8 @@ saved_training_logs
 - `fake_true_datasets`: folder containing all the generated datasets  (need to run the scripts to have them)
 - `fake_true_datasets/modifed_dataset` folder containing the adversarial version of the dataset above (need to run the scripts to have them)
 
-We provide a link to a google drive to see an example of how it could look like after running the scripts: [data link](https://drive.google.com/drive/folders/18x33deOTvugtZB9z9OEYey4A0y40Q68b?usp=drive_link)
+We provide a link to a Google Drive to show an example of how it could look like after running the scripts: [data link](https://drive.google.com/drive/folders/18x33deOTvugtZB9z9OEYey4A0y40Q68b?usp=drive_link)  
+However, we want to emphasize that we strongly discourage using a static dataset for security benchmarking and we strongly advocate for a dynamic benchmark adapted to your detector's threat model, ie. our approach encourages and supports users to adapt and add attacks depending on your threat model and regenerate the benchmark accordingly. As Nicholas Carlini better said: "There is no single benchmark for security. You can't just evaluate your defense on “the attack benchmark” and call it a day. Because the only attack that matters is the one that's designed to break your specific defense." (source: https://nicholas.carlini.com/writing/2024/why-i-attack.html)
 
 ## Reproducing the experiments and the plots
 
